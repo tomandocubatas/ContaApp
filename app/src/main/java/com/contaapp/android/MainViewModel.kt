@@ -27,6 +27,7 @@ import com.contaapp.android.domain.Movement
 import com.contaapp.android.domain.RentalProperty
 import com.contaapp.android.domain.RentalMonth
 import com.contaapp.android.domain.RentalSummary
+import com.contaapp.android.widget.ContaWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -330,6 +331,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val snapshot = payload.toSnapshot(loadedAt)
                 snapshotStore.save(snapshot)
                 snapshotStore.save(filters.snapshotKey(), snapshot)
+                ContaWidgetProvider.updateAll(getApplication())
                 homeCache = homeCache + (filters to CachedHomePayload(payload, loadedAt, label))
                 lastHomeFilters = filters
                 lastHomeLoadedAt = loadedAt

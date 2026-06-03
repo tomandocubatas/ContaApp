@@ -10,6 +10,15 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-06-03 - Correccion/UX - Hoy en Movimientos y widget premium
+
+- Movimientos arranca ahora en `Mes actual` en vez de `Todo`, forzando rango explicito desde el dia 1 hasta hoy y evitando que el listado global paginado o caches de filtros oculten movimientos del dia actual.
+- Se mantiene la semantica exclusiva de `movements-global`: Android envia `dateTo + 1 dia` para que el backend con `$lt` incluya el dia final.
+- Widget Android redisenado con look ejecutivo oscuro: balance, ingresos, gastos, neto, avisos y hora de snapshot.
+- El widget abre la app al tocarlo y muestra estado `Sin cache` cuando todavia no existe snapshot financiero.
+- El widget se refresca al guardar un nuevo snapshot financiero, ademas de su actualizacion periodica del sistema.
+- Verificacion: `:app:assembleDebug` correcto en Gradle offline. No se prueba emulador por indicacion del usuario.
+
 ## 2026-06-03 - Correccion - DateTo inclusivo en dashboard y alquileres
 
 - Se corrige el descuadre de `Mes pasado`: `dashboard/summary` usa `dateTo` inclusivo (`$lte`), por lo que Android deja de sumar un dia en ese endpoint.

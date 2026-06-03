@@ -263,6 +263,8 @@ TTL: por defecto son 6 horas, porque la informacion financiera consultiva normal
 
 Cache de Movimientos: Movimientos mantiene cache propia por `MovementFilters` porque busqueda, categoria, cuenta, fechas, importe y revision cambian con mas frecuencia que el snapshot general. El boton de cabecera limpia esa cache y fuerza recarga. Ajustes permite refrescar la entrada de Movimientos usando los filtros activos.
 
+Rango inicial de Movimientos: la pantalla de Movimientos debe abrir por defecto en `Mes actual`, no en `Todo`, para garantizar que el dia actual entra en un rango explicito y no depende de un listado global paginado. El usuario puede cambiar a `Todo` desde filtros si quiere historico completo.
+
 Visibilidad de cache: Ajustes debe mostrar por pantalla la hora de cacheo, tiempo restante de vigencia y accion de refresco selectivo. Aunque varias pantallas compartan el mismo snapshot, deben aparecer separadas para que el usuario entienda que estan cubiertas.
 
 Compatibilidad de snapshots: los snapshots creados antes de guardar `loadedAtMillis` pueden contener datos validos pero no fecha de carga. En ese caso la UI debe mostrarlos como `Cache local` con `Fecha no disponible`, nunca como `Sin cache`, porque eso contradice que la app este mostrando datos.
@@ -322,7 +324,7 @@ Modo oscuro:
 - Ajustes debe explicar el modo offline/snapshot: TTL vigente, cache disponible y refresco forzado desde cabecera.
 - Exportacion actual: CSV local en external files de la app.
 - Notificaciones locales: canal `conta_attention`, permiso `POST_NOTIFICATIONS` solicitado en Android 13+ y accion manual desde Ajustes.
-- Widget Android: `ContaWidgetProvider` muestra balance, movimientos pendientes y avisos de deuda desde el ultimo snapshot.
+- Widget Android: `ContaWidgetProvider` muestra balance, ingresos, gastos, neto, pendientes/avisos y hora del ultimo snapshot. Debe abrir la app al tocarlo y refrescarse cuando `MainViewModel` guarda un snapshot nuevo, no solo por `updatePeriodMillis`.
 
 IA no aparece en la navegacion inicial.
 

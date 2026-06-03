@@ -93,7 +93,7 @@ fun MovementsScreen(
     var text by remember { mutableStateOf("") }
     var type by remember { mutableStateOf<String?>(null) }
     var reviewed by remember { mutableStateOf<Boolean?>(null) }
-    var range by remember { mutableStateOf(QuickRange.All) }
+    var range by remember { mutableStateOf(QuickRange.ThisMonth) }
     var groupMode by remember { mutableStateOf(MovementGroupMode.Date) }
     var categoryId by remember { mutableStateOf<String?>(null) }
     var accountId by remember { mutableStateOf<String?>(null) }
