@@ -66,8 +66,8 @@ class ContaWidgetProvider : AppWidgetProvider() {
 
         views.setTextViewText(R.id.widget_updated, snapshot.freshnessLabel(preferences.cacheTtlMinutes()))
         views.setTextViewText(R.id.widget_balance, money(balance, hidden))
-        views.setTextViewText(R.id.widget_income, "Ingresos ${money(income, hidden)}")
-        views.setTextViewText(R.id.widget_expense, "Gastos ${money(expense, hidden)}")
+        views.setTextViewText(R.id.widget_income, "Ing. ${money(income, hidden)}")
+        views.setTextViewText(R.id.widget_expense, "Gas. ${money(expense, hidden)}")
         views.setTextViewText(R.id.widget_net, "Neto ${money(net, hidden)}")
         views.setTextColor(R.id.widget_net, if (net >= 0.0) ContaTeal else ContaCoral)
         views.setTextViewText(R.id.widget_health, "Salud $health%")
@@ -84,10 +84,13 @@ class ContaWidgetProvider : AppWidgetProvider() {
         listOf(
             R.id.widget_root,
             R.id.widget_balance,
+            R.id.widget_result_row,
             R.id.widget_income_card,
             R.id.widget_income,
             R.id.widget_expense_card,
             R.id.widget_expense,
+            R.id.widget_net_card,
+            R.id.widget_net,
             R.id.widget_top_expense_card,
             R.id.widget_top_expense,
             R.id.widget_next_card,
@@ -99,13 +102,13 @@ class ContaWidgetProvider : AppWidgetProvider() {
     }
 
     private fun attentionText(hasCache: Boolean, pending: Int, debtAlerts: Int, insuranceAlerts: Int): String {
-        if (!hasCache) return "Abre ContaApp para cargar el snapshot"
+        if (!hasCache) return "Abre la app para cargar datos"
         val parts = buildList {
             if (debtAlerts > 0) add("$debtAlerts criticos")
-            if (pending > 0) add("$pending mov. pendientes")
-            if (insuranceAlerts > 0) add("$insuranceAlerts seguros a revisar")
+            if (pending > 0) add("$pending pendientes")
+            if (insuranceAlerts > 0) add("$insuranceAlerts seguros")
         }
-        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ") ?: "Sin avisos pendientes"
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ") ?: "Todo al dia"
     }
 
     private fun openAppIntent(context: Context): PendingIntent {
@@ -121,7 +124,7 @@ class ContaWidgetProvider : AppWidgetProvider() {
     }
 
     private fun money(value: Double, hidden: Boolean): String {
-        if (hidden) return "**** €"
+        if (hidden) return "•••• €"
         return compactMoney(value)
     }
 
@@ -153,11 +156,11 @@ class ContaWidgetProvider : AppWidgetProvider() {
             .format(DateTimeFormatter.ofPattern("HH:mm"))
         val status = if (remainingMinutes > 0) {
             val hours = remainingMinutes / 60
-            if (hours > 0) "vigente ${hours}h" else "vigente ${remainingMinutes}m"
+            if (hours > 0) "${hours}h vig." else "${remainingMinutes}m vig."
         } else {
-            "cache vencida"
+            "vencida"
         }
-        return "Act. $time · $status"
+        return "$time · $status"
     }
 
     private fun healthScore(
@@ -185,18 +188,18 @@ class ContaWidgetProvider : AppWidgetProvider() {
 
     private fun compositionLabel(income: Double, expense: Double): String {
         val total = kotlin.math.abs(income) + kotlin.math.abs(expense)
-        if (total <= 0.0) return "Sin actividad del periodo"
+        if (total <= 0.0) return "Sin actividad"
         val incomePct = ((kotlin.math.abs(income) / total) * 100).roundToInt()
         val expensePct = 100 - incomePct
-        return "Mix $incomePct% ingresos · $expensePct% gastos"
+        return "Mix $incomePct% ing. · $expensePct% gas."
     }
 
     private fun topExpenseLabel(snapshot: FinancialSnapshot?, hidden: Boolean): String {
         val top = snapshot?.dashboard?.expenseCategories
             ?.filter { it.total > 0.0 }
             ?.maxByOrNull { it.total }
-            ?: return "Top gasto: sin datos"
-        return "Top gasto: ${top.name} · ${money(top.total, hidden)}"
+            ?: return "Top: sin datos"
+        return "Top: ${top.name} · ${money(top.total, hidden)}"
     }
 
     private fun nextObligationLabel(
@@ -215,7 +218,7 @@ class ContaWidgetProvider : AppWidgetProvider() {
             }
             .minByOrNull { it.daysSort }
         val best = listOfNotNull(nextDebt, nextInsurance).minByOrNull { it.daysSort }
-        return best?.label ?: "Proximo: sin vencimientos"
+        return best?.label ?: "Vence: sin vencimientos"
     }
 
     private fun obligation(type: String, name: String, amount: Double, days: Int?, hidden: Boolean): WidgetObligation {
@@ -226,7 +229,7 @@ class ContaWidgetProvider : AppWidgetProvider() {
             else -> "en ${days}d"
         }
         return WidgetObligation(
-            label = "$type: ${name.take(20)} · $dayText · ${money(amount, hidden)}",
+            label = "${type.take(6)}: ${name.take(18)} · $dayText · ${money(amount, hidden)}",
             daysSort = days ?: Int.MAX_VALUE
         )
     }
@@ -262,5 +265,4 @@ class ContaWidgetProvider : AppWidgetProvider() {
         val label: String,
         val daysSort: Int
     )
-
 }

@@ -10,6 +10,14 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-06-03 - UX/Widget - Layout P&L compacto
+
+- Ingresos, gastos y neto pasan a una misma fila de tres mini metricas iconificadas para lectura tipo P&L.
+- El texto del widget se compacta: frescura `HH:mm · Xh vig.`, `Top`, `Vence` y `Todo al dia`.
+- El modo privacidad del widget usa `•••• €` para una ocultacion mas elegante y estable.
+- Se reduce la altura minima del widget para que encaje mejor en tamanos medios sin perder el resumen ejecutivo.
+- Verificacion: `:app:assembleDebug` correcto en Gradle offline. No se prueba emulador por indicacion del usuario.
+
 ## 2026-06-03 - UX/Widget - Iconografia semantica en widget
 
 - Se incorporan iconos compactos para ingresos, gastos, top gasto, proximo vencimiento y avisos del widget.

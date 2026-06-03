@@ -3,7 +3,7 @@
     android:description="@string/widget_description"
     android:initialLayout="@layout/widget_conta_summary"
     android:minWidth="250dp"
-    android:minHeight="210dp"
+    android:minHeight="190dp"
     android:previewImage="@drawable/ic_brand_mark"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="1800000"

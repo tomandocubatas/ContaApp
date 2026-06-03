@@ -116,10 +116,11 @@
         android:indeterminate="false"
         android:max="100"
         android:progress="0"
-        android:progressTint="#00DDB4"
-        android:progressBackgroundTint="#1A3147" />
+        android:progressBackgroundTint="#1A3147"
+        android:progressTint="#00DDB4" />
 
     <LinearLayout
+        android:id="@+id/widget_result_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="9dp"
@@ -129,18 +130,18 @@
             android:id="@+id/widget_income_card"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="3dp"
             android:layout_weight="1"
             android:background="@drawable/widget_metric_background"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="9dp"
+            android:paddingHorizontal="7dp"
             android:paddingVertical="7dp">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="6dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="5dp"
                 android:background="@drawable/widget_icon_teal_background"
                 android:contentDescription="Ingresos"
                 android:padding="4dp"
@@ -155,9 +156,9 @@
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:maxLines="1"
-                android:text="Ingresos 0 €"
+                android:text="Ing. 0 €"
                 android:textColor="#2DD4BF"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -165,18 +166,19 @@
             android:id="@+id/widget_expense_card"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp"
             android:layout_weight="1"
             android:background="@drawable/widget_metric_background"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="9dp"
+            android:paddingHorizontal="7dp"
             android:paddingVertical="7dp">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="6dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="5dp"
                 android:background="@drawable/widget_icon_coral_background"
                 android:contentDescription="Gastos"
                 android:padding="4dp"
@@ -191,25 +193,48 @@
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:maxLines="1"
-                android:text="Gastos 0 €"
+                android:text="Gas. 0 €"
                 android:textColor="#FF6B66"
-                android:textSize="10sp"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/widget_net_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_metric_background"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="7dp"
+            android:paddingVertical="7dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/widget_icon_blue_background"
+                android:contentDescription="Neto"
+                android:padding="4dp"
+                android:src="@drawable/ic_chart"
+                android:tint="#78A8FF" />
+
+            <TextView
+                android:id="@+id/widget_net"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="Neto 0 €"
+                android:textColor="#2DD4BF"
+                android:textSize="9sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/widget_net"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:ellipsize="end"
-        android:includeFontPadding="false"
-        android:maxLines="1"
-        android:text="Neto 0,00 €"
-        android:textColor="#2DD4BF"
-        android:textSize="11sp"
-        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/widget_top_expense_card"
@@ -240,7 +265,7 @@
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"
-            android:text="Top gasto: sin datos"
+            android:text="Top: sin datos"
             android:textColor="#D8E3F0"
             android:textSize="10sp" />
     </LinearLayout>
@@ -274,7 +299,7 @@
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"
-            android:text="Proximo: sin vencimientos"
+            android:text="Vence: sin vencimientos"
             android:textColor="#D8E3F0"
             android:textSize="10sp" />
     </LinearLayout>
@@ -308,7 +333,7 @@
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"
-            android:text="Sin avisos pendientes"
+            android:text="Todo al dia"
             android:textColor="#D8E3F0"
             android:textSize="10sp" />
     </LinearLayout>
