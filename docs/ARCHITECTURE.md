@@ -324,7 +324,7 @@ Modo oscuro:
 - Ajustes debe explicar el modo offline/snapshot: TTL vigente, cache disponible y refresco forzado desde cabecera.
 - Exportacion actual: CSV local en external files de la app.
 - Notificaciones locales: canal `conta_attention`, permiso `POST_NOTIFICATIONS` solicitado en Android 13+ y accion manual desde Ajustes.
-- Widget Android: `ContaWidgetProvider` muestra balance, ingresos, gastos, neto, pendientes/avisos y hora del ultimo snapshot. Debe abrir la app al tocarlo y refrescarse cuando `MainViewModel` guarda un snapshot nuevo, no solo por `updatePeriodMillis`.
+- Widget Android: `ContaWidgetProvider` consume el snapshot financiero compartido y muestra balance, ingresos, gastos, neto, salud financiera, mix del periodo, top gasto, proximo vencimiento, avisos y frescura TTL. Debe respetar privacidad por defecto, excluir seguros/deudas caducados, abrir la app al tocar zonas relevantes y refrescarse cuando `MainViewModel` guarda un snapshot nuevo, no solo por `updatePeriodMillis`.
 
 IA no aparece en la navegacion inicial.
 

@@ -12,84 +12,151 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/widget_title"
+        <ImageView
+            android:id="@+id/widget_logo"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_brand_mark" />
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:includeFontPadding="false"
-            android:text="ContaApp"
-            android:textColor="#EAF2FF"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/widget_updated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:text="Cache"
-            android:textColor="#91A4B8"
-            android:textSize="10sp" />
+            <TextView
+                android:id="@+id/widget_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="ContaApp"
+                android:textColor="#EAF2FF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_updated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="Sin cache"
+                android:textColor="#91A4B8"
+                android:textSize="9sp" />
+        </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:id="@+id/widget_balance_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="9dp"
         android:includeFontPadding="false"
         android:text="Balance disponible"
         android:textColor="#AAB8C8"
-        android:textSize="11sp" />
+        android:textSize="10sp" />
 
     <TextView
         android:id="@+id/widget_balance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="2dp"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:maxLines="1"
         android:text="0,00 €"
         android:textColor="#FFFFFF"
-        android:textSize="25sp"
+        android:textSize="24sp"
         android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_health"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="Salud 0%"
+            android:textColor="#2DD4BF"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_mix"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="Sin actividad"
+            android:textColor="#91A4B8"
+            android:textSize="9sp" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/widget_health_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_marginTop="5dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#00DDB4"
+        android:progressBackgroundTint="#1A3147" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/widget_income"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
+            android:layout_marginEnd="4dp"
             android:layout_weight="1"
             android:background="@drawable/widget_metric_background"
+            android:ellipsize="end"
             android:includeFontPadding="false"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="8dp"
-            android:text="Ing. 0 €"
+            android:maxLines="1"
+            android:paddingHorizontal="9dp"
+            android:paddingVertical="7dp"
+            android:text="Ingresos 0 €"
             android:textColor="#2DD4BF"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/widget_expense"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
             android:background="@drawable/widget_metric_background"
+            android:ellipsize="end"
             android:includeFontPadding="false"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="8dp"
-            android:text="Gas. 0 €"
+            android:maxLines="1"
+            android:paddingHorizontal="9dp"
+            android:paddingVertical="7dp"
+            android:text="Gastos 0 €"
             android:textColor="#FF6B66"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -97,26 +164,58 @@
         android:id="@+id/widget_net"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
         android:includeFontPadding="false"
+        android:maxLines="1"
         android:text="Neto 0,00 €"
         android:textColor="#2DD4BF"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/widget_top_expense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/widget_metric_background"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:paddingHorizontal="9dp"
+        android:paddingVertical="6dp"
+        android:text="Top gasto: sin datos"
+        android:textColor="#D8E3F0"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/widget_next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/widget_metric_background"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:paddingHorizontal="9dp"
+        android:paddingVertical="6dp"
+        android:text="Proximo: sin vencimientos"
+        android:textColor="#D8E3F0"
+        android:textSize="10sp" />
 
     <TextView
         android:id="@+id/widget_attention"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="7dp"
         android:background="@drawable/widget_attention_background"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:maxLines="1"
         android:paddingHorizontal="10dp"
-        android:paddingVertical="8dp"
+        android:paddingVertical="7dp"
         android:text="Sin avisos pendientes"
         android:textColor="#D8E3F0"
-        android:textSize="11sp" />
+        android:textSize="10sp" />
 
 </LinearLayout>

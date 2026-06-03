@@ -10,6 +10,15 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-06-03 - UX/Widget - Widget ejecutivo con salud y TTL
+
+- El widget Android pasa de resumen basico a panel ejecutivo: balance, ingresos, gastos, neto, salud financiera, mix ingresos/gastos, top gasto, proximo vencimiento y avisos priorizados.
+- El widget respeta `Privacidad por defecto`: oculta importes con `**** €` sin romper el layout.
+- Se muestra frescura de cache con `Act. HH:mm`, vigencia restante segun TTL o `cache vencida`.
+- Deuda y seguros del widget filtran entidades pagadas, canceladas, expiradas o inactivas para no mostrar datos caducados.
+- Se mejora la presentacion visual con logo propio, barra de salud, tarjetas compactas y preview basada en la marca.
+- Verificacion: `:app:assembleDebug` correcto en Gradle offline. No se prueba emulador por indicacion del usuario.
+
 ## 2026-06-03 - Correccion/UX - Hoy en Movimientos y widget premium
 
 - Movimientos arranca ahora en `Mes actual` en vez de `Todo`, forzando rango explicito desde el dia 1 hasta hoy y evitando que el listado global paginado o caches de filtros oculten movimientos del dia actual.
