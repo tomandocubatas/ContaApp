@@ -1,0 +1,668 @@
+﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
+package com.contaapp.android.ui.screens
+
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.contaapp.android.ContaUiState
+import com.contaapp.android.R
+import com.contaapp.android.core.settings.AppPreferencesStore
+import com.contaapp.android.data.MovementFilters
+import com.contaapp.android.domain.BankAccountBalance
+import com.contaapp.android.domain.CategoryBreakdown
+import com.contaapp.android.domain.DashboardSummary
+import com.contaapp.android.domain.DebtDetail
+import com.contaapp.android.domain.DebtSummary
+import com.contaapp.android.domain.InsurancePolicy
+import com.contaapp.android.domain.Movement
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+@Composable
+fun HomeScreen(
+    state: ContaUiState,
+    onMovementFiltersChanged: (MovementFilters) -> Unit
+) {
+    var selectedMovement by remember { mutableStateOf<Movement?>(null) }
+    val context = LocalContext.current
+    val preferencesStore = remember(context) { AppPreferencesStore(context) }
+    var period by remember {
+        mutableStateOf(
+            runCatching { QuickRange.valueOf(preferencesStore.getString("homePeriod", QuickRange.ThisMonth.name)) }
+                .getOrDefault(QuickRange.ThisMonth)
+        )
+    }
+    LaunchedEffect(period) {
+        val dates = period.toDates()
+        onMovementFiltersChanged(MovementFilters(dateFrom = dates?.first, dateTo = dates?.second))
+    }
+
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val isTablet = maxWidth >= 760.dp
+        val dashboard = state.dashboard
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(if (isTablet) 24.dp else 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            item {
+                PremiumPeriodSelector(
+                    selected = period,
+                    onSelected = {
+                        period = it
+                        preferencesStore.setString("homePeriod", it.name)
+                    },
+                    title = "Vista financiera",
+                    detail = "Cambia periodo sin salir del dashboard"
+                )
+            }
+            item {
+                if (dashboard == null) {
+                    if (state.isLoading) {
+                        SkeletonCard(lines = 4)
+                    } else {
+                        WelcomeEmptyState(state.error)
+                    }
+                } else {
+                    HomeHeroDashboard(dashboard, state.privacyMode)
+                }
+            }
+            item {
+                HomeQuickMetrics(dashboard, state.privacyMode, isTablet, state.debtDetails.visibleDebtDetails().sumOf { it.pendingAmount })
+            }
+            item {
+                HomePeriodComparisonCard(state)
+            }
+            if (dashboard != null) {
+                item {
+                    FinancialLineChart(
+                        title = "Ingresos vs gastos",
+                        subtitle = "tendencia estimada",
+                        values = executiveTrend(dashboard.income, dashboard.expense, dashboard.net),
+                        color = ExecutiveBlue
+                    )
+                }
+            }
+            item {
+                if (isTablet && dashboard != null) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
+                        FinancialPulseCard(dashboard, state.privacyMode, Modifier.weight(1f))
+                        CategoryRankingCard(
+                            title = "Top gastos",
+                            categories = dashboard.expenseCategories,
+                            hidden = state.privacyMode,
+                            accent = ContaCoral,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                } else {
+                    dashboard?.let {
+                        FinancialPulseCard(it, state.privacyMode)
+                    }
+                }
+            }
+            if (!isTablet && dashboard != null) {
+                item {
+                    CategoryRankingCard(
+                        title = "Top gastos",
+                        categories = dashboard.expenseCategories,
+                        hidden = state.privacyMode,
+                        accent = ContaCoral
+                    )
+                }
+            }
+            item {
+                if (isTablet) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
+                        HomeAttentionSection(state = state, isTablet = true, modifier = Modifier.weight(1f))
+                        HomeHealthCard(dashboard, state, Modifier.weight(1f))
+                    }
+                } else {
+                    HomeHealthCard(dashboard, state)
+                    Spacer(Modifier.height(12.dp))
+                    HomeAttentionSection(state = state, isTablet = false)
+                }
+            }
+            item {
+                HomeAgendaCard(state)
+            }
+            item { ErrorText(state.error) }
+            item { SectionHeader("Actividad reciente", "${state.movements.size} mov.") }
+            items(
+                state.movements.take(if (isTablet) 8 else 5),
+                key = { it.id.ifBlank { "${it.date}-${it.description}-${it.amount}" } }
+            ) { movement ->
+                WalletMovementRow(
+                    movement = movement,
+                    hidden = state.privacyMode,
+                    categories = state.categories,
+                    accounts = state.accounts,
+                    debts = state.debtDetails,
+                    insurances = state.expiringInsurances,
+                    onClick = { selectedMovement = movement }
+                )
+            }
+        }
+    }
+
+    selectedMovement?.let { movement ->
+        MovementDetailDialog(
+            movement = movement,
+            hidden = state.privacyMode,
+            categories = state.categories,
+            accounts = state.accounts,
+            debts = state.debtDetails,
+            insurances = state.expiringInsurances,
+            onDismiss = { selectedMovement = null }
+        )
+    }
+}
+
+@Composable
+fun HomeAgendaCard(state: ContaUiState) {
+    val entries = buildList {
+        state.debtDetails
+            .visibleDebtDetails()
+            .filter { it.nextPaymentDate != null }
+            .sortedBy { it.nextPaymentDate }
+            .take(3)
+            .forEach { debt ->
+                add(
+                    AgendaEntry(
+                        title = debt.name,
+                        detail = "${debt.entity} · ${money(debt.monthlyPayment, state.privacyMode)}",
+                        date = debt.nextPaymentDate?.take(10).orEmpty(),
+                        iconRes = R.drawable.ic_credit_card,
+                        accent = if ((debt.daysUntilPayment ?: 99) < 0) ContaDanger else ContaAmber
+                    )
+                )
+            }
+        state.expiringInsurances
+            .visibleInsurancePolicies()
+            .sortedBy { it.renewalDate ?: it.endDate ?: "9999-12-31" }
+            .take(3)
+            .forEach { policy ->
+                add(
+                    AgendaEntry(
+                        title = policy.name.ifBlank { "Seguro" },
+                        detail = "${policy.company ?: policy.type} · ${money(policy.annualPremium, state.privacyMode)}",
+                        date = (policy.renewalDate ?: policy.endDate ?: "sin fecha").take(10),
+                        iconRes = R.drawable.ic_shield,
+                        accent = when (insuranceUrgency(policy.renewalDate ?: policy.endDate)) {
+                            InsuranceUrgency.Expired -> ContaDanger
+                            InsuranceUrgency.Soon -> ContaAmber
+                            InsuranceUrgency.Future -> ContaTeal
+                            InsuranceUrgency.Unknown -> MaterialTheme.colorScheme.primary
+                        }
+                    )
+                )
+            }
+    }.sortedBy { it.date }.take(5)
+    if (entries.isEmpty()) return
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionHeader("Agenda financiera", "${entries.size} proximos hitos")
+            entries.forEach { entry ->
+                AgendaRow(entry)
+            }
+        }
+    }
+}
+
+data class AgendaEntry(
+    val title: String,
+    val detail: String,
+    val date: String,
+    @DrawableRes val iconRes: Int,
+    val accent: Color
+)
+
+@Composable
+fun AgendaRow(entry: AgendaEntry) {
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            Modifier.size(40.dp).background(entry.accent.copy(alpha = 0.12f), RoundedCornerShape(13.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(painterResource(entry.iconRes), contentDescription = null, tint = entry.accent, modifier = Modifier.size(20.dp))
+        }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(entry.title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(entry.detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        StatusChip(entry.date, entry.accent)
+    }
+}
+
+@Composable
+fun HomePeriodComparisonCard(state: ContaUiState) {
+    val series = state.charts.financialSeries
+    if (series.size < 2) return
+    val first = series.first()
+    val last = series.last()
+    val incomeDelta = last.income - first.income
+    val expenseDelta = last.expense - first.expense
+    val netDelta = last.net - first.net
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionHeader("Comparativa del periodo", "${first.label.toAxisLabel()} -> ${last.label.toAxisLabel()}")
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                ComparisonMetric("Ingresos", incomeDelta, ContaTeal, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric("Gastos", expenseDelta, ContaCoral, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric("Neto", netDelta, if (netDelta >= 0.0) ContaTeal else ContaDanger, state.privacyMode, Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+fun ComparisonMetric(title: String, delta: Double, color: Color, hidden: Boolean, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .background(color.copy(alpha = 0.10f), RoundedCornerShape(14.dp))
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)
+        Text(
+            money(delta, hidden),
+            color = color,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Black,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+fun HomePeriodCombo(period: QuickRange, onPeriod: (QuickRange) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().clickable { expanded = true }.padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
+                Box(
+                    Modifier.size(38.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(14.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(painterResource(R.drawable.ic_credit_card), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                }
+                Column {
+                    Text("Vista financiera", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text(period.homeLabel(), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                }
+            }
+            Text("v", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Black)
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                QuickRange.entries.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option.homeLabel()) },
+                        onClick = {
+                            onPeriod(option)
+                            expanded = false
+                        },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_credit_card), contentDescription = null) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
+    val netColor = if (dashboard.net >= 0.0) ContaTeal else ContaDanger
+    val dark = MaterialTheme.colorScheme.background.red < 0.1f && MaterialTheme.colorScheme.background.green < 0.1f
+    val heroBrush = if (dark) {
+        Brush.horizontalGradient(listOf(Color(0xFF0B1120), Color(0xFF10233F), Color(0xFF0F2F2A)))
+    } else {
+        Brush.horizontalGradient(listOf(Color.White, Color(0xFFEAF2FF), Color(0xFFEFFDF8)))
+    }
+    val heroText = if (dark) Color.White else ContaInk
+    val heroMuted = if (dark) Color.White.copy(alpha = 0.68f) else ContaMuted
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            Modifier
+                .background(
+                    heroBrush,
+                    RoundedCornerShape(18.dp)
+                )
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("Balance disponible", color = heroMuted, style = MaterialTheme.typography.labelLarge)
+                    Text(money(dashboard.totalBalance, hidden), color = heroText, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("Resumen ejecutivo del periodo actual", color = heroMuted, style = MaterialTheme.typography.bodySmall)
+                }
+                StatusChip(if (dashboard.net >= 0.0) "positivo" else "atencion", if (dashboard.net >= 0.0) ContaTeal else ContaAmber)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                LightHeroMiniMetric("Neto", money(dashboard.net, hidden), netColor, Modifier.weight(1f))
+                LightHeroMiniMetric("Revisado", percent(dashboard.reviewedPct), ExecutiveBlue, Modifier.weight(1f))
+                LightHeroMiniMetric("Categ.", percent(dashboard.categorizedPct), ContaAmber, Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+fun HeroMiniMetric(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
+    Column(
+        modifier.background(Color.White.copy(alpha = 0.12f), RoundedCornerShape(14.dp)).padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(label, color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.labelMedium)
+        Text(value, color = color, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+fun LightHeroMiniMetric(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
+    Column(
+        modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.78f), RoundedCornerShape(14.dp)).padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(label, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f), style = MaterialTheme.typography.labelMedium)
+        Text(value, color = color, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+fun HomeQuickMetrics(dashboard: DashboardSummary?, hidden: Boolean, isTablet: Boolean, activeDebt: Double? = null) {
+    val columns = if (isTablet) 4 else 2
+    val metrics = listOf(
+        ExecutiveMetricSpec("Ingresos", money(dashboard?.income ?: 0.0, hidden), "+ actividad", R.drawable.ic_bank, ContaTeal, listOf(2.0, 3.0, 3.4, 4.0, 4.8, 5.2)),
+        ExecutiveMetricSpec("Gastos", money(dashboard?.expense ?: 0.0, hidden), "control mensual", R.drawable.ic_receipt, ContaCoral, listOf(3.0, 3.6, 3.1, 4.0, 3.8, 4.2)),
+        ExecutiveMetricSpec("Deuda", money(activeDebt?.takeIf { it > 0.0 } ?: dashboard?.totalDebts ?: 0.0, hidden), "exposicion", R.drawable.ic_credit_card, ContaAmber, listOf(5.0, 4.8, 4.6, 4.4, 4.1, 3.9)),
+        ExecutiveMetricSpec("Revisado", percent(dashboard?.reviewedPct ?: 0.0), "calidad dato", R.drawable.ic_shield, ExecutiveBlue, listOf(1.0, 2.0, 2.8, 3.4, 4.2, 5.0))
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        metrics.chunked(columns).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                row.forEach { metric ->
+                    ExecutiveKpiCard(
+                        title = metric.title,
+                        value = metric.value,
+                        detail = metric.detail,
+                        iconRes = metric.icon,
+                        color = metric.color,
+                        sparkValues = if (isTablet) metric.spark else emptyList(),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
+    }
+}
+
+data class ExecutiveMetricSpec(
+    val title: String,
+    val value: String,
+    val detail: String,
+    @DrawableRes val icon: Int,
+    val color: Color,
+    val spark: List<Double>
+)
+
+@Composable
+fun WalletMetricCard(title: String, value: String, color: Color, modifier: Modifier = Modifier) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier
+    ) {
+        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(Modifier.size(28.dp).background(color.copy(alpha = 0.12f), RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(9.dp).background(color, RoundedCornerShape(50)))
+            }
+            Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+            Text(value, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+@Composable
+fun FinancialPulseCard(dashboard: DashboardSummary, hidden: Boolean, modifier: Modifier = Modifier) {
+    val activityTotal = (dashboard.income + dashboard.expense).takeIf { it > 0.0 } ?: 1.0
+    val incomeProgress = dashboard.income / activityTotal
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionHeader("Pulso financiero", "periodo")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                Box(Modifier.weight(incomeProgress.toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaTeal, RoundedCornerShape(50)))
+                Box(Modifier.weight((1.0 - incomeProgress).toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaCoral, RoundedCornerShape(50)))
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                PulseLine("Ingresos", money(dashboard.income, hidden), ContaTeal, Modifier.weight(1f))
+                PulseLine("Gastos", money(dashboard.expense, hidden), ContaCoral, Modifier.weight(1f))
+            }
+            PulseLine("Neto del periodo", money(dashboard.net, hidden), if (dashboard.net >= 0.0) ContaTeal else ContaDanger)
+        }
+    }
+}
+
+@Composable
+fun PulseLine(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+        Text(value, color = color, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+fun executiveTrend(income: Double, expense: Double, net: Double): List<Double> {
+    val base = (income - expense).takeIf { it != 0.0 } ?: net.takeIf { it != 0.0 } ?: 1.0
+    return listOf(0.12, 0.22, 0.34, 0.42, 0.57, 0.63, 0.71, 0.82, 0.92, 1.0).mapIndexed { index, factor ->
+        base * factor + (income * 0.025 * (index % 3))
+    }
+}
+
+fun QuickRange.homeLabel(): String {
+    return when (this) {
+        QuickRange.All -> "Todo el historico"
+        QuickRange.Last30Days -> "Ultimos 30 dias"
+        QuickRange.LastMonth -> "Mes pasado"
+        QuickRange.ThisQuarter -> "Trimestre actual"
+        QuickRange.ThisYear -> "Anio actual"
+        QuickRange.LastYear -> "Anio pasado"
+        QuickRange.ThisMonth -> "Mes actual"
+    }
+}
+
+fun QuickRange.previousHomeRange(): QuickRange {
+    return when (this) {
+        QuickRange.ThisMonth -> QuickRange.LastMonth
+        QuickRange.ThisQuarter -> QuickRange.LastMonth
+        QuickRange.ThisYear -> QuickRange.ThisQuarter
+        QuickRange.LastYear -> QuickRange.ThisYear
+        QuickRange.LastMonth -> QuickRange.Last30Days
+        QuickRange.Last30Days -> QuickRange.All
+        QuickRange.All -> QuickRange.ThisMonth
+    }
+}
+
+fun QuickRange.nextHomeRange(): QuickRange {
+    return when (this) {
+        QuickRange.All -> QuickRange.Last30Days
+        QuickRange.Last30Days -> QuickRange.LastMonth
+        QuickRange.LastMonth -> QuickRange.ThisQuarter
+        QuickRange.ThisQuarter -> QuickRange.ThisYear
+        QuickRange.ThisYear -> QuickRange.LastYear
+        QuickRange.LastYear -> QuickRange.ThisMonth
+        QuickRange.ThisMonth -> QuickRange.All
+    }
+}
+
+@Composable
+fun HomeHealthCard(dashboard: DashboardSummary?, state: ContaUiState, modifier: Modifier = Modifier) {
+    val pendingMovements = state.movements.count { !it.reviewed }
+    val urgentDebt = state.debtDetails.visibleDebtDetails().count { it.isDebtAlert() }
+    val score = ((dashboard?.reviewedPct ?: 0.0) * 0.45 + (dashboard?.categorizedPct ?: 0.0) * 0.35 + if (urgentDebt == 0) 20.0 else 5.0).coerceIn(0.0, 100.0)
+    val color = when {
+        score >= 75.0 -> ContaTeal
+        score >= 45.0 -> ContaAmber
+        else -> ContaDanger
+    }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Column {
+                    Text("Salud financiera", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    Text("$pendingMovements pendientes · $urgentDebt avisos", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                }
+                StatusChip(percent(score), color)
+            }
+            ProgressBar(progress = score / 100.0, color = color)
+        }
+    }
+}
+
+@Composable
+fun HomeAttentionSection(state: ContaUiState, isTablet: Boolean, modifier: Modifier = Modifier) {
+    val pendingMovements = state.movements.count { !it.reviewed }
+    val urgentDebt = state.debtDetails.visibleDebtDetails().count { it.isDebtAlert() }
+    val upcomingInsurance = state.expiringInsurances.visibleInsurancePolicies().count {
+        val raw = it.renewalDate ?: it.endDate
+        val date = raw?.take(10)?.let { value -> runCatching { LocalDate.parse(value) }.getOrNull() }
+        date != null && !date.isBefore(LocalDate.now()) && !date.isAfter(LocalDate.now().plusDays(30))
+    }
+
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        SectionHeader("Requiere atencion", "lectura rapida")
+        if (isTablet) {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                AttentionCard("Movimientos pendientes", pendingMovements.toString(), "Revisa clasificacion y estado", ContaAmber, Modifier.weight(1f))
+                AttentionCard("Deudas con aviso", urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger, Modifier.weight(1f))
+                AttentionCard("Seguros proximos", upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal, Modifier.weight(1f))
+            }
+        } else {
+            AttentionCard("Movimientos pendientes", pendingMovements.toString(), "Revisa clasificacion y estado", ContaAmber)
+            AttentionCard("Deudas con aviso", urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger)
+            AttentionCard("Seguros proximos", upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal)
+        }
+    }
+}
+
+@Composable
+fun WelcomeEmptyState(error: String?) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Preparando tus datos", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(
+                "Cuando la API responda, aqui veras el balance, ingresos, gastos y movimientos recientes.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            ErrorText(error)
+        }
+    }
+}
+
+
+

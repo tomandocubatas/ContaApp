@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ContaApp</string>
+    <string name="widget_description">Resumen financiero de ContaApp</string>
+</resources>

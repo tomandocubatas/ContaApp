@@ -1,0 +1,366 @@
+﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
+package com.contaapp.android.ui.screens
+
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.contaapp.android.ContaUiState
+import com.contaapp.android.R
+import com.contaapp.android.data.MovementFilters
+import com.contaapp.android.domain.BankAccountBalance
+import com.contaapp.android.domain.CategoryBreakdown
+import com.contaapp.android.domain.DebtDetail
+import com.contaapp.android.domain.DebtSummary
+import com.contaapp.android.domain.InsurancePolicy
+import com.contaapp.android.domain.Movement
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+@Composable
+fun AccountsScreen(state: ContaUiState) {
+    var selectedAccount by remember { mutableStateOf<BankAccountBalance?>(null) }
+    var query by remember { mutableStateOf("") }
+    var bankFilter by remember { mutableStateOf<String?>(null) }
+    var balanceFilter by remember { mutableStateOf(AccountBalanceFilter.All) }
+    val banks = state.accounts.map { it.bankName.ifBlank { "Banco" } }.distinct().sorted()
+    val filteredAccounts = state.accounts
+        .filter { account ->
+            val matchesText = query.isBlank() ||
+                account.accountName.contains(query, ignoreCase = true)
+            val matchesBank = bankFilter == null || account.bankName.ifBlank { "Banco" } == bankFilter
+            val matchesBalance = when (balanceFilter) {
+                AccountBalanceFilter.All -> true
+                AccountBalanceFilter.Positive -> account.balance >= 0.0
+                AccountBalanceFilter.Negative -> account.balance < 0.0
+            }
+            matchesText && matchesBank && matchesBalance
+        }
+        .sortedByDescending { kotlin.math.abs(it.balance) }
+
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val isTablet = maxWidth >= 760.dp
+
+        LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            item { SectionHeader("Cuentas", "${filteredAccounts.size} visibles") }
+            item {
+                AccountsTotalCard(accounts = filteredAccounts, hidden = state.privacyMode)
+            }
+            item {
+                FilterPanel {
+                    OutlinedTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_bank), contentDescription = null) },
+                        label = { Text("Buscar cuenta") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    BankCombo(
+                        banks = banks,
+                        selected = bankFilter,
+                        onSelected = { bankFilter = it }
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                        FilterButton("Todas", balanceFilter == AccountBalanceFilter.All) { balanceFilter = AccountBalanceFilter.All }
+                        FilterButton("Positivas", balanceFilter == AccountBalanceFilter.Positive) { balanceFilter = AccountBalanceFilter.Positive }
+                        FilterButton("Negativas", balanceFilter == AccountBalanceFilter.Negative) { balanceFilter = AccountBalanceFilter.Negative }
+                    }
+                }
+            }
+            filteredAccounts.groupBy { it.bankName.ifBlank { "Banco" } }.forEach { (bank, accounts) ->
+                item { BankAccountsCard(bank, accounts, state.privacyMode, onClick = { selectedAccount = it }) }
+            }
+            item { EmptyHint(filteredAccounts.isEmpty(), "No hay cuentas para los filtros actuales.") }
+        }
+    }
+
+    selectedAccount?.let { account ->
+        AccountDetailDialog(
+            account = account,
+            movements = state.movements.filter { movement -> movement.accountId == account.id || movement.accountName == account.accountName },
+            hidden = state.privacyMode,
+            onDismiss = { selectedAccount = null }
+        )
+    }
+}
+
+enum class AccountBalanceFilter {
+    All,
+    Positive,
+    Negative
+}
+
+@Composable
+fun BankCombo(
+    banks: List<String>,
+    selected: String?,
+    onSelected: (String?) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        OutlinedButton(
+            onClick = { expanded = true },
+            shape = RoundedCornerShape(14.dp),
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp)
+        ) {
+            Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = ContaTeal, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(selected ?: "Todos los bancos", modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("v", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text("Todos los bancos") },
+                onClick = {
+                    onSelected(null)
+                    expanded = false
+                },
+                leadingIcon = { Icon(painterResource(R.drawable.ic_bank), contentDescription = null) }
+            )
+            banks.forEach { bank ->
+                DropdownMenuItem(
+                    text = { Text(bank) },
+                    onClick = {
+                        onSelected(bank)
+                        expanded = false
+                    },
+                    leadingIcon = { Icon(painterResource(R.drawable.ic_bank), contentDescription = null) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun BankAccountsCard(
+    bank: String,
+    accounts: List<BankAccountBalance>,
+    hidden: Boolean,
+    onClick: (BankAccountBalance) -> Unit
+) {
+    val total = accounts.sumOf { it.balance }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
+                    Box(
+                        Modifier.size(38.dp).background(ContaTeal.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = ContaTeal, modifier = Modifier.size(21.dp))
+                    }
+                    Column {
+                        Text(bank, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text("${accounts.size} cuentas", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+                StatusChip(money(total, hidden), if (total >= 0.0) ContaTeal else ContaDanger)
+            }
+            accounts.forEach { account ->
+                Row(
+                    Modifier.fillMaxWidth().clickable { onClick(account) }.padding(vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(account.accountName.ifBlank { "Cuenta" }, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(account.currency, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    }
+                    Text(money(account.balance, hidden), color = if (account.balance >= 0.0) MaterialTheme.colorScheme.onSurface else ContaDanger, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AccountBankHeader(bank: String, total: Double, hidden: Boolean) {
+    Row(
+        Modifier.fillMaxWidth().padding(top = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(bank, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+        StatusChip(money(total, hidden), if (total >= 0.0) ContaTeal else ContaDanger)
+    }
+}
+
+@Composable
+fun AccountsTotalCard(accounts: List<BankAccountBalance>, hidden: Boolean) {
+    val total = accounts.sumOf { it.balance }
+    val negative = accounts.count { it.balance < 0.0 }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            Modifier.fillMaxWidth().padding(18.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text("Patrimonio en cuentas", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                Text(money(total, hidden), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text("$negative cuentas en negativo", color = if (negative > 0) ContaDanger else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+            }
+            Box(
+                Modifier.size(48.dp).background(ContaCoral.copy(alpha = 0.16f), RoundedCornerShape(14.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(accounts.size.toString(), color = ContaCoral, fontWeight = FontWeight.Black)
+            }
+        }
+    }
+}
+
+@Composable
+fun AccountRow(account: BankAccountBalance, hidden: Boolean, onClick: () -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                Modifier.size(40.dp).background(ExecutiveSky.copy(alpha = 0.14f), RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(account.bankName.take(1).ifBlank { "C" }, color = Color(0xFF0369A1), fontWeight = FontWeight.Black)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(account.accountName.ifBlank { "Cuenta" }, fontWeight = FontWeight.SemiBold)
+                Text(account.bankName.ifBlank { "Banco" }, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Text(money(account.balance, hidden), fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun AccountDetailDialog(
+    account: BankAccountBalance,
+    movements: List<com.contaapp.android.domain.Movement>,
+    hidden: Boolean,
+    onDismiss: () -> Unit
+) {
+    val income = movements.filter { it.amount > 0.0 }.sumOf { it.amount }
+    val expense = movements.filter { it.amount < 0.0 }.sumOf { kotlin.math.abs(it.amount) }
+    val net = income - expense
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Cerrar") }
+        },
+        title = { Text(account.accountName.ifBlank { "Cuenta" }) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                DetailLine("Banco", account.bankName.ifBlank { "Banco" })
+                DetailLine("Saldo", money(account.balance, hidden))
+                DetailLine("Moneda", account.currency)
+                DetailLine("Identificador", account.id.ifBlank { "No informado" })
+                if (movements.isNotEmpty()) {
+                    Text("Resumen visible", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        AccountDetailMetric("Ingresos", money(income, hidden), ContaTeal, Modifier.weight(1f))
+                        AccountDetailMetric("Gastos", money(expense, hidden), ContaCoral, Modifier.weight(1f))
+                        AccountDetailMetric("Neto", money(net, hidden), if (net >= 0.0) ContaTeal else ContaDanger, Modifier.weight(1f))
+                    }
+                    Text("Actividad reciente", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    movements.sortedByDescending { it.date }.take(4).forEach { movement ->
+                        DetailLine(
+                            movement.date.take(10),
+                            "${movement.description.take(28)} · ${money(movement.amount, hidden)}"
+                        )
+                    }
+                }
+            }
+        },
+        shape = RoundedCornerShape(18.dp)
+    )
+}
+
+@Composable
+fun AccountDetailMetric(title: String, value: String, color: Color, modifier: Modifier = Modifier) {
+    Column(
+        modifier.background(color.copy(alpha = 0.10f), RoundedCornerShape(12.dp)).padding(9.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)
+        Text(value, color = color, fontWeight = FontWeight.Black, style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+
+
