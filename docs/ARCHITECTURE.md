@@ -300,9 +300,11 @@ Adaptacion por dispositivo:
 - Movimientos debe mantener accesos rapidos para casos frecuentes: pendientes, gastos del mes, ingresos del mes, vinculados y duplicados.
 - Movimientos se agrupan visualmente por fecha relativa para lectura rapida.
 - Movimientos pueden agruparse por fecha, categoria o cuenta, y sus filas deben mostrar categoria, cuenta y vinculacion cuando el backend la proporcione.
+- Los detalles emergentes de cuenta, movimiento, deuda, seguro y alquiler deben comportarse como fichas ejecutivas: cabecera con dato principal, chips de estado, metricas resumidas y actividad/contexto reciente. Evitar volver a dialogos planos compuestos solo de pares etiqueta/valor.
 - Cuentas, Deuda y Seguros usan filtros locales instantaneos sobre el snapshot cargado.
 - `Mas` en movil funciona como hub ejecutivo compacto y busqueda global local sobre cache. No debe mostrar importes con jerarquia excesiva ni duplicar la navegacion completa en tablet.
 - Seguros debe cargar el inventario completo de polizas desde `GET /api/insurances/all`, con fallback a `GET /api/insurances/expiring-soon?days=60` si el endpoint completo no responde. La pantalla puede filtrar localmente por vencimiento a 30/60 dias, pero el estado base debe ser inventario de polizas, no solo renovaciones.
+- Seguros debe enriquecer el snapshot con `GET /api/insurances/coverage-comparison` y `GET /api/insurances/renewal-calendar` cuando esten disponibles. Estos datos son de lectura y deben mostrarse como comparativa de coberturas y calendario, sin habilitar edicion.
 - Seguros debe permitir abrir detalle de poliza. El detalle minimo es compania, tipo, prima anual/mensual, renovacion, estado e identificador. Si el backend expone `policyNumber`, `coverage`, `status` o `periodicity`, Android debe conservarlos en snapshot y mostrarlos en la ficha sin habilitar edicion.
 - Alquileres debe permitir abrir detalle de propiedad usando el snapshot disponible. Si existe endpoint especifico por propiedad/mes, usarlo para enriquecer la ficha, pero sin bloquear la vista basica.
 - Cuentas debe mantener un selector desplegable de banco para busqueda rapida por entidad, ademas de texto libre y filtro de saldo.

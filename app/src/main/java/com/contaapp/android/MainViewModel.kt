@@ -21,6 +21,8 @@ import com.contaapp.android.domain.DebtDetail
 import com.contaapp.android.domain.DebtSummary
 import com.contaapp.android.domain.InsuranceSummary
 import com.contaapp.android.domain.InsurancePolicy
+import com.contaapp.android.domain.InsuranceCoverage
+import com.contaapp.android.domain.InsuranceRenewal
 import com.contaapp.android.domain.Movement
 import com.contaapp.android.domain.RentalProperty
 import com.contaapp.android.domain.RentalMonth
@@ -70,6 +72,8 @@ data class ContaUiState(
     val debtDetails: List<DebtDetail> = emptyList(),
     val insurance: InsuranceSummary? = null,
     val expiringInsurances: List<InsurancePolicy> = emptyList(),
+    val insuranceCoverages: List<InsuranceCoverage> = emptyList(),
+    val insuranceRenewals: List<InsuranceRenewal> = emptyList(),
     val rentalSummary: RentalSummary? = null,
     val rentalProperties: List<RentalProperty> = emptyList(),
     val rentalMonths: List<RentalMonth> = emptyList(),
@@ -88,6 +92,8 @@ private fun initialCacheStatus(snapshot: FinancialSnapshot?, ttlMinutes: Int): L
             snapshot.debtDetails.isNotEmpty() ||
             snapshot.insurance != null ||
             snapshot.expiringInsurances.isNotEmpty() ||
+            snapshot.insuranceCoverages.isNotEmpty() ||
+            snapshot.insuranceRenewals.isNotEmpty() ||
             snapshot.rentalSummary != null ||
             snapshot.rentalProperties.isNotEmpty() ||
             snapshot.rentalMonths.isNotEmpty() ||
@@ -162,6 +168,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             debtDetails = initialSnapshot?.debtDetails.orEmpty(),
             insurance = initialSnapshot?.insurance,
             expiringInsurances = initialSnapshot?.expiringInsurances.orEmpty(),
+            insuranceCoverages = initialSnapshot?.insuranceCoverages.orEmpty(),
+            insuranceRenewals = initialSnapshot?.insuranceRenewals.orEmpty(),
             rentalSummary = initialSnapshot?.rentalSummary,
             rentalProperties = initialSnapshot?.rentalProperties.orEmpty(),
             rentalMonths = initialSnapshot?.rentalMonths.orEmpty(),
@@ -254,6 +262,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 debtDetails = emptyList(),
                 insurance = null,
                 expiringInsurances = emptyList(),
+                insuranceCoverages = emptyList(),
+                insuranceRenewals = emptyList(),
                 rentalSummary = null,
                 rentalProperties = emptyList(),
                 rentalMonths = emptyList(),
@@ -337,6 +347,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             debtDetails = snapshot.debtDetails,
                             insurance = snapshot.insurance,
                             expiringInsurances = snapshot.expiringInsurances,
+                            insuranceCoverages = snapshot.insuranceCoverages,
+                            insuranceRenewals = snapshot.insuranceRenewals,
                             rentalSummary = snapshot.rentalSummary,
                             rentalProperties = snapshot.rentalProperties,
                             rentalMonths = snapshot.rentalMonths,
@@ -453,6 +465,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             insurance = repository.insurances(token),
             expiringInsurances = runCatching { repository.insurancePolicies(token) }
                 .getOrElse { repository.expiringInsurances(token) },
+            insuranceCoverages = runCatching { repository.insuranceCoverages(token) }.getOrDefault(emptyList()),
+            insuranceRenewals = runCatching { repository.insuranceRenewals(token) }.getOrDefault(emptyList()),
             rentalSummary = runCatching { repository.rentalSummary(token, filters) }.getOrDefault(RentalSummary(0.0, 0.0, 0.0, 0.0, 0)),
             rentalProperties = runCatching { repository.rentalProperties(token, filters) }.getOrDefault(emptyList()),
             rentalMonths = runCatching { repository.rentalMonths(token, filters) }.getOrDefault(emptyList()),
@@ -481,6 +495,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 debtDetails = payload.debtDetails,
                 insurance = payload.insurance,
                 expiringInsurances = payload.expiringInsurances,
+                insuranceCoverages = payload.insuranceCoverages,
+                insuranceRenewals = payload.insuranceRenewals,
                 rentalSummary = payload.rentalSummary,
                 rentalProperties = payload.rentalProperties,
                 rentalMonths = payload.rentalMonths,
@@ -543,6 +559,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             state.debtDetails.isNotEmpty() ||
             state.insurance != null ||
             state.expiringInsurances.isNotEmpty() ||
+            state.insuranceCoverages.isNotEmpty() ||
+            state.insuranceRenewals.isNotEmpty() ||
             state.rentalSummary != null ||
             state.rentalProperties.isNotEmpty() ||
             state.rentalMonths.isNotEmpty() ||
@@ -609,6 +627,8 @@ private data class HomePayload(
     val debtDetails: List<DebtDetail>,
     val insurance: InsuranceSummary,
     val expiringInsurances: List<InsurancePolicy>,
+    val insuranceCoverages: List<InsuranceCoverage>,
+    val insuranceRenewals: List<InsuranceRenewal>,
     val rentalSummary: RentalSummary,
     val rentalProperties: List<RentalProperty>,
     val rentalMonths: List<RentalMonth>,
@@ -626,6 +646,8 @@ private fun HomePayload.toSnapshot(loadedAt: Instant): FinancialSnapshot {
         debtDetails = debtDetails,
         insurance = insurance,
         expiringInsurances = expiringInsurances,
+        insuranceCoverages = insuranceCoverages,
+        insuranceRenewals = insuranceRenewals,
         rentalSummary = rentalSummary,
         rentalProperties = rentalProperties,
         rentalMonths = rentalMonths,

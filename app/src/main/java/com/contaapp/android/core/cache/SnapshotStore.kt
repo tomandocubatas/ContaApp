@@ -11,6 +11,8 @@ import com.contaapp.android.domain.DebtDetail
 import com.contaapp.android.domain.DebtSummary
 import com.contaapp.android.domain.FinancialSeriesPoint
 import com.contaapp.android.domain.InsurancePolicy
+import com.contaapp.android.domain.InsuranceCoverage
+import com.contaapp.android.domain.InsuranceRenewal
 import com.contaapp.android.domain.InsuranceSummary
 import com.contaapp.android.domain.Movement
 import com.contaapp.android.domain.RentalCategoryMonth
@@ -30,6 +32,8 @@ data class FinancialSnapshot(
     val debtDetails: List<DebtDetail>,
     val insurance: InsuranceSummary?,
     val expiringInsurances: List<InsurancePolicy>,
+    val insuranceCoverages: List<InsuranceCoverage> = emptyList(),
+    val insuranceRenewals: List<InsuranceRenewal> = emptyList(),
     val rentalSummary: RentalSummary?,
     val rentalProperties: List<RentalProperty>,
     val rentalMonths: List<RentalMonth>,
@@ -66,6 +70,8 @@ private fun FinancialSnapshot.toJson(): JSONObject {
         .put("debtDetails", debtDetails.toJsonArray { it.toJson() })
         .put("insurance", insurance?.toJson())
         .put("expiringInsurances", expiringInsurances.toJsonArray { it.toJson() })
+        .put("insuranceCoverages", insuranceCoverages.toJsonArray { it.toJson() })
+        .put("insuranceRenewals", insuranceRenewals.toJsonArray { it.toJson() })
         .put("rentalSummary", rentalSummary?.toJson())
         .put("rentalProperties", rentalProperties.toJsonArray { it.toJson() })
         .put("rentalMonths", rentalMonths.toJsonArray { it.toJson() })
@@ -83,6 +89,8 @@ private fun JSONObject.toSnapshot(): FinancialSnapshot {
         debtDetails = optJSONArray("debtDetails").mapObjects { it.toDebtDetail() },
         insurance = optJSONObject("insurance")?.toInsurance(),
         expiringInsurances = optJSONArray("expiringInsurances").mapObjects { it.toInsurancePolicy() },
+        insuranceCoverages = optJSONArray("insuranceCoverages").mapObjects { it.toInsuranceCoverage() },
+        insuranceRenewals = optJSONArray("insuranceRenewals").mapObjects { it.toInsuranceRenewal() },
         rentalSummary = optJSONObject("rentalSummary")?.toRentalSummary(),
         rentalProperties = optJSONArray("rentalProperties").mapObjects { it.toRentalProperty() },
         rentalMonths = optJSONArray("rentalMonths").mapObjects { it.toRentalMonth() },
@@ -273,6 +281,30 @@ private fun JSONObject.toInsurancePolicy() = InsurancePolicy(
     periodicity = optString("periodicity").takeIf { it.isNotBlank() && it != "null" }
 )
 
+private fun InsuranceCoverage.toJson() = JSONObject()
+    .put("type", type)
+    .put("maxCoverage", maxCoverage.jsonNumber())
+    .put("totalPremium", totalPremium.jsonNumber())
+    .put("ratio", ratio.jsonNumber())
+
+private fun JSONObject.toInsuranceCoverage() = InsuranceCoverage(
+    type = optString("type"),
+    maxCoverage = optDouble("maxCoverage"),
+    totalPremium = optDouble("totalPremium"),
+    ratio = optDouble("ratio")
+)
+
+private fun InsuranceRenewal.toJson() = JSONObject()
+    .put("date", date)
+    .put("count", count)
+    .put("names", JSONArray(names))
+
+private fun JSONObject.toInsuranceRenewal() = InsuranceRenewal(
+    date = optString("date"),
+    count = optInt("count"),
+    names = optJSONArray("names").mapStrings()
+)
+
 private fun RentalSummary.toJson() = JSONObject()
     .put("income", income.jsonNumber())
     .put("expense", expense.jsonNumber())
@@ -391,6 +423,15 @@ private fun <T> JSONArray?.mapObjects(mapper: (JSONObject) -> T): List<T> {
     return buildList {
         for (index in 0 until length()) {
             optJSONObject(index)?.let { add(mapper(it)) }
+        }
+    }
+}
+
+private fun JSONArray?.mapStrings(): List<String> {
+    if (this == null) return emptyList()
+    return buildList {
+        for (index in 0 until length()) {
+            optString(index).takeIf { it.isNotBlank() }?.let { add(it) }
         }
     }
 }

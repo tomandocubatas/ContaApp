@@ -24,6 +24,17 @@ YYYY-MM-DD - Tipo - Resumen
 - Se agrega descripcion semantica al selector premium de periodo para mejorar accesibilidad.
 - Verificacion: `:app:assembleDebug` correcto en Gradle offline. No se prueba emulador por indicacion del usuario.
 
+## 2026-06-03 - UX/Funcional - Detalles premium, seguros enriquecidos y graficas interactivas
+
+- Seguros incorpora comparativa de coberturas desde `GET /insurances/coverage-comparison`.
+- Seguros incorpora calendario de renovaciones desde `GET /insurances/renewal-calendar`.
+- Snapshot/cache guarda coberturas y renovaciones de seguros para soporte offline.
+- Detalle de cuenta se redisenia como ficha ejecutiva: cabecera visual, saldo destacado, chips de estado, resumen de ingresos/gastos/neto y actividad reciente.
+- Detalle de seguro se redisenia con cabecera premium, prima anual, estado, renovacion y datos tecnicos.
+- Graficas compactas agregan punto destacado seleccionable entre inicio, centro y fin.
+- Se mantiene fuera de alcance la automatizacion de tests porque el usuario indica que ya la ha realizado.
+- Verificacion: `:app:assembleDebug` correcto en Gradle offline. No se prueba emulador por indicacion del usuario.
+
 ## 2026-06-02 - UX/Funcional - Accesos reversibles y seguros completos
 
 - Todos los accesos rapidos de Movimientos pasan a comportamiento reversible: un toque activa y otro toque desactiva `Pendientes`, `Gastos mes`, `Ingresos mes`, `Vinculados` y `Duplicados`.

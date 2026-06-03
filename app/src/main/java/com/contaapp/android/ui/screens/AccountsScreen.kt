@@ -325,10 +325,31 @@ fun AccountDetailDialog(
         },
         title = { Text(account.accountName.ifBlank { "Cuenta" }) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                DetailLine("Banco", account.bankName.ifBlank { "Banco" })
-                DetailLine("Saldo", money(account.balance, hidden))
-                DetailLine("Moneda", account.currency)
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = if (account.balance >= 0.0) ContaTeal.copy(alpha = 0.12f) else ContaDanger.copy(alpha = 0.12f)),
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) {
+                                Text(account.bankName.ifBlank { "Banco" }, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                                Text(money(account.balance, hidden), color = if (account.balance >= 0.0) ContaTeal else ContaDanger, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                            Box(
+                                Modifier.size(48.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = if (account.balance >= 0.0) ContaTeal else ContaDanger)
+                            }
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            StatusChip(account.currency, MaterialTheme.colorScheme.primary)
+                            StatusChip(if (account.balance >= 0.0) "Saldo positivo" else "En negativo", if (account.balance >= 0.0) ContaTeal else ContaDanger)
+                        }
+                    }
+                }
+                DetailLine("Cuenta", account.accountName.ifBlank { "Cuenta" })
                 DetailLine("Identificador", account.id.ifBlank { "No informado" })
                 if (movements.isNotEmpty()) {
                     Text("Resumen visible", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
@@ -339,16 +360,30 @@ fun AccountDetailDialog(
                     }
                     Text("Actividad reciente", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                     movements.sortedByDescending { it.date }.take(4).forEach { movement ->
-                        DetailLine(
-                            movement.date.take(10),
-                            "${movement.description.take(28)} · ${money(movement.amount, hidden)}"
-                        )
+                        AccountMovementMiniRow(movement, hidden)
                     }
+                } else {
+                    EmptyHint(true, "No hay movimientos visibles vinculados a esta cuenta en la cache actual.")
                 }
             }
         },
         shape = RoundedCornerShape(18.dp)
     )
+}
+
+@Composable
+fun AccountMovementMiniRow(movement: com.contaapp.android.domain.Movement, hidden: Boolean) {
+    val accent = if (movement.amount >= 0.0) ContaTeal else ContaDanger
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(30.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+            Icon(painterResource(movementIcon(movement)), contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))
+        }
+        Column(Modifier.weight(1f)) {
+            Text(movement.description, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(movement.date.take(10), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+        }
+        Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.labelMedium)
+    }
 }
 
 @Composable

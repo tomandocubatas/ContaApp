@@ -10,6 +10,8 @@ import com.contaapp.android.domain.DashboardSummary
 import com.contaapp.android.domain.DebtDetail
 import com.contaapp.android.domain.DebtSummary
 import com.contaapp.android.domain.FinancialSeriesPoint
+import com.contaapp.android.domain.InsuranceCoverage
+import com.contaapp.android.domain.InsuranceRenewal
 import com.contaapp.android.domain.InsuranceSummary
 import com.contaapp.android.domain.InsurancePolicy
 import com.contaapp.android.domain.Movement
@@ -224,6 +226,30 @@ class ContaRepository(
         val response = api.get("insurances/all", token)
         val items = response.firstArray("data", "items", "insurances")
         return items.mapObjects { item -> item.toInsurancePolicy() }
+    }
+
+    fun insuranceCoverages(token: String): List<InsuranceCoverage> {
+        val response = api.get("insurances/coverage-comparison", token)
+        return response.firstArray("data", "items").mapObjects { item ->
+            InsuranceCoverage(
+                type = item.optString("type", "Seguro"),
+                maxCoverage = item.optDouble("maxCoverage"),
+                totalPremium = item.optDouble("totalPremium"),
+                ratio = item.optDouble("ratio")
+            )
+        }
+    }
+
+    fun insuranceRenewals(token: String): List<InsuranceRenewal> {
+        val response = api.get("insurances/renewal-calendar", token)
+        return response.firstArray("data", "items").mapObjects { item ->
+            val policies = item.optJSONArray("insurances")
+            InsuranceRenewal(
+                date = item.optString("date"),
+                count = policies?.length() ?: item.optInt("count"),
+                names = policies.mapObjects { policy -> policy.optString("name", "Seguro") }
+            )
+        }
     }
 
     fun rentalSummary(token: String, filters: MovementFilters = MovementFilters()): RentalSummary {

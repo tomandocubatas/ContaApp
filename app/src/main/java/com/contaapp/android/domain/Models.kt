@@ -103,6 +103,19 @@ data class InsurancePolicy(
     val periodicity: String? = null
 )
 
+data class InsuranceCoverage(
+    val type: String,
+    val maxCoverage: Double,
+    val totalPremium: Double,
+    val ratio: Double
+)
+
+data class InsuranceRenewal(
+    val date: String,
+    val count: Int,
+    val names: List<String>
+)
+
 data class RentalSummary(
     val income: Double,
     val expense: Double,

@@ -110,6 +110,12 @@ fun InsuranceScreen(state: ContaUiState) {
                 }
             }
             item {
+                InsuranceCoverageCard(state.insuranceCoverages, state.privacyMode)
+            }
+            item {
+                InsuranceRenewalCalendarCard(state.insuranceRenewals)
+            }
+            item {
                 FilterPanel {
                     OutlinedTextField(
                         value = query,
@@ -152,6 +158,72 @@ enum class InsuranceRange(val days: Long?) {
         val date = rawDate?.take(10)?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return false
         val today = LocalDate.now()
         return !date.isBefore(today) && !date.isAfter(today.plusDays(limit))
+    }
+}
+
+@Composable
+fun InsuranceCoverageCard(coverages: List<com.contaapp.android.domain.InsuranceCoverage>, hidden: Boolean) {
+    if (coverages.isEmpty()) return
+    val sorted = coverages.sortedByDescending { it.maxCoverage }.take(4)
+    val max = sorted.maxOfOrNull { it.maxCoverage }?.takeIf { it > 0.0 } ?: 1.0
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionHeader("Coberturas", "comparativa por tipo")
+            sorted.forEach { item ->
+                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(item.type, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text("Prima ${money(item.totalPremium, hidden)} · ratio ${item.ratio.toInt()}x", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                        }
+                        Text(money(item.maxCoverage, hidden), color = ContaTeal, fontWeight = FontWeight.Black)
+                    }
+                    ProgressBar(item.maxCoverage / max, ContaTeal)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InsuranceRenewalCalendarCard(renewals: List<com.contaapp.android.domain.InsuranceRenewal>) {
+    val upcoming = renewals
+        .filter { renewal ->
+            val date = runCatching { LocalDate.parse(renewal.date.take(10)) }.getOrNull()
+            date != null && !date.isBefore(LocalDate.now())
+        }
+        .sortedBy { it.date }
+        .take(4)
+    if (upcoming.isEmpty()) return
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionHeader("Calendario de renovaciones", "${upcoming.size} fechas")
+            upcoming.forEach { renewal ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier.size(44.dp).background(ContaAmber.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(renewal.date.takeLast(2), color = ContaAmber, fontWeight = FontWeight.Black)
+                    }
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(renewal.date.take(10), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                        Text(renewal.names.take(2).joinToString(", "), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    StatusChip("${renewal.count}", ContaAmber)
+                }
+            }
+        }
     }
 }
 
@@ -281,7 +353,33 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
         },
         title = { Text(policy.name.ifBlank { "Detalle del seguro" }) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                val accent = when (urgency) {
+                    InsuranceUrgency.Expired -> ContaDanger
+                    InsuranceUrgency.Soon -> ContaAmber
+                    InsuranceUrgency.Future -> ContaTeal
+                    InsuranceUrgency.Unknown -> MaterialTheme.colorScheme.primary
+                }
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = accent.copy(alpha = 0.12f)),
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) {
+                                Text(policy.company ?: "Compania no informada", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                                Text(money(policy.annualPremium, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                            Box(Modifier.size(48.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+                                Icon(painterResource(R.drawable.ic_shield), contentDescription = null, tint = accent)
+                            }
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            StatusChip(policy.status ?: urgency.label, accent)
+                            StatusChip("Renueva ${date?.take(10) ?: "sin fecha"}", accent)
+                        }
+                    }
+                }
                 DetailLine("Compania", policy.company ?: "No informada")
                 DetailLine("Tipo", policy.type.ifBlank { "No informado" })
                 DetailLine("Numero de poliza", policy.policyNumber ?: "No informado")

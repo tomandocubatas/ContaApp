@@ -4,6 +4,7 @@ package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -499,6 +500,7 @@ fun InlineChartPanel(
     modifier: Modifier = Modifier
 ) {
     val cleanValues = values.map { if (it.isFinite()) it else 0.0 }
+    var selectedIndex by remember(cleanValues, labels) { mutableStateOf(cleanValues.lastIndex.coerceAtLeast(0)) }
     val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f)
     Column(
         modifier
@@ -523,10 +525,28 @@ fun InlineChartPanel(
         if (cleanValues.size >= 2) {
             val min = cleanValues.minOrNull() ?: 0.0
             val max = cleanValues.maxOrNull() ?: 0.0
+            val safeIndex = selectedIndex.coerceIn(0, cleanValues.lastIndex)
+            val selectedLabel = labels.getOrNull(safeIndex).orEmpty()
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("${cleanValues.size} puntos", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                 Text("Rango ${money(min, false)} / ${money(max, false)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
+            Row(
+                Modifier.fillMaxWidth().background(color.copy(alpha = 0.10f), RoundedCornerShape(14.dp)).padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("Punto destacado", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(selectedLabel.ifBlank { "Indice ${safeIndex + 1}" }, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                }
+                Text(money(cleanValues[safeIndex], false), color = color, fontWeight = FontWeight.Black)
+            }
+            ChartPointSelector(
+                size = cleanValues.size,
+                selected = safeIndex,
+                onSelected = { selectedIndex = it }
+            )
             Canvas(Modifier.fillMaxWidth().height(96.dp)) {
                 repeat(3) { line ->
                     val y = size.height * (line + 1) / 4f
@@ -558,6 +578,39 @@ fun InlineChartPanel(
             }
         } else {
             EmptyHint(true, "No hay suficientes datos para esta grafica.")
+        }
+    }
+}
+
+@Composable
+fun ChartPointSelector(size: Int, selected: Int, onSelected: (Int) -> Unit) {
+    if (size < 2) return
+    val options = listOf(0, size / 2, size - 1).distinct()
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        options.forEach { index ->
+            val active = selected == index
+            Box(
+                Modifier
+                    .weight(1f)
+                    .background(
+                        if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surface,
+                        RoundedCornerShape(50)
+                    )
+                    .clickable { onSelected(index) }
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    when (index) {
+                        0 -> "Inicio"
+                        size - 1 -> "Fin"
+                        else -> "Centro"
+                    },
+                    color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = if (active) FontWeight.Black else FontWeight.SemiBold
+                )
+            }
         }
     }
 }
