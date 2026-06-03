@@ -69,7 +69,7 @@ class ContaRepository(
     fun dashboardResponse(token: String, filters: MovementFilters = MovementFilters()): JSONObject {
         val query = buildList {
             if (filters.dateFrom != null) add("dateFrom=${filters.dateFrom.urlEncode()}")
-            if (filters.dateTo != null) add("dateTo=${filters.dateTo.exclusiveDateTo().urlEncode()}")
+            if (filters.dateTo != null) add("dateTo=${filters.dateTo.urlEncode()}")
             if (filters.accountId != null) add("accountId=${filters.accountId.urlEncode()}")
         }.joinToString("&")
         return api.get("dashboard/summary${query.takeIf { it.isNotBlank() }?.let { "?$it" }.orEmpty()}", token)
@@ -264,7 +264,7 @@ class ContaRepository(
     }
 
     fun rentalSummary(token: String, filters: MovementFilters = MovementFilters()): RentalSummary {
-        val query = dateQuery(filters)
+        val query = inclusiveDateQuery(filters)
         val response = api.get("rentals/summary${query.querySuffix()}", token)
         return RentalSummary(
             income = response.optDouble("income"),
@@ -276,7 +276,7 @@ class ContaRepository(
     }
 
     fun rentalProperties(token: String, filters: MovementFilters = MovementFilters()): List<RentalProperty> {
-        val query = dateQuery(filters)
+        val query = inclusiveDateQuery(filters)
         val direct = runCatching { api.getArray("rentals/properties-breakdown${query.querySuffix()}", token) }.getOrNull()
         val items = direct ?: api.get("rentals/properties-breakdown${query.querySuffix()}", token).firstArray("data", "items")
         return items.mapObjects { item ->
@@ -306,7 +306,7 @@ class ContaRepository(
     }
 
     fun rentalMonths(token: String, filters: MovementFilters = MovementFilters()): List<RentalMonth> {
-        val query = dateQuery(filters)
+        val query = inclusiveDateQuery(filters)
         val categoriesByPeriod = runCatching {
             flexibleArray("rentals/expenses-by-category${query.querySuffix()}", token)
                 .mapObjects { item ->
@@ -335,7 +335,8 @@ class ContaRepository(
     }
 
     fun charts(token: String, dashboard: JSONObject, filters: MovementFilters = MovementFilters()): ChartsSnapshot {
-        val query = dateQuery(filters)
+        val query = exclusiveDateQuery(filters)
+        val dashboardQuery = inclusiveDateQuery(filters)
         val range = dashboard.optJSONObject("range") ?: JSONObject()
         val series = (dashboard.optJSONObject("series")?.firstArray("current") ?: JSONArray()).mapObjects { item ->
             val expense = kotlin.math.abs(item.optDouble("expense"))
@@ -347,11 +348,11 @@ class ContaRepository(
             )
         }
         val income = runCatching {
-            flexibleArray("dashboard/category-history?type=income${query.queryContinuation()}", token)
+            flexibleArray("dashboard/category-history?type=income${dashboardQuery.queryContinuation()}", token)
                 .mapObjects { it.toMonthlyTotal() }
         }.getOrDefault(emptyList())
         val expense = runCatching {
-            flexibleArray("dashboard/category-history?type=expense${query.queryContinuation()}", token)
+            flexibleArray("dashboard/category-history?type=expense${dashboardQuery.queryContinuation()}", token)
                 .mapObjects { it.toMonthlyTotal() }
         }.getOrDefault(emptyList())
         val debt = runCatching {
@@ -440,9 +441,14 @@ private fun String.exclusiveDateTo(): String {
     return runCatching { LocalDate.parse(take(10)).plusDays(1).toString() }.getOrDefault(this)
 }
 
-private fun dateQuery(filters: MovementFilters): List<String> = buildList {
+private fun exclusiveDateQuery(filters: MovementFilters): List<String> = buildList {
     if (filters.dateFrom != null) add("dateFrom=${filters.dateFrom.urlEncode()}")
     if (filters.dateTo != null) add("dateTo=${filters.dateTo.exclusiveDateTo().urlEncode()}")
+}
+
+private fun inclusiveDateQuery(filters: MovementFilters): List<String> = buildList {
+    if (filters.dateFrom != null) add("dateFrom=${filters.dateFrom.urlEncode()}")
+    if (filters.dateTo != null) add("dateTo=${filters.dateTo.urlEncode()}")
 }
 
 private fun List<String>.querySuffix(): String = takeIf { it.isNotEmpty() }?.joinToString("&", prefix = "?").orEmpty()

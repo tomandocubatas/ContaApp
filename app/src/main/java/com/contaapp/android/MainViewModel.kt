@@ -689,7 +689,7 @@ private fun FinancialSnapshot.toHomePayloadOrNull(): HomePayload? {
 
 private fun MovementFilters.snapshotKey(): String {
     return listOf(
-        "home",
+        "home-v2",
         text.trim(),
         type.orEmpty(),
         reviewed?.toString().orEmpty(),

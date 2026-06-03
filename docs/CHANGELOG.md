@@ -10,6 +10,15 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-06-03 - Correccion - DateTo inclusivo en dashboard y alquileres
+
+- Se corrige el descuadre de `Mes pasado`: `dashboard/summary` usa `dateTo` inclusivo (`$lte`), por lo que Android deja de sumar un dia en ese endpoint.
+- `dashboard/category-history` tambien pasa a recibir fechas inclusivas para evitar que las graficas por categoria arrastren datos del dia siguiente.
+- Alquileres pasa a enviar `dateTo` inclusivo porque el backend de rentals ya transforma internamente el limite a `< dateTo + 1 dia`.
+- `movements-global` mantiene `dateTo + 1 dia`, ya que ese repositorio usa limite superior exclusivo (`$lt`) y asi se incluyen los movimientos del dia final.
+- Se versiona la clave persistida de snapshot financiero a `home-v2` para no reutilizar caches antiguas contaminadas por el rango incorrecto.
+- Verificacion: `:app:assembleDebug` correcto en Gradle offline. No se prueba emulador por indicacion del usuario.
+
 ## 2026-06-03 - UX/Funcional - Busqueda directa, cache por rango y detalles ejecutivos
 
 - La busqueda global de `Mas` abre ahora el detalle concreto cuando el resultado es movimiento, cuenta, deuda, seguro o alquiler, en vez de limitarse a cambiar de pestana.
