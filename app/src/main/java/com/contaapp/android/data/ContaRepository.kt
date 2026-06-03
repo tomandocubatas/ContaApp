@@ -226,6 +226,17 @@ class ContaRepository(
         val response = api.get("insurances/all", token)
         val items = response.firstArray("data", "items", "insurances")
         return items.mapObjects { item -> item.toInsurancePolicy() }
+            .map { policy ->
+                policy.id.takeIf { it.isNotBlank() }
+                    ?.let { id -> runCatching { insurancePolicy(token, id) }.getOrDefault(policy) }
+                    ?: policy
+            }
+    }
+
+    fun insurancePolicy(token: String, id: String): InsurancePolicy {
+        val response = api.get("insurances/${id.urlEncode()}", token)
+        val data = response.optJSONObject("data") ?: response
+        return data.toInsurancePolicy()
     }
 
     fun insuranceCoverages(token: String): List<InsuranceCoverage> {
@@ -247,7 +258,7 @@ class ContaRepository(
             InsuranceRenewal(
                 date = item.optString("date"),
                 count = policies?.length() ?: item.optInt("count"),
-                names = policies.mapObjects { policy -> policy.optString("name", "Seguro") }
+                names = policies?.mapObjects { policy -> policy.optString("name", "Seguro") }.orEmpty()
             )
         }
     }

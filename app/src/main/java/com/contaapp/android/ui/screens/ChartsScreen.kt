@@ -33,6 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -547,7 +549,17 @@ fun InlineChartPanel(
                 selected = safeIndex,
                 onSelected = { selectedIndex = it }
             )
-            Canvas(Modifier.fillMaxWidth().height(96.dp)) {
+            Canvas(
+                Modifier
+                    .fillMaxWidth()
+                    .height(96.dp)
+                    .pointerInput(cleanValues) {
+                        detectTapGestures { offset ->
+                            val step = if (cleanValues.size > 1) size.width / (cleanValues.size - 1) else size.width
+                            selectedIndex = (offset.x / step).toInt().coerceIn(0, cleanValues.lastIndex)
+                        }
+                    }
+            ) {
                 repeat(3) { line ->
                     val y = size.height * (line + 1) / 4f
                     drawLine(gridColor, androidx.compose.ui.geometry.Offset(0f, y), androidx.compose.ui.geometry.Offset(size.width, y), strokeWidth = 1.dp.toPx())
@@ -565,6 +577,16 @@ fun InlineChartPanel(
                         cap = StrokeCap.Round
                     )
                 }
+                val selectedX = step * safeIndex
+                val selectedY = size.height - (((cleanValues[safeIndex] - min) / range).toFloat() * size.height)
+                drawLine(
+                    color = color.copy(alpha = 0.36f),
+                    start = androidx.compose.ui.geometry.Offset(selectedX, 0f),
+                    end = androidx.compose.ui.geometry.Offset(selectedX, size.height),
+                    strokeWidth = 1.dp.toPx()
+                )
+                drawCircle(color = color, radius = 5.dp.toPx(), center = androidx.compose.ui.geometry.Offset(selectedX, selectedY))
+                drawCircle(color = androidx.compose.ui.graphics.Color.White, radius = 2.dp.toPx(), center = androidx.compose.ui.geometry.Offset(selectedX, selectedY))
             }
             AxisLabels(labels)
         } else if (cleanValues.size == 1) {

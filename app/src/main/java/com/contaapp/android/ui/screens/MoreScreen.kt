@@ -35,7 +35,11 @@ import com.contaapp.android.ContaUiState
 import com.contaapp.android.R
 
 @Composable
-fun MoreScreen(state: ContaUiState, onOpen: (Tab) -> Unit) {
+fun MoreScreen(
+    state: ContaUiState,
+    onOpen: (Tab) -> Unit,
+    onOpenResult: (MoreSearchResult) -> Unit = { onOpen(it.tab) }
+) {
     var query by remember { mutableStateOf("") }
     val pendingMovements = state.movements.count { !it.reviewed }
     val debtWarnings = state.debtDetails.visibleDebtDetails().count { it.isDebtAlert() }
@@ -62,7 +66,7 @@ fun MoreScreen(state: ContaUiState, onOpen: (Tab) -> Unit) {
         }
         if (query.isNotBlank()) {
             items(searchResults.take(8)) { result ->
-                MoreSearchResultRow(result = result, onOpen = onOpen)
+                MoreSearchResultRow(result = result, onOpen = onOpenResult)
             }
             item { EmptyHint(searchResults.isEmpty(), "No hay coincidencias en la cache actual.") }
         }
@@ -160,12 +164,12 @@ fun GlobalSearchCard(query: String, onQuery: (String) -> Unit, resultCount: Int)
 }
 
 @Composable
-fun MoreSearchResultRow(result: MoreSearchResult, onOpen: (Tab) -> Unit) {
+fun MoreSearchResultRow(result: MoreSearchResult, onOpen: (MoreSearchResult) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(14.dp),
-        modifier = Modifier.fillMaxWidth().clickable { onOpen(result.tab) }
+        modifier = Modifier.fillMaxWidth().clickable { onOpen(result) }
     ) {
         Row(
             Modifier.fillMaxWidth().padding(12.dp),
@@ -191,7 +195,8 @@ data class MoreSearchResult(
     val title: String,
     val detail: String,
     val type: String,
-    val tab: Tab
+    val tab: Tab,
+    val targetId: String? = null
 )
 
 fun globalSearchResults(query: String, state: ContaUiState): List<MoreSearchResult> {
@@ -202,27 +207,27 @@ fun globalSearchResults(query: String, state: ContaUiState): List<MoreSearchResu
         state.movements.filter {
             it.description.matchesTerm() || it.categoryName.matchesTerm() || it.accountName.matchesTerm()
         }.take(5).forEach {
-            add(MoreSearchResult(it.description, "${it.date.take(10)} · ${it.categoryName ?: it.type} · ${money(it.amount, state.privacyMode)}", "Mov", Tab.Movements))
+            add(MoreSearchResult(it.description, "${it.date.take(10)} · ${it.categoryName ?: it.type} · ${money(it.amount, state.privacyMode)}", "Mov", Tab.Movements, it.id))
         }
         state.accounts.filter {
             it.accountName.matchesTerm() || it.bankName.matchesTerm()
         }.take(4).forEach {
-            add(MoreSearchResult(it.accountName, "${it.bankName} · ${money(it.balance, state.privacyMode)}", "Cuenta", Tab.Accounts))
+            add(MoreSearchResult(it.accountName, "${it.bankName} · ${money(it.balance, state.privacyMode)}", "Cuenta", Tab.Accounts, it.id))
         }
         state.debtDetails.visibleDebtDetails().filter {
             it.name.matchesTerm() || it.entity.matchesTerm() || it.type.matchesTerm()
         }.take(4).forEach {
-            add(MoreSearchResult(it.name, "${it.source} · ${it.entity} · ${money(it.pendingAmount, state.privacyMode)}", "Deuda", Tab.Debt))
+            add(MoreSearchResult(it.name, "${it.source} · ${it.entity} · ${money(it.pendingAmount, state.privacyMode)}", "Deuda", Tab.Debt, it.id))
         }
         state.expiringInsurances.visibleInsurancePolicies().filter {
             it.name.matchesTerm() || it.company.matchesTerm() || it.type.matchesTerm()
         }.take(4).forEach {
-            add(MoreSearchResult(it.name.ifBlank { "Seguro" }, "${it.company ?: it.type} · ${money(it.annualPremium, state.privacyMode)}", "Seguro", Tab.Insurance))
+            add(MoreSearchResult(it.name.ifBlank { "Seguro" }, "${it.company ?: it.type} · ${money(it.annualPremium, state.privacyMode)}", "Seguro", Tab.Insurance, it.id))
         }
         state.rentalProperties.filter {
             it.name.matchesTerm()
         }.take(4).forEach {
-            add(MoreSearchResult(it.name, "Cashflow ${money(it.profit, state.privacyMode)} · ${percent(it.profitability)}", "Alquiler", Tab.Rentals))
+            add(MoreSearchResult(it.name, "Cashflow ${money(it.profit, state.privacyMode)} · ${percent(it.profitability)}", "Alquiler", Tab.Rentals, it.id))
         }
     }
 }
@@ -254,3 +259,4 @@ fun MoreRow(tab: Tab, detail: String, onOpen: (Tab) -> Unit) {
         }
     }
 }
+

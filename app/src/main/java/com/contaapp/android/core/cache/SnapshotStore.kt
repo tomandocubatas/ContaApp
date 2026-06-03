@@ -49,8 +49,19 @@ class SnapshotStore(context: Context) {
         }
     }
 
+    fun save(key: String, snapshot: FinancialSnapshot) {
+        runCatching {
+            prefs.edit().putString(key.safeSnapshotKey(), snapshot.toJson().toString()).apply()
+        }
+    }
+
     fun load(): FinancialSnapshot? {
         val raw = prefs.getString("home", null) ?: return null
+        return runCatching { JSONObject(raw).toSnapshot() }.getOrNull()
+    }
+
+    fun load(key: String): FinancialSnapshot? {
+        val raw = prefs.getString(key.safeSnapshotKey(), null) ?: return null
         return runCatching { JSONObject(raw).toSnapshot() }.getOrNull()
     }
 
@@ -58,6 +69,8 @@ class SnapshotStore(context: Context) {
         prefs.edit().clear().apply()
     }
 }
+
+private fun String.safeSnapshotKey(): String = "snapshot_" + replace(Regex("[^A-Za-z0-9_.-]"), "_")
 
 private fun FinancialSnapshot.toJson(): JSONObject {
     return JSONObject()

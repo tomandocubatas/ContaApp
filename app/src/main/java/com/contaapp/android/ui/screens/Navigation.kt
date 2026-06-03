@@ -85,6 +85,8 @@ enum class Tab(val label: String, val shortLabel: String, @DrawableRes val iconR
     More("Mas", "Mas", R.drawable.ic_menu)
 }
 
+private data class DetailTarget(val tab: Tab, val id: String?)
+
 @Composable
 fun MainScaffold(
     state: ContaUiState,
@@ -103,6 +105,7 @@ fun MainScaffold(
     onShowAttentionNotification: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(Tab.Home) }
+    var detailTarget by remember { mutableStateOf<DetailTarget?>(null) }
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val isTablet = maxWidth >= 720.dp
@@ -148,12 +151,34 @@ fun MainScaffold(
                     AdaptiveScreenFrame(isTablet = isTablet) {
                         when (selectedTab) {
                             Tab.Home -> HomeScreen(state, onHomeFiltersChanged)
-                            Tab.Movements -> MovementsScreen(state, onMovementFiltersChanged)
-                            Tab.Accounts -> AccountsScreen(state)
+                            Tab.Movements -> MovementsScreen(
+                                state = state,
+                                onMovementFiltersChanged = onMovementFiltersChanged,
+                                focusMovementId = detailTarget.takeIf { it?.tab == Tab.Movements }?.id,
+                                onFocusConsumed = { detailTarget = null }
+                            )
+                            Tab.Accounts -> AccountsScreen(
+                                state = state,
+                                focusAccountId = detailTarget.takeIf { it?.tab == Tab.Accounts }?.id,
+                                onFocusConsumed = { detailTarget = null }
+                            )
                             Tab.Charts -> ChartsScreen(state, onChartFiltersChanged)
-                            Tab.Debt -> DebtScreen(state)
-                            Tab.Insurance -> InsuranceScreen(state)
-                            Tab.Rentals -> RentalsScreen(state, onChartFiltersChanged)
+                            Tab.Debt -> DebtScreen(
+                                state = state,
+                                focusDebtId = detailTarget.takeIf { it?.tab == Tab.Debt }?.id,
+                                onFocusConsumed = { detailTarget = null }
+                            )
+                            Tab.Insurance -> InsuranceScreen(
+                                state = state,
+                                focusInsuranceId = detailTarget.takeIf { it?.tab == Tab.Insurance }?.id,
+                                onFocusConsumed = { detailTarget = null }
+                            )
+                            Tab.Rentals -> RentalsScreen(
+                                state = state,
+                                onRentalsFiltersChanged = onChartFiltersChanged,
+                                focusPropertyId = detailTarget.takeIf { it?.tab == Tab.Rentals }?.id,
+                                onFocusConsumed = { detailTarget = null }
+                            )
                             Tab.Settings -> SettingsScreen(
                                 state = state,
                                 onRefresh = onRefresh,
@@ -166,7 +191,14 @@ fun MainScaffold(
                                 onShowAttentionNotification = onShowAttentionNotification,
                                 onLogout = onLogout
                             )
-                            Tab.More -> MoreScreen(state = state, onOpen = { selectedTab = it })
+                            Tab.More -> MoreScreen(
+                                state = state,
+                                onOpen = { selectedTab = it },
+                                onOpenResult = { result ->
+                                    selectedTab = result.tab
+                                    detailTarget = DetailTarget(result.tab, result.targetId)
+                                }
+                            )
                         }
                     }
 

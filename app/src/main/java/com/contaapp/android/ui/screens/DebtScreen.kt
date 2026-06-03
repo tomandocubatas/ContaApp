@@ -74,7 +74,11 @@ import com.contaapp.android.domain.Movement
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 @Composable
-fun DebtScreen(state: ContaUiState) {
+fun DebtScreen(
+    state: ContaUiState,
+    focusDebtId: String? = null,
+    onFocusConsumed: () -> Unit = {}
+) {
     var selectedDebt by remember { mutableStateOf<DebtDetail?>(null) }
     var query by remember { mutableStateOf("") }
     var source by remember { mutableStateOf<String?>(null) }
@@ -92,6 +96,13 @@ fun DebtScreen(state: ContaUiState) {
         val matchesSource = source == null || debt.source == source
         val matchesStatus = status == null || debt.status.equals(status, ignoreCase = true)
         matchesText && matchesSource && matchesStatus
+    }
+
+    LaunchedEffect(focusDebtId, visibleDetails) {
+        focusDebtId?.let { id ->
+            selectedDebt = visibleDetails.firstOrNull { it.id == id }
+            onFocusConsumed()
+        }
     }
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -131,6 +142,10 @@ fun DebtScreen(state: ContaUiState) {
                             FilterButton("Vencidas", status == "overdue") { status = "overdue" }
                         }
                     }
+                }
+                if (state.isLoading && filteredDetails.isEmpty()) {
+                    item { SkeletonCard(lines = 4) }
+                    item { SkeletonCard(lines = 4) }
                 }
                 debtSourceGroups(filteredDetails).forEach { (label, rows) ->
                     item {
@@ -311,6 +326,11 @@ fun DebtDetailDialog(
 ) {
     val monthsLeft = if (debt.monthlyPayment > 0.0) kotlin.math.ceil(debt.pendingAmount / debt.monthlyPayment).toInt() else null
     val monthlyRatio = debt.monthlyPayment / (debt.pendingAmount.takeIf { it > 0.0 } ?: 1.0)
+    val statusColor = when {
+        debt.status.equals("overdue", true) -> ContaDanger
+        debt.status.equals("warning", true) -> ContaAmber
+        else -> ContaTeal
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -318,27 +338,46 @@ fun DebtDetailDialog(
         },
         title = { Text(debt.name) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)),
-                    shape = RoundedCornerShape(16.dp)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)),
+                    shape = RoundedCornerShape(18.dp)
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Resumen ejecutivo", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
-                        ProgressBar(progress = monthlyRatio.coerceIn(0.0, 1.0), color = MaterialTheme.colorScheme.primary)
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                Modifier.size(50.dp).background(statusColor.copy(alpha = 0.14f), RoundedCornerShape(16.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(painterResource(R.drawable.ic_credit_card), contentDescription = null, tint = statusColor, modifier = Modifier.size(26.dp))
+                            }
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text(debt.entity, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text("${debt.source} · ${debt.type}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                            }
+                            StatusChip(debt.status.ifBlank { "Activo" }, statusColor)
+                        }
+                        Text("Pendiente", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                        Text(money(debt.pendingAmount, hidden), color = statusColor, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall)
+                        ProgressBar(progress = monthlyRatio.coerceIn(0.0, 1.0), color = statusColor)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                             LightHeroMiniMetric("Meses est.", monthsLeft?.toString() ?: "N/D", ContaAmber, Modifier.weight(1f))
                             LightHeroMiniMetric("Cuota", money(debt.monthlyPayment, hidden), ContaTeal, Modifier.weight(1f))
                         }
                     }
                 }
-                DetailLine("Origen", debt.source)
-                DetailLine("Entidad", debt.entity)
-                DetailLine("Tipo", debt.type)
-                DetailLine("Pendiente", money(debt.pendingAmount, hidden))
-                DetailLine("Cuota mensual", money(debt.monthlyPayment, hidden))
-                DetailLine("Proximo pago", nextPaymentText(debt))
-                DetailLine("Estado", debt.status)
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        DetailLine("Proximo pago", nextPaymentText(debt))
+                        DetailLine("Cuota mensual", money(debt.monthlyPayment, hidden))
+                        DetailLine("Origen", debt.source)
+                        DetailLine("Tipo", debt.type)
+                    }
+                }
             }
         },
         shape = RoundedCornerShape(18.dp)

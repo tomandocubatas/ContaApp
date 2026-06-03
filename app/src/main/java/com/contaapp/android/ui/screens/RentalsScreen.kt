@@ -46,12 +46,24 @@ import com.contaapp.android.domain.RentalProperty
 import java.time.LocalDate
 
 @Composable
-fun RentalsScreen(state: ContaUiState, onRentalsFiltersChanged: (MovementFilters) -> Unit) {
+fun RentalsScreen(
+    state: ContaUiState,
+    onRentalsFiltersChanged: (MovementFilters) -> Unit,
+    focusPropertyId: String? = null,
+    onFocusConsumed: () -> Unit = {}
+) {
     var year by remember { mutableIntStateOf(LocalDate.now().year) }
     var selectedProperty by remember { mutableStateOf<RentalProperty?>(null) }
 
     LaunchedEffect(year) {
         onRentalsFiltersChanged(MovementFilters(dateFrom = "$year-01-01", dateTo = "$year-12-31"))
+    }
+
+    LaunchedEffect(focusPropertyId, state.rentalProperties) {
+        focusPropertyId?.let { id ->
+            selectedProperty = state.rentalProperties.firstOrNull { it.id == id }
+            onFocusConsumed()
+        }
     }
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -103,6 +115,10 @@ fun RentalsScreen(state: ContaUiState, onRentalsFiltersChanged: (MovementFilters
             }
             item {
                 SectionHeader("Propiedades", "${state.rentalProperties.size} con actividad")
+            }
+            if (state.isLoading && state.rentalProperties.isEmpty()) {
+                item { SkeletonCard(lines = 4) }
+                item { SkeletonCard(lines = 4) }
             }
             items(state.rentalProperties.take(12)) { property ->
                 RentalPropertyRow(property, state.privacyMode) { selectedProperty = property }
@@ -221,6 +237,10 @@ fun RentalPropertyDetailDialog(
     hidden: Boolean,
     onDismiss: () -> Unit
 ) {
+    val accent = if (property.profit >= 0.0) ContaTeal else ContaDanger
+    val activeMonths = months.filter { it.income > 0.0 || it.expense > 0.0 }
+    val bestMonth = activeMonths.maxByOrNull { it.profit }
+    val worstMonth = activeMonths.minByOrNull { it.profit }
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -228,16 +248,70 @@ fun RentalPropertyDetailDialog(
         },
         title = { Text(property.name.ifBlank { "Propiedad" }) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                DetailLine("Ingresos", money(property.income, hidden))
-                DetailLine("Gastos", money(property.expense, hidden))
-                DetailLine("Cashflow", money(property.profit, hidden))
-                DetailLine("Rentabilidad", percent(property.profitability))
-                val activeMonths = months.filter { it.income > 0.0 || it.expense > 0.0 }
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)),
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(painterResource(R.drawable.ic_home), contentDescription = null, tint = accent, modifier = Modifier.size(26.dp))
+                            }
+                            Column(Modifier.weight(1f)) {
+                                Text("Cashflow anual", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                                Text(money(property.profit, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall)
+                            }
+                            StatusChip(percent(property.profitability), accent)
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            LightHeroMiniMetric("Ingresos", money(property.income, hidden), ContaTeal, Modifier.weight(1f))
+                            LightHeroMiniMetric("Gastos", money(property.expense, hidden), ContaCoral, Modifier.weight(1f))
+                        }
+                        ProgressBar(progress = property.income.takeIf { it > 0.0 }?.let { (property.profit / it).coerceIn(0.0, 1.0) } ?: 0.0, color = accent)
+                    }
+                }
+                if (bestMonth != null || worstMonth != null) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            bestMonth?.let { DetailLine("Mejor mes", "${it.monthName} · ${money(it.profit, hidden)}") }
+                            worstMonth?.let { DetailLine("Mes mas flojo", "${it.monthName} · ${money(it.profit, hidden)}") }
+                        }
+                    }
+                }
                 if (activeMonths.isNotEmpty()) {
                     Text("Detalle mensual", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                     activeMonths.take(6).forEach { month ->
-                        DetailLine(month.monthName, "${money(month.profit, hidden)} · ${month.categories.size} categorias")
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text(month.monthName, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                                    Text(money(month.profit, hidden), color = if (month.profit >= 0.0) ContaTeal else ContaDanger, fontWeight = FontWeight.Black)
+                                }
+                                Text(
+                                    "Ingresos ${money(month.income, hidden)} · gastos ${money(month.expense, hidden)}",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                month.categories.take(3).forEach { category ->
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text(category.categoryName, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                        Text(money(category.total, hidden), color = ContaCoral, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -245,7 +319,6 @@ fun RentalPropertyDetailDialog(
         shape = RoundedCornerShape(18.dp)
     )
 }
-
 @Composable
 fun RentalMonthsCard(months: List<com.contaapp.android.domain.RentalMonth>, hidden: Boolean) {
     Card(
@@ -301,3 +374,4 @@ fun RentalMonthRow(month: com.contaapp.android.domain.RentalMonth, hidden: Boole
         }
     }
 }
+

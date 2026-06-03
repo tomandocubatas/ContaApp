@@ -327,7 +327,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }.onSuccess { payload ->
                 val loadedAt = Instant.now()
                 val label = freshDataLabel()
-                snapshotStore.save(payload.toSnapshot(loadedAt))
+                val snapshot = payload.toSnapshot(loadedAt)
+                snapshotStore.save(snapshot)
+                snapshotStore.save(filters.snapshotKey(), snapshot)
                 homeCache = homeCache + (filters to CachedHomePayload(payload, loadedAt, label))
                 lastHomeFilters = filters
                 lastHomeLoadedAt = loadedAt
@@ -475,11 +477,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun applyCachedHome(filters: MovementFilters): Boolean {
-        val cached = homeCache[filters] ?: return false
-        if (!isFresh(cached.loadedAt)) return false
+        val cached = homeCache[filters]
+        if (cached != null && isFresh(cached.loadedAt)) {
+            lastHomeFilters = filters
+            lastHomeLoadedAt = cached.loadedAt
+            applyHomePayload(cached.payload, cached.label, isLoading = false)
+            return true
+        }
+        val snapshot = snapshotStore.load(filters.snapshotKey()) ?: return false
+        val loadedAt = snapshot.loadedAtMillis.takeIf { it > 0L }?.let(Instant::ofEpochMilli) ?: return false
+        if (!isFresh(loadedAt)) return false
+        val payload = snapshot.toHomePayloadOrNull() ?: return false
+        val label = "Cache ${loadedAt.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm"))}"
+        homeCache = homeCache + (filters to CachedHomePayload(payload, loadedAt, label))
         lastHomeFilters = filters
-        lastHomeLoadedAt = cached.loadedAt
-        applyHomePayload(cached.payload, cached.label, isLoading = false)
+        lastHomeLoadedAt = loadedAt
+        applyHomePayload(payload, label, isLoading = false)
         return true
     }
 
@@ -653,4 +666,38 @@ private fun HomePayload.toSnapshot(loadedAt: Instant): FinancialSnapshot {
         rentalMonths = rentalMonths,
         charts = charts
     )
+}
+
+private fun FinancialSnapshot.toHomePayloadOrNull(): HomePayload? {
+    return HomePayload(
+        dashboard = dashboard ?: return null,
+        categories = categories,
+        accounts = accounts,
+        movements = movements,
+        debts = debts,
+        debtDetails = debtDetails,
+        insurance = insurance ?: InsuranceSummary(0, 0.0, 0),
+        expiringInsurances = expiringInsurances,
+        insuranceCoverages = insuranceCoverages,
+        insuranceRenewals = insuranceRenewals,
+        rentalSummary = rentalSummary ?: RentalSummary(0.0, 0.0, 0.0, 0.0, 0),
+        rentalProperties = rentalProperties,
+        rentalMonths = rentalMonths,
+        charts = charts
+    )
+}
+
+private fun MovementFilters.snapshotKey(): String {
+    return listOf(
+        "home",
+        text.trim(),
+        type.orEmpty(),
+        reviewed?.toString().orEmpty(),
+        dateFrom.orEmpty(),
+        dateTo.orEmpty(),
+        accountId.orEmpty(),
+        categoryId.orEmpty(),
+        minAmount?.toString().orEmpty(),
+        maxAmount?.toString().orEmpty()
+    ).joinToString("|")
 }

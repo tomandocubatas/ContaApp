@@ -76,7 +76,11 @@ import com.contaapp.android.domain.Movement
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 @Composable
-fun AccountsScreen(state: ContaUiState) {
+fun AccountsScreen(
+    state: ContaUiState,
+    focusAccountId: String? = null,
+    onFocusConsumed: () -> Unit = {}
+) {
     var selectedAccount by remember { mutableStateOf<BankAccountBalance?>(null) }
     var query by remember { mutableStateOf("") }
     var bankFilter by remember { mutableStateOf<String?>(null) }
@@ -95,6 +99,13 @@ fun AccountsScreen(state: ContaUiState) {
             matchesText && matchesBank && matchesBalance
         }
         .sortedByDescending { kotlin.math.abs(it.balance) }
+
+    LaunchedEffect(focusAccountId, state.accounts) {
+        focusAccountId?.let { id ->
+            selectedAccount = state.accounts.firstOrNull { it.id == id }
+            onFocusConsumed()
+        }
+    }
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val isTablet = maxWidth >= 760.dp
@@ -125,6 +136,10 @@ fun AccountsScreen(state: ContaUiState) {
                         FilterButton("Negativas", balanceFilter == AccountBalanceFilter.Negative) { balanceFilter = AccountBalanceFilter.Negative }
                     }
                 }
+            }
+            if (state.isLoading && state.accounts.isEmpty()) {
+                item { SkeletonCard(lines = 4) }
+                item { SkeletonCard(lines = 4) }
             }
             filteredAccounts.groupBy { it.bankName.ifBlank { "Banco" } }.forEach { (bank, accounts) ->
                 item { BankAccountsCard(bank, accounts, state.privacyMode, onClick = { selectedAccount = it }) }

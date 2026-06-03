@@ -10,6 +10,19 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-06-03 - UX/Funcional - Busqueda directa, cache por rango y detalles ejecutivos
+
+- La busqueda global de `Mas` abre ahora el detalle concreto cuando el resultado es movimiento, cuenta, deuda, seguro o alquiler, en vez de limitarse a cambiar de pestana.
+- Se agrega destino interno de navegacion para consumir ids de busqueda y abrir modales de detalle en Movimientos, Cuentas, Deuda, Seguros y Alquileres.
+- Movimientos mejora su ficha de detalle con cabecera ejecutiva, estado, categoria visual, cuenta resuelta por id y bloque de vinculacion/contexto.
+- Deuda mejora su ficha de detalle con pendiente destacado, entidad, estado, cuota, meses estimados y proximo pago.
+- Alquileres mejora la ficha de propiedad con cashflow anual, ingresos/gastos, rentabilidad, mejor/peor mes y categorias principales por mes.
+- Graficas compactas permiten seleccionar el punto mas cercano tocando directamente sobre la linea, mostrando valor y eje X seleccionado.
+- La cache persistida guarda snapshots por rango/filtro financiero ademas del snapshot general, para reutilizar periodos ya consultados dentro del TTL aunque se vuelva a la pantalla despues.
+- Se agregan skeletons especificos en Movimientos, Cuentas, Deuda, Seguros y Alquileres cuando una pantalla esta cargando sin datos visibles.
+- Se corrige el mapeo nulo del calendario de renovaciones de seguros para evitar error si el backend no devuelve lista de polizas.
+- Verificacion: `:app:compileDebugKotlin --rerun-tasks` correcto en Gradle offline y `:app:assembleDebug` correcto. No se prueba emulador por indicacion del usuario.
+
 ## 2026-06-03 - UX/Funcional - Git inicial, caducados y refinamiento profesional
 
 - Se amplia `.gitignore` para excluir `.kotlin/` y logs JVM `hs_err_pid*.log`/`replay_pid*.log` antes del primer commit.

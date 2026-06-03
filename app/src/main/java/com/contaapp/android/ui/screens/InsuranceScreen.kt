@@ -74,7 +74,11 @@ import com.contaapp.android.domain.Movement
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 @Composable
-fun InsuranceScreen(state: ContaUiState) {
+fun InsuranceScreen(
+    state: ContaUiState,
+    focusInsuranceId: String? = null,
+    onFocusConsumed: () -> Unit = {}
+) {
     var query by remember { mutableStateOf("") }
     var range by remember { mutableStateOf(InsuranceRange.All) }
     var selectedPolicy by remember { mutableStateOf<InsurancePolicy?>(null) }
@@ -87,6 +91,13 @@ fun InsuranceScreen(state: ContaUiState) {
         val matchesRange = range.matches(policy.renewalDate ?: policy.endDate)
         matchesText && matchesRange
     }.sortedBy { it.renewalDate ?: it.endDate ?: "9999-12-31" }
+
+    LaunchedEffect(focusInsuranceId, visiblePolicies) {
+        focusInsuranceId?.let { id ->
+            selectedPolicy = visiblePolicies.firstOrNull { it.id == id }
+            onFocusConsumed()
+        }
+    }
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val isTablet = maxWidth >= 760.dp
@@ -130,6 +141,10 @@ fun InsuranceScreen(state: ContaUiState) {
                         FilterButton("60 dias", range == InsuranceRange.Days60) { range = InsuranceRange.Days60 }
                     }
                 }
+            }
+            if (state.isLoading && filteredPolicies.isEmpty()) {
+                item { SkeletonCard(lines = 4) }
+                item { SkeletonCard(lines = 4) }
             }
             item { SectionTitle("Detalle de seguros") }
             items(filteredPolicies, key = { it.id.ifBlank { "${it.name}-${it.policyNumber.orEmpty()}" } }) { policy ->

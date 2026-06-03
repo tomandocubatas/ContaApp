@@ -84,7 +84,9 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun MovementsScreen(
     state: ContaUiState,
-    onMovementFiltersChanged: (MovementFilters) -> Unit
+    onMovementFiltersChanged: (MovementFilters) -> Unit,
+    focusMovementId: String? = null,
+    onFocusConsumed: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val preferencesStore = remember(context) { AppPreferencesStore(context) }
@@ -129,6 +131,13 @@ fun MovementsScreen(
                 maxAmount = maxAmount.toDoubleOrNull()
             )
         )
+    }
+
+    LaunchedEffect(focusMovementId, state.movements) {
+        focusMovementId?.let { id ->
+            selectedMovement = state.movements.firstOrNull { it.id == id }
+            onFocusConsumed()
+        }
     }
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -236,6 +245,10 @@ fun MovementsScreen(
             }
             if (state.isMovementsLoading) {
                 item { InlineLoading("Actualizando movimientos...") }
+                if (state.movements.isEmpty()) {
+                    item { SkeletonCard(lines = 5) }
+                    item { SkeletonCard(lines = 4) }
+                }
             }
             val groups = visibleMovements.groupBy {
                 when (groupMode) {

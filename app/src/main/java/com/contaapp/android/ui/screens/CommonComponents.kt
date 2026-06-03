@@ -385,33 +385,44 @@ fun MovementDetailDialog(
         title = { Text("Detalle del movimiento", fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(
-                        Modifier.size(48.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(16.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(painterResource(categoryIcon(category, movement)), contentDescription = null, tint = accent, modifier = Modifier.size(25.dp))
-                    }
-                    Column(Modifier.weight(1f)) {
-                        Text(movement.description, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                        Text(movement.date.take(10), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f), style = MaterialTheme.typography.bodySmall)
-                    }
-                }
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = accent.copy(alpha = 0.10f)),
-                    shape = RoundedCornerShape(16.dp)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.76f)),
+                    shape = RoundedCornerShape(18.dp)
                 ) {
-                    Row(Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Importe", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.68f))
-                        Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.titleLarge)
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Box(
+                                Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(painterResource(categoryIcon(category, movement)), contentDescription = null, tint = accent, modifier = Modifier.size(26.dp))
+                            }
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                Text(movement.description, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                Text("${movement.date.take(10)} · ${category?.name ?: movement.categoryName ?: movement.type}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text(if (movement.amount >= 0.0) "Ingreso" else "Gasto", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                                Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall)
+                            }
+                            StatusChip(if (movement.reviewed) "Revisado" else "Pendiente", if (movement.reviewed) ContaTeal else ContaAmber)
+                        }
+                        ProgressBar(
+                            progress = if (movement.amount >= 0.0) 1.0 else 0.72,
+                            color = accent
+                        )
                     }
                 }
                 QualityBadges(movement = movement, accountName = accountName, category = category, link = link)
-                DetailLine("Tipo", movement.type)
-                DetailLine("Cuenta", accountName ?: "Cuenta no informada por la API")
-                DetailLine("Categoria", category?.name ?: movement.categoryName ?: "Sin categoria")
-                DetailLine("Vinculacion", link ?: "Sin vinculacion detectada")
-                DetailLine("Estado", if (movement.reviewed) "Revisado" else "Pendiente de revisar")
+                MovementContextCard(
+                    type = movement.type,
+                    account = accountName ?: "Cuenta no informada por la API",
+                    category = category?.name ?: movement.categoryName ?: "Sin categoria",
+                    link = link ?: "Sin vinculacion detectada",
+                    accent = accent
+                )
                 if (movement.hasSplits) DetailLine("Desglose", "Movimiento con splits")
                 if (movement.isDuplicate) DetailLine("Duplicado", "Marcado como posible duplicado")
                 movement.notes?.let { DetailLine("Notas", it) }
@@ -419,6 +430,33 @@ fun MovementDetailDialog(
         },
         shape = RoundedCornerShape(18.dp)
     )
+}
+
+@Composable
+fun MovementContextCard(type: String, account: String, category: String, link: String, accent: Color) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Contexto", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
+            DetailLine("Tipo", type)
+            DetailLine("Cuenta", account)
+            DetailLine("Categoria", category)
+            Row(
+                Modifier.fillMaxWidth().background(accent.copy(alpha = 0.09f), RoundedCornerShape(12.dp)).padding(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(painterResource(R.drawable.ic_receipt), contentDescription = null, tint = accent, modifier = Modifier.size(18.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Vinculacion", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(link, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
+            }
+        }
+    }
 }
 
 @Composable
