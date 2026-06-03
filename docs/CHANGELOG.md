@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-06-03 - UX/Widget - Iconografia semantica en widget
+
+- Se incorporan iconos compactos para ingresos, gastos, top gasto, proximo vencimiento y avisos del widget.
+- Se agregan fondos visuales teal, coral, ambar y azul para que las metricas se lean por color e icono, no solo por texto.
+- Las tarjetas iconificadas del widget tambien son zonas tactiles para abrir la app.
+- Verificacion: `:app:assembleDebug` correcto en Gradle offline. No se prueba emulador por indicacion del usuario.
+
 ## 2026-06-03 - UX/Widget - Widget ejecutivo con salud y TTL
 
 - El widget Android pasa de resumen basico a panel ejecutivo: balance, ingresos, gastos, neto, salud financiera, mix ingresos/gastos, top gasto, proximo vencimiento y avisos priorizados.

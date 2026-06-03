@@ -84,10 +84,15 @@ class ContaWidgetProvider : AppWidgetProvider() {
         listOf(
             R.id.widget_root,
             R.id.widget_balance,
+            R.id.widget_income_card,
             R.id.widget_income,
+            R.id.widget_expense_card,
             R.id.widget_expense,
+            R.id.widget_top_expense_card,
             R.id.widget_top_expense,
+            R.id.widget_next_card,
             R.id.widget_next,
+            R.id.widget_attention_card,
             R.id.widget_attention
         ).forEach { views.setOnClickPendingIntent(it, openApp) }
         return views
