@@ -340,7 +340,7 @@ private fun String.privacySafeTitle(hidden: Boolean): String {
 }
 
 @Composable
-fun ComparisonMetric(title: String, value: Double, color: Color, hidden: Boolean, modifier: Modifier = Modifier) {
+fun ComparisonMetric(title: String, value: Double, color: Color, hidden: Boolean, modifier: Modifier = Modifier, valueText: String? = null) {
     Column(
         modifier
             .background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md))
@@ -349,7 +349,7 @@ fun ComparisonMetric(title: String, value: Double, color: Color, hidden: Boolean
     ) {
         Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)
         FitText(
-            money(value, hidden),
+            valueText ?: money(value, hidden),
             color = color,
             style = MaterialTheme.typography.amountMedium,
             fontWeight = FontWeight.Black

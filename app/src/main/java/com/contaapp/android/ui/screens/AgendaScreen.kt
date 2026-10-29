@@ -211,7 +211,7 @@ fun AgendaSummary(calendar: CalendarMonth, hidden: Boolean) {
             Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 ComparisonMetric(stringResource(R.string.agenda_ingresos), income, ContaIncome, hidden, Modifier.weight(1f))
                 ComparisonMetric(stringResource(R.string.agenda_gastos), expense, ContaExpense, hidden, Modifier.weight(1f))
-                ComparisonMetric(stringResource(R.string.agenda_previstos), pending.toDouble(), ContaWarning, false, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.agenda_previstos), pending.toDouble(), ContaWarning, false, Modifier.weight(1f), valueText = pending.toString())
             }
         }
     }

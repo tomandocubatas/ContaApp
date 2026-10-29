@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - Seguridad/Privacidad - Vista de recientes protegida (v0.19.0)
+
+- Con la privacidad activa la ventana lleva `FLAG_SECURE` (y `setRecentsScreenshotEnabled(false)` en API 33+): la tarjeta de la app en la vista de recientes queda en blanco y se bloquean las capturas. Al desactivarla se retira. `setRecentsScreenshotEnabled` por si solo no bastaba en un movil con Android 15 (One UI).
+- Fix: en el resumen de Agenda, "Previstos" mostraba el numero de eventos sin confirmar como dinero ("26,00 €") y no respetaba la privacidad; ahora muestra "26" (`ComparisonMetric` admite `valueText`).
+- Auditoria con privacidad activa: Inicio, Movimientos, Cuentas, Graficas, Mas, Deuda, Seguros y Alquileres ocultan sus importes.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil, recientes en blanco con privacidad y captura normal sin ella.
+
 ## 2026-10-29 - UX/Estados - Banner de error con Reintentar (v0.18.0)
 
 - Nuevo `ErrorBanner` bajo la barra superior de `MainScaffold`: titulo "No se pudo actualizar", mensaje, boton "Reintentar" de 48 dp que relanza la carga y region viva para lectores de pantalla. Sustituye a los `ErrorText` sueltos de Inicio, Agenda y Ajustes (el de las pantallas de acceso se mantiene).
