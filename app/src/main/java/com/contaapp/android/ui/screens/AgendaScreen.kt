@@ -365,6 +365,7 @@ private fun CalendarEvent.typeLabel(): String {
     }
 }
 
+@Composable
 private fun eventAccent(event: CalendarEvent): Color {
     return when {
         event.direction == "income" -> ContaTeal

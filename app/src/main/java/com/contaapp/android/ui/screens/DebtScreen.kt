@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.contaapp.android.ui.screens
 
@@ -269,7 +269,7 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
                 }
                 pendingShare?.let { StatusChip("${(it * 100).toInt()}%", ContaDanger) }
             }
-            pendingShare?.let { ProgressBar(progress = it, color = Color(0xFFFF5A52)) }
+            pendingShare?.let { ProgressBar(progress = it, color = ContaCoral) }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 LightHeroMiniMetric(stringResource(R.string.debt_pagado), paid?.let { money(it, hidden) } ?: NO_DATA, ContaTeal, Modifier.weight(1f))
                 LightHeroMiniMetric(stringResource(R.string.debt_intereses), interest?.let { money(it, hidden) } ?: NO_DATA, ContaAmber, Modifier.weight(1f))
@@ -281,9 +281,9 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
 @Composable
 fun DebtDetailRow(debt: DebtDetail, hidden: Boolean, onClick: () -> Unit) {
     val statusColor = when (debt.status.lowercase()) {
-        "overdue" -> Color(0xFFDC2626)
-        "warning" -> Color(0xFFF59E0B)
-        else -> Color(0xFF0F766E)
+        "overdue" -> ContaDanger
+        "warning" -> ContaAmber
+        else -> ContaTeal
     }
 
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(12.dp)) {
@@ -411,7 +411,7 @@ fun DebtRow(debt: DebtSummary, hidden: Boolean) {
             debt.paid?.let { paid ->
                 ProgressBar(
                     progress = debt.pending / ((debt.pending + paid).takeIf { it > 0 } ?: 1.0),
-                    color = Color(0xFFFF5A52)
+                    color = ContaCoral
                 )
             }
             Text(stringResource(R.string.debt_intereses_2, debt.interest?.let { money(it, hidden) } ?: NO_DATA), color = MaterialTheme.colorScheme.onSurfaceVariant)

@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.contaapp.android.ui.screens
 
@@ -312,7 +312,7 @@ fun AccountRow(account: BankAccountBalance, hidden: Boolean, onClick: () -> Unit
                 Modifier.size(40.dp).background(ExecutiveSky.copy(alpha = 0.14f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(account.bankName.take(1).ifBlank { "C" }, color = Color(0xFF0369A1), fontWeight = FontWeight.Black)
+                Text(account.bankName.take(1).ifBlank { "C" }, color = ExecutiveSky, fontWeight = FontWeight.Black)
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {

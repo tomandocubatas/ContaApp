@@ -8,6 +8,15 @@ plugins {
 fun apiBaseUrl(property: String, fallback: String): String =
     "\"${providers.gradleProperty(property).getOrElse(fallback)}\""
 
+// Versión semántica: fix -> patch, mejora -> minor, cambio incompatible -> major.
+val appVersionMajor = 0
+val appVersionMinor = 2
+val appVersionPatch = 0
+val appVersionName = "$appVersionMajor.$appVersionMinor.$appVersionPatch"
+
+// El APK sale como ContaApp-<versión>-<tipo>.apk.
+base.archivesName.set("ContaApp-$appVersionName")
+
 android {
     namespace = "com.contaapp.android"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -16,8 +25,8 @@ android {
         applicationId = "com.contaapp.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = appVersionMajor * 10000 + appVersionMinor * 100 + appVersionPatch
+        versionName = appVersionName
 
         vectorDrawables {
             useSupportLibrary = true

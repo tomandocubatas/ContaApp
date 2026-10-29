@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.contaapp.android.ui.screens
 
@@ -49,6 +49,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
+import com.contaapp.android.ui.theme.LocalContaPalette
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,18 +83,18 @@ import com.contaapp.android.domain.Movement
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-val ContaCoral = Color(0xFFFF5A52)
-val ContaTeal = Color(0xFF0F766E)
-val ContaAmber = Color(0xFFF59E0B)
-val ContaDanger = Color(0xFFDC2626)
-val ContaInk = Color(0xFF0F172A)
-val ContaMuted = Color(0xFF64748B)
-val ContaSurface = Color.White
-val ExecutiveBlue = Color(0xFF0D47A1)
-val ExecutiveSky = Color(0xFF1E88E5)
-val ExecutiveMint = Color(0xFF22C55E)
-val ExecutiveOrange = Color(0xFFF59E0B)
-val ExecutiveBg = Color(0xFFF1F5F9)
+val ContaCoral: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.coral
+val ContaTeal: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.teal
+val ContaAmber: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.amber
+val ContaDanger: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.danger
+val ContaInk: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.ink
+val ContaMuted: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.muted
+val ContaSurface: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.surface
+val ExecutiveBlue: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.blue
+val ExecutiveSky: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.sky
+val ExecutiveMint: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.mint
+val ExecutiveOrange: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.orange
+val ExecutiveBg: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.background
 
 @Composable
 fun HeroBalance(title: String, value: String, subtitle: String) {
@@ -328,9 +330,9 @@ fun MetricCard(title: String, value: String, modifier: Modifier = Modifier) {
 @Composable
 fun MovementRow(movement: Movement, hidden: Boolean, onClick: () -> Unit) {
     val accent = when {
-        movement.amount > 0 -> Color(0xFF0F766E)
-        movement.amount < 0 -> Color(0xFFFF5A52)
-        else -> Color(0xFF64748B)
+        movement.amount > 0 -> ContaTeal
+        movement.amount < 0 -> ContaCoral
+        else -> ContaMuted
     }
     val icon = movementIcon(movement)
     Card(
@@ -598,7 +600,7 @@ fun PremiumPeriodSelector(
         shape = RoundedCornerShape(18.dp),
         modifier = modifier
             .fillMaxWidth()
-            .semantics { contentDescription = "Selector de periodo ${selected.homeLabel()}" }
+            .semantics { contentDescription = "Selector de periodo ${selected.homeLabel()}" }
             .clickable { open = true }
     ) {
         Row(

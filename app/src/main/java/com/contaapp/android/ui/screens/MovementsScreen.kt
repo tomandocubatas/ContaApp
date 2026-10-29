@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.contaapp.android.ui.screens
 
@@ -779,13 +779,13 @@ fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
                     Modifier
                         .weight((income / total).toFloat().coerceAtLeast(0.08f))
                         .height(8.dp)
-                        .background(Color(0xFF2DD4BF), RoundedCornerShape(50))
+                        .background(ContaTeal, RoundedCornerShape(50))
                 )
                 Box(
                     Modifier
                         .weight((expense / total).toFloat().coerceAtLeast(0.08f))
                         .height(8.dp)
-                        .background(Color(0xFFFF5A52), RoundedCornerShape(50))
+                        .background(ContaCoral, RoundedCornerShape(50))
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

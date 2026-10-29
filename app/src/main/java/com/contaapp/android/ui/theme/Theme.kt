@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 
@@ -64,12 +66,62 @@ private val AppTypography = Typography().let { base ->
     )
 }
 
+/** Colores de marca y de estado que no existen en [ColorScheme]; cada tema aporta su variante. */
+data class ContaPalette(
+    val coral: Color,
+    val teal: Color,
+    val amber: Color,
+    val danger: Color,
+    val ink: Color,
+    val muted: Color,
+    val surface: Color,
+    val blue: Color,
+    val sky: Color,
+    val mint: Color,
+    val orange: Color,
+    val background: Color
+)
+
+private val LightPalette = ContaPalette(
+    coral = Color(0xFFFF5A52),
+    teal = Color(0xFF0F766E),
+    amber = Color(0xFFF59E0B),
+    danger = Color(0xFFDC2626),
+    ink = Color(0xFF0F172A),
+    muted = Color(0xFF64748B),
+    surface = Color.White,
+    blue = Color(0xFF0D47A1),
+    sky = Color(0xFF1E88E5),
+    mint = Color(0xFF22C55E),
+    orange = Color(0xFFF59E0B),
+    background = Color(0xFFF1F5F9)
+)
+
+private val DarkPalette = ContaPalette(
+    coral = Color(0xFFFF8A80),
+    teal = Color(0xFF2DD4BF),
+    amber = Color(0xFFFBBF24),
+    danger = Color(0xFFFF7B7B),
+    ink = Color(0xFFEAF2FF),
+    muted = Color(0xFF94A3B8),
+    surface = Color(0xFF0A1524),
+    blue = Color(0xFF72B7FF),
+    sky = Color(0xFF64B5F6),
+    mint = Color(0xFF4ADE80),
+    orange = Color(0xFFFBBF24),
+    background = Color(0xFF050B16)
+)
+
+val LocalContaPalette = staticCompositionLocalOf { LightPalette }
+
 @Composable
 fun ContaTheme(darkMode: Boolean? = null, content: @Composable () -> Unit) {
     val dark = darkMode ?: isSystemInDarkTheme()
-    MaterialTheme(
-        colorScheme = if (dark) DarkColors else LightColors,
-        typography = AppTypography,
-        content = content
-    )
+    CompositionLocalProvider(LocalContaPalette provides if (dark) DarkPalette else LightPalette) {
+        MaterialTheme(
+            colorScheme = if (dark) DarkColors else LightColors,
+            typography = AppTypography,
+            content = content
+        )
+    }
 }

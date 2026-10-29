@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Tema - Paleta unica de colores (v0.2.0)
+
+- Las constantes de color sueltas (`ContaCoral`, `ContaTeal`, `ExecutiveBlue`...) pasan a leerse de `ContaPalette`, con variante clara y oscura servida por `ContaTheme`.
+- Colores de movimientos, deuda, barra de ingresos/gastos y avatar de cuentas salen de la paleta.
+- Versionado: `build.gradle.kts` calcula `versionName`/`versionCode` desde major.minor.patch (fix = patch, mejora = minor, cambio incompatible = major) y el APK sale como `ContaApp-<version>-<tipo>.apk`.
+- Verificacion: `:app:assembleDebug` y tests correctos; Inicio y Movimientos revisados en el movil en tema claro y oscuro.
+
 ## 2026-06-03 - UX/Widget - Layout P&L compacto
 
 - Ingresos, gastos y neto pasan a una misma fila de tres mini metricas iconificadas para lectura tipo P&L.

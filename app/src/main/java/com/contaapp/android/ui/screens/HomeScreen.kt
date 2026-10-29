@@ -305,6 +305,7 @@ fun HomePeriodComparisonCard(state: ContaUiState) {
     }
 }
 
+@Composable
 private fun CalendarEvent.toAgendaEntry(): AgendaEntry {
     val accent = when {
         direction == "income" -> ContaTeal
