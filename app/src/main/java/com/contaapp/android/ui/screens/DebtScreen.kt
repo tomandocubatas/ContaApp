@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
@@ -110,7 +111,7 @@ fun DebtScreen(
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val isTablet = maxWidth >= 760.dp
 
-        LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             item { SectionHeader(stringResource(R.string.debt_posicion_de_deuda), "${filteredDetails.size} detalles") }
             item {
                 DebtHeroCard(debts = visibleSummaries, hidden = state.privacyMode)
@@ -132,13 +133,13 @@ fun DebtScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
                         Text(stringResource(R.string.debt_origen), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs), modifier = Modifier.fillMaxWidth()) {
                             FilterButton(stringResource(R.string.debt_todo), source == null) { source = null }
                             FilterButton(stringResource(R.string.debt_prestamos), source == "Prestamo") { source = "Prestamo" }
                             FilterButton(stringResource(R.string.debt_financ), source == "Financiacion") { source = "Financiacion" }
                         }
                         Text(stringResource(R.string.debt_estado), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs), modifier = Modifier.fillMaxWidth()) {
                             FilterButton(stringResource(R.string.debt_estados), status == null) { status = null }
                             FilterButton(stringResource(R.string.debt_avisos), status == "warning") { status = "warning" }
                             FilterButton(stringResource(R.string.debt_vencidas), status == "overdue") { status = "overdue" }
@@ -200,7 +201,7 @@ fun DebtSourceSummaryCard(label: String, debts: List<DebtDetail>, hidden: Boolea
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(14.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -261,7 +262,7 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                     Text(stringResource(R.string.debt_exposicion_financiera), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
@@ -271,7 +272,7 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
                 pendingShare?.let { StatusChip("${(it * 100).toInt()}%", ContaDanger) }
             }
             pendingShare?.let { ProgressBar(progress = it, color = ContaDebt) }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
                 LightHeroMiniMetric(stringResource(R.string.debt_pagado), paid?.let { money(it, hidden) } ?: NO_DATA, ContaTeal, Modifier.weight(1f))
                 LightHeroMiniMetric(stringResource(R.string.debt_intereses), interest?.let { money(it, hidden) } ?: NO_DATA, ContaDebt, Modifier.weight(1f))
             }
@@ -292,8 +293,8 @@ fun DebtDetailRow(debt: DebtDetail, hidden: Boolean, onClick: () -> Unit) {
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -340,13 +341,13 @@ fun DebtDetailDialog(
         },
         title = { Text(debt.name) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)),
                     shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 Modifier.size(50.dp).background(statusColor.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.lg)),
                                 contentAlignment = Alignment.Center
@@ -362,7 +363,7 @@ fun DebtDetailDialog(
                         Text(stringResource(R.string.debt_pendiente), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                         Text(money(debt.pendingAmount, hidden), color = statusColor, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall)
                         ProgressBar(progress = monthlyRatio.coerceIn(0.0, 1.0), color = statusColor)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                             LightHeroMiniMetric(stringResource(R.string.debt_meses_est), monthsLeft?.toString() ?: "N/D", ContaAmber, Modifier.weight(1f))
                             LightHeroMiniMetric(stringResource(R.string.debt_cuota), money(debt.monthlyPayment, hidden), ContaTeal, Modifier.weight(1f))
                         }
@@ -373,7 +374,7 @@ fun DebtDetailDialog(
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                     shape = RoundedCornerShape(ContaRadius.lg)
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                         DetailLine(stringResource(R.string.debt_proximo_pago), nextPaymentText(debt))
                         DetailLine(stringResource(R.string.debt_cuota_mensual), money(debt.monthlyPayment, hidden))
                         DetailLine(stringResource(R.string.debt_origen), debt.source)
@@ -403,9 +404,9 @@ fun nextPaymentText(debt: DebtDetail): String {
 @Composable
 fun DebtRow(debt: DebtSummary, hidden: Boolean) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(ContaRadius.md)) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Text(debt.title, fontWeight = FontWeight.SemiBold)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
                 MetricCard(stringResource(R.string.debt_pendiente), money(debt.pending, hidden), Modifier.weight(1f))
                 MetricCard(stringResource(R.string.debt_pagado), debt.paid?.let { money(it, hidden) } ?: NO_DATA, Modifier.weight(1f))
             }

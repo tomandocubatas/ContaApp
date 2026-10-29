@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
@@ -104,12 +105,12 @@ fun InsuranceScreen(
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val isTablet = maxWidth >= 760.dp
 
-        LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             item { SectionHeader(stringResource(R.string.insurance_seguros), "${filteredPolicies.size} polizas") }
             item {
                 val insurance = state.insurance
                 if (insurance != null) {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                         InsuranceHeroCard(
                             active = insurance.activeCount,
                             expiring = insurance.expiringSoon,
@@ -223,10 +224,10 @@ fun InsuranceCoverageCard(coverages: List<com.contaapp.android.domain.InsuranceC
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             SectionHeader(stringResource(R.string.insurance_coberturas), "comparativa por tipo")
             sorted.forEach { item ->
-                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(item.type, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -257,10 +258,10 @@ fun InsuranceRenewalCalendarCard(renewals: List<com.contaapp.android.domain.Insu
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             SectionHeader(stringResource(R.string.insurance_calendario_de_renovaciones), "${upcoming.size} fechas")
             upcoming.forEach { renewal ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         Modifier.size(44.dp).background(ContaWarning.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                         contentAlignment = Alignment.Center
@@ -299,7 +300,7 @@ fun InsuranceCalendarSummary(policies: List<InsurancePolicy>, annualPremium: Dou
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(Modifier.fillMaxWidth().padding(ContaSpacing.md), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             MetricCard(stringResource(R.string.insurance_mensual), money(annualPremium / 12.0, hidden), Modifier.weight(1.4f))
             MetricCard(stringResource(R.string.insurance_vencidas), overdue.toString(), Modifier.weight(1f))
             MetricCard(stringResource(R.string.insurance_30_dias), next30.toString(), Modifier.weight(1f))
@@ -315,7 +316,7 @@ fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, hidden:
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
                     Text(stringResource(R.string.insurance_prima_anual), color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
@@ -328,7 +329,7 @@ fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, hidden:
                     Text(expiring.toString(), color = Color.White, fontWeight = FontWeight.Black)
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
                 DarkMiniMetric(stringResource(R.string.insurance_activos), active.toString(), Color(0xFF2DD4BF), Modifier.weight(1f))
                 DarkMiniMetric(stringResource(R.string.insurance_por_renovar), expiring.toString(), Color(0xFFFBBF24), Modifier.weight(1f))
             }
@@ -352,10 +353,10 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
-        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Row(
                 Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
@@ -376,7 +377,7 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
                     Text(insuranceStatusLabel(policy.status) ?: urgency.label, color = accent, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                 StatusChip(insuranceTypeLabel(policy.type), accent, Modifier.weight(1f))
                 StatusChip(renewalChipText(urgency, date), accent, Modifier.weight(1f))
             }
@@ -406,7 +407,7 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
         },
         title = { Text(policy.name.ifBlank { "Detalle del seguro" }) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 val accent = when (urgency) {
                     InsuranceUrgency.Expired -> ContaDanger
                     InsuranceUrgency.Soon -> ContaWarning
@@ -417,7 +418,7 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
                     colors = CardDefaults.cardColors(containerColor = accent.copy(alpha = 0.12f)),
                     shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
                                 Text(policy.company ?: "Compania no informada", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
@@ -427,7 +428,7 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
                                 Icon(painterResource(R.drawable.ic_shield), contentDescription = null, tint = accent)
                             }
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                             StatusChip(insuranceStatusLabel(policy.status) ?: urgency.label, accent)
                             StatusChip(renewalChipText(urgency, date), accent)
                         }

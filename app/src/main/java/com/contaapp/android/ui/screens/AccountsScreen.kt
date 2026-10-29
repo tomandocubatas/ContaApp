@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
@@ -112,7 +113,7 @@ fun AccountsScreen(
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val isTablet = maxWidth >= 760.dp
 
-        LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             item { SectionHeader(stringResource(R.string.accounts_cuentas), "${filteredAccounts.size} visibles") }
             item {
                 AccountsTotalCard(accounts = filteredAccounts, hidden = state.privacyMode)
@@ -132,7 +133,7 @@ fun AccountsScreen(
                         selected = bankFilter,
                         onSelected = { bankFilter = it }
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs), modifier = Modifier.fillMaxWidth()) {
                         FilterButton(stringResource(R.string.accounts_todas), balanceFilter == AccountBalanceFilter.All) { balanceFilter = AccountBalanceFilter.All }
                         FilterButton(stringResource(R.string.accounts_positivas), balanceFilter == AccountBalanceFilter.Positive) { balanceFilter = AccountBalanceFilter.Positive }
                         FilterButton(stringResource(R.string.accounts_negativas), balanceFilter == AccountBalanceFilter.Negative) { balanceFilter = AccountBalanceFilter.Negative }
@@ -178,7 +179,7 @@ fun BankCombo(
             onClick = { expanded = true },
             shape = RoundedCornerShape(ContaRadius.md),
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp)
+            contentPadding = PaddingValues(horizontal = ContaSpacing.md, vertical = ContaSpacing.md)
         ) {
             Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = ContaTeal, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
@@ -222,9 +223,9 @@ fun BankAccountsCard(
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.weight(1f)) {
                     Box(
                         Modifier.size(38.dp).background(ContaTeal.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                         contentAlignment = Alignment.Center
@@ -240,7 +241,7 @@ fun BankAccountsCard(
             }
             accounts.forEach { account ->
                 Row(
-                    Modifier.fillMaxWidth().clickable { onClick(account) }.padding(vertical = 6.dp),
+                    Modifier.fillMaxWidth().clickable { onClick(account) }.padding(vertical = ContaSpacing.xs),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -258,7 +259,7 @@ fun BankAccountsCard(
 @Composable
 fun AccountBankHeader(bank: String, total: Double, hidden: Boolean) {
     Row(
-        Modifier.fillMaxWidth().padding(top = 6.dp),
+        Modifier.fillMaxWidth().padding(top = ContaSpacing.xs),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -278,7 +279,7 @@ fun AccountsTotalCard(accounts: List<BankAccountBalance>, hidden: Boolean) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(18.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.lg),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -305,7 +306,7 @@ fun AccountRow(account: BankAccountBalance, hidden: Boolean, onClick: () -> Unit
         shape = RoundedCornerShape(ContaRadius.md)
     ) {
         Row(
-            Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
+            Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -342,12 +343,12 @@ fun AccountDetailDialog(
         },
         title = { Text(account.accountName.ifBlank { "Cuenta" }) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = if (account.balance >= 0.0) ContaIncome.copy(alpha = 0.12f) else ContaDanger.copy(alpha = 0.12f)),
                     shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
                                 Text(account.bankName.ifBlank { "Banco" }, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
@@ -360,7 +361,7 @@ fun AccountDetailDialog(
                                 Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = if (account.balance >= 0.0) ContaIncome else ContaDanger)
                             }
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                             StatusChip(account.currency, MaterialTheme.colorScheme.primary)
                             StatusChip(if (account.balance >= 0.0) "Saldo positivo" else "En negativo", if (account.balance >= 0.0) ContaIncome else ContaDanger)
                         }
@@ -370,7 +371,7 @@ fun AccountDetailDialog(
                 DetailLine(stringResource(R.string.accounts_identificador), account.id.ifBlank { "No informado" })
                 if (movements.isNotEmpty()) {
                     Text(stringResource(R.string.accounts_resumen_visible), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                         AccountDetailMetric(stringResource(R.string.accounts_ingresos), money(income, hidden), ContaIncome, Modifier.weight(1f))
                         AccountDetailMetric(stringResource(R.string.accounts_gastos), money(expense, hidden), ContaExpense, Modifier.weight(1f))
                         AccountDetailMetric(stringResource(R.string.accounts_neto), money(net, hidden), if (net >= 0.0) ContaIncome else ContaDanger, Modifier.weight(1f))
@@ -391,7 +392,7 @@ fun AccountDetailDialog(
 @Composable
 fun AccountMovementMiniRow(movement: com.contaapp.android.domain.Movement, hidden: Boolean) {
     val accent = if (movement.amount >= 0.0) ContaIncome else ContaDanger
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(30.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)), contentAlignment = Alignment.Center) {
             Icon(painterResource(movementIcon(movement)), contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))
         }
@@ -406,7 +407,7 @@ fun AccountMovementMiniRow(movement: com.contaapp.android.domain.Movement, hidde
 @Composable
 fun AccountDetailMetric(title: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier.background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(9.dp),
+        modifier.background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.sm),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)

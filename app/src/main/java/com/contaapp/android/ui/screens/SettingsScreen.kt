@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
@@ -50,7 +51,7 @@ fun SettingsScreen(
         val isTablet = maxWidth >= 760.dp
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)
         ) {
             item { SectionHeader(stringResource(R.string.settings_ajustes), "seguridad y datos") }
             item {
@@ -134,14 +135,14 @@ fun OfflinePolicyCard(ttlMinutes: Int) {
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(ContaRadius.xl)
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Text(stringResource(R.string.settings_modo_consulta_offline), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "Si no hay servidor, la app usa el ultimo snapshot disponible. La informacion se considera fresca durante ${ttlMinutes / 60}h, salvo refresco manual desde cabecera.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 StatusChip(stringResource(R.string.settings_snapshot_financiero), ContaTeal, Modifier.weight(1f))
                 StatusChip(stringResource(R.string.settings_refresco_forzado), ExecutiveBlue, Modifier.weight(1f))
             }
@@ -156,7 +157,7 @@ fun CacheStatusCard(entries: List<CacheStatusUi>, onRefreshEntry: (String) -> Un
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(ContaRadius.xl)
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Text(stringResource(R.string.settings_estado_de_cache_por_pantalla), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "La foto financiera se reutiliza durante el TTL configurado. Puedes refrescar una pantalla concreta o usar la cabecera para forzar todo.",
@@ -177,12 +178,12 @@ fun CacheStatusRow(entry: CacheStatusUi, onRefresh: () -> Unit) {
         Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f), RoundedCornerShape(ContaRadius.md))
-            .padding(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+            .padding(ContaSpacing.md),
+        horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            Modifier.background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)).padding(9.dp),
+            Modifier.background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.sm),
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.material3.Icon(painterResource(R.drawable.ic_refresh), contentDescription = null, tint = accent)
@@ -203,14 +204,14 @@ fun CacheTtlCard(selectedMinutes: Int, onSelected: (Int) -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(ContaRadius.xl)
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Text(stringResource(R.string.settings_cache_de_datos), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "Evita recargas automaticas al navegar. El boton superior de actualizar fuerza una carga inmediata.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 listOf(60, 180, 360, 720).forEach { minutes ->
                     val label = if (minutes < 60) "${minutes}m" else "${minutes / 60}h"
                     FilterButton(label, selectedMinutes == minutes) { onSelected(minutes) }
@@ -227,7 +228,7 @@ fun SettingsRoadmapCard(onShowAttentionNotification: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(ContaRadius.xl)
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Text(stringResource(R.string.settings_avisos_y_widget), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             StatusChip(stringResource(R.string.settings_notificacion_local_de_atencion), ContaWarning)
             StatusChip(stringResource(R.string.settings_widget_android_de_balance_y_alertas), ContaTeal)
@@ -252,7 +253,7 @@ fun SettingsHero(baseUrl: String) {
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Text(stringResource(R.string.settings_entorno_api), color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
             Text(baseUrl, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold)
             Text(stringResource(R.string.settings_http_permitido_temporalmente_hasta_d), color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.bodySmall)
@@ -269,12 +270,12 @@ fun SettingsToggleRow(title: String, detail: String, checked: Boolean, iconRes: 
         shape = RoundedCornerShape(ContaRadius.xl)
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.lg),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.background(ExecutiveBlue.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(10.dp),
+                Modifier.background(ExecutiveBlue.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.sm),
                 contentAlignment = Alignment.Center
             ) {
                 androidx.compose.material3.Icon(painterResource(iconRes), contentDescription = null, tint = ExecutiveBlue)
@@ -304,10 +305,10 @@ fun SettingsActionCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(ContaRadius.xl)
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             Text(title, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Text(detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                 OutlinedButton(onClick = onPrimary, shape = RoundedCornerShape(50), modifier = Modifier.fillMaxWidth()) { Text(primary) }
                 if (secondary != null && onSecondary != null) {
                     OutlinedButton(onClick = onSecondary, shape = RoundedCornerShape(50), modifier = Modifier.fillMaxWidth()) { Text(secondary) }
@@ -323,8 +324,8 @@ fun SettingsActionCard(
 @Composable
 fun StatusNote(title: String, detail: String) {
     Column(
-        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface, RoundedCornerShape(ContaRadius.md)).padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface, RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)
     ) {
         Text(title, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         Text(detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)

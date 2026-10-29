@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
@@ -96,13 +97,13 @@ fun LoginScreen(
             onClick = { showServerDialog = true },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 24.dp, end = 22.dp)
+                .padding(top = ContaSpacing.xl, end = ContaSpacing.xl)
         )
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(22.dp),
+                .padding(ContaSpacing.xl),
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.xl),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AuthBrandMark()
@@ -114,7 +115,7 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .widthIn(max = 460.dp)
             ) {
-                Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(Modifier.padding(ContaSpacing.xl), verticalArrangement = Arrangement.spacedBy(ContaSpacing.lg)) {
                     Text(stringResource(R.string.auths_acceso_seguro), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface)
                     Text(
                         "Tu posicion financiera, movimientos y alertas en una vista privada y cacheada.",
@@ -160,7 +161,7 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A884), contentColor = Color(0xFF04130F)),
-                        contentPadding = PaddingValues(vertical = 15.dp)
+                        contentPadding = PaddingValues(vertical = ContaSpacing.lg)
                     ) {
                         Text(
                             when {
@@ -258,7 +259,7 @@ fun ServerStatusPill(baseUrl: String) {
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(ContaRadius.md))
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -279,7 +280,7 @@ fun ServerStatusPill(baseUrl: String) {
 
 @Composable
 fun AuthBrandMark() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
         Box(
             modifier = Modifier
                 .size(82.dp)
@@ -295,7 +296,7 @@ fun AuthBrandMark() {
 
 @Composable
 fun AuthTrustStrip() {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
         AuthMiniPill(stringResource(R.string.auths_cache_6h), ContaTeal, Modifier.weight(1f))
         AuthMiniPill(stringResource(R.string.auths_biometria), ExecutiveBlue, Modifier.weight(1f))
         AuthMiniPill(stringResource(R.string.auths_privado), ContaAmber, Modifier.weight(1f))
@@ -307,7 +308,7 @@ fun AuthMiniPill(text: String, color: Color, modifier: Modifier = Modifier) {
     Box(
         modifier
             .background(color.copy(alpha = 0.12f), RoundedCornerShape(50))
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .padding(horizontal = ContaSpacing.sm, vertical = ContaSpacing.sm),
         contentAlignment = Alignment.Center
     ) {
         Text(text, color = color, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, maxLines = 1)
@@ -328,20 +329,20 @@ fun ServerDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.auths_servidor_api)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 Text(stringResource(R.string.auths_selecciona_la_api_a_la_que_se_conect))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                     OutlinedButton(
                         onClick = { value = "http://10.0.2.2:4000/api" },
                         shape = RoundedCornerShape(50),
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)
+                        contentPadding = PaddingValues(horizontal = ContaSpacing.sm, vertical = ContaSpacing.sm)
                     ) {
                         Text(stringResource(R.string.auths_emulador))
                     }
                     OutlinedButton(
                         onClick = { value = "http://192.168.1.X:4000/api" },
                         shape = RoundedCornerShape(50),
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)
+                        contentPadding = PaddingValues(horizontal = ContaSpacing.sm, vertical = ContaSpacing.sm)
                     ) {
                         Text(stringResource(R.string.auths_movil_fisico))
                     }
@@ -390,10 +391,10 @@ fun LockedScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(24.dp)
+                .padding(ContaSpacing.xl)
                 .widthIn(max = 420.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.lg)
         ) {
             AuthBrandMark()
             Card(
@@ -402,7 +403,7 @@ fun LockedScreen(
                 shape = RoundedCornerShape(ContaRadius.xxl),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(Modifier.padding(ContaSpacing.xl), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(ContaSpacing.lg)) {
                     Box(
                         Modifier.size(76.dp).background(Color(0xFF00DDB4).copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.xxl)),
                         contentAlignment = Alignment.Center
@@ -416,7 +417,7 @@ fun LockedScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A884), contentColor = Color(0xFF04130F)),
-                        contentPadding = PaddingValues(vertical = 15.dp)
+                        contentPadding = PaddingValues(vertical = ContaSpacing.lg)
                     ) {
                         Text(stringResource(R.string.auths_desbloquear_con_huella), fontWeight = FontWeight.Bold)
                     }

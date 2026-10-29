@@ -10,6 +10,11 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Tokens - Espaciado en todas las pantallas (v0.6.1)
+
+- Los 257 `spacedBy` y `padding` de 4 a 28 dp de las 12 pantallas restantes pasan a `ContaSpacing`, con el mismo criterio que en `CommonComponents.kt` (escalon mas cercano, empates al menor).
+- Verificacion: `:app:assembleDebug` y tests correctos; nueve pantallas revisadas en el movil sin cortes ni desbordes.
+
 ## 2026-10-29 - UX/Tokens - Escala de espaciado y radios (v0.6.0)
 
 - Nuevo `ui/theme/Dimens.kt` con `ContaSpacing` (4/8/12/16/24) y `ContaRadius` (8/12/16/20/28).

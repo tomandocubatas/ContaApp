@@ -1,6 +1,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
@@ -80,8 +81,8 @@ fun AgendaScreen(
     val allEvents = calendar.days.flatMap { it.events }.sortedBy { it.date }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        modifier = Modifier.fillMaxSize().padding(ContaSpacing.lg),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)
     ) {
         item {
             AgendaHeader(
@@ -155,7 +156,7 @@ fun AgendaHeader(
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(stringResource(R.string.agenda_agenda_financiera), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
@@ -165,7 +166,7 @@ fun AgendaHeader(
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = onPrevious, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text("<") }
                 OutlinedButton(onClick = onToday, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text(stringResource(R.string.agenda_hoy)) }
                 OutlinedButton(onClick = onNext, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text(">") }
@@ -186,9 +187,9 @@ fun AgendaSummary(calendar: CalendarMonth, hidden: Boolean) {
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             SectionHeader(stringResource(R.string.agenda_resumen_mensual), "$events eventos")
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 ComparisonMetric(stringResource(R.string.agenda_ingresos), income, ContaIncome, hidden, Modifier.weight(1f))
                 ComparisonMetric(stringResource(R.string.agenda_gastos), expense, ContaExpense, hidden, Modifier.weight(1f))
                 ComparisonMetric(stringResource(R.string.agenda_previstos), pending.toDouble(), ContaWarning, false, Modifier.weight(1f))
@@ -212,8 +213,8 @@ fun AgendaMonthGrid(
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                 listOf("L", "M", "X", "J", "V", "S", "D").forEach { label ->
                     Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                         Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
@@ -221,7 +222,7 @@ fun AgendaMonthGrid(
                 }
             }
             cells.chunked(7).forEach { week ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                     week.forEach { cell ->
                         AgendaDayCell(
                             cell = cell,
@@ -254,11 +255,11 @@ fun AgendaDayCell(cell: AgendaCell, selected: Boolean, onClick: () -> Unit, modi
                 RoundedCornerShape(ContaRadius.md)
             )
             .clickable(enabled = day != null, onClick = onClick)
-            .padding(4.dp),
+            .padding(ContaSpacing.xs),
         contentAlignment = Alignment.Center
     ) {
         if (day != null) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                 Text(cell.number.toString(), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium, fontWeight = if (selected) FontWeight.Black else FontWeight.SemiBold)
                 Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                     repeat(day.events.take(3).size) {
@@ -280,8 +281,8 @@ fun AgendaEventRow(event: CalendarEvent, hidden: Boolean, onClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(Modifier.size(42.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)), contentAlignment = Alignment.Center) {
@@ -291,7 +292,7 @@ fun AgendaEventRow(event: CalendarEvent, hidden: Boolean, onClick: () -> Unit) {
                 Text(event.label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("${event.date.toReadableDate()} · ${event.typeLabel()}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                 Text(money(event.signedAmount(), hidden), color = accent, fontWeight = FontWeight.Black, maxLines = 1)
                 StatusChip(if (event.confirmed) "Confirmado" else "Previsto", if (event.confirmed) ContaIncome else ContaWarning)
             }
@@ -307,8 +308,8 @@ fun AgendaEventDialog(event: CalendarEvent, hidden: Boolean, onDismiss: () -> Un
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.agenda_cerrar)) } },
         title = { Text(event.label, fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(46.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)), contentAlignment = Alignment.Center) {
                         Icon(painterResource(eventIcon(event)), contentDescription = null, tint = accent)
                     }

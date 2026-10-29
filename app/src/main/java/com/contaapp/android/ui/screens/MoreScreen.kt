@@ -1,6 +1,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
@@ -48,8 +49,8 @@ fun MoreScreen(
     val insuranceWarnings = state.expiringInsurances.visibleInsurancePolicies().count { insuranceUrgency(it.renewalDate ?: it.endDate) != InsuranceUrgency.Future }
     val searchResults = remember(query, state) { globalSearchResults(query, state) }
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier = Modifier.fillMaxSize().padding(ContaSpacing.lg),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)
     ) {
         item { SectionHeader(stringResource(R.string.more_mas_opciones), "navegacion completa") }
         item {
@@ -94,8 +95,8 @@ fun MoreExecutiveCard(balance: String, pending: Int, alerts: Int, cacheTtlMinute
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     Modifier.size(52.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.lg)),
                     contentAlignment = Alignment.Center
@@ -118,7 +119,7 @@ fun MoreExecutiveCard(balance: String, pending: Int, alerts: Int, cacheTtlMinute
                     )
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 MoreCompactMetric(stringResource(R.string.more_pendientes), pending.toString(), Modifier.weight(1f))
                 MoreCompactMetric(stringResource(R.string.more_avisos), alerts.toString(), Modifier.weight(1f))
                 MoreCompactMetric(stringResource(R.string.more_cache), ttlLabel(cacheTtlMinutes), Modifier.weight(1f))
@@ -132,7 +133,7 @@ fun MoreCompactMetric(title: String, value: String, modifier: Modifier = Modifie
     Box(
         modifier
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.62f), RoundedCornerShape(ContaRadius.md))
-            .padding(horizontal = 12.dp, vertical = 10.dp)
+            .padding(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)
@@ -149,7 +150,7 @@ fun GlobalSearchCard(query: String, onQuery: (String) -> Unit, resultCount: Int)
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             OutlinedTextField(
                 value = query,
                 onValueChange = onQuery,
@@ -176,8 +177,8 @@ fun MoreSearchResultRow(result: MoreSearchResult, onOpen: (MoreSearchResult) -> 
         modifier = Modifier.fillMaxWidth().clickable { onOpen(result) }
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -252,8 +253,8 @@ fun MoreRow(tab: Tab, detail: String, onOpen: (Tab) -> Unit) {
         modifier = Modifier.fillMaxWidth().clickable { onOpen(tab) }
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(

@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
@@ -234,7 +235,7 @@ fun AppTopBar(
 ) {
     TopAppBar(
         title = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 Box(
                     Modifier
                         .size(38.dp)
@@ -275,7 +276,7 @@ fun AppTopBar(
 fun HeaderIconButton(@DrawableRes iconRes: Int, contentDescription: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .padding(end = 6.dp)
+            .padding(end = ContaSpacing.xs)
             .size(36.dp)
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(ContaRadius.md)),
         contentAlignment = Alignment.Center
@@ -338,8 +339,8 @@ fun ContaBottomBar(selectedTab: Tab, onSelected: (Tab) -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 7.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = ContaSpacing.sm, vertical = ContaSpacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val visibleTabs = bottomTabs()
@@ -353,7 +354,7 @@ fun ContaBottomBar(selectedTab: Tab, onSelected: (Tab) -> Unit) {
                             RoundedCornerShape(ContaRadius.xl)
                         )
                         .clickable { onSelected(tab) }
-                        .padding(horizontal = 3.dp, vertical = 7.dp),
+                        .padding(horizontal = 3.dp, vertical = ContaSpacing.sm),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {

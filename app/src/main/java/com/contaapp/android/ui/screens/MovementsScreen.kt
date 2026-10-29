@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
@@ -148,7 +149,7 @@ fun MovementsScreen(
 
         LazyColumn(
             Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)
         ) {
             item { SectionHeader(stringResource(R.string.movements_movimientos_recientes), "${visibleMovements.size} resultados") }
             item {
@@ -385,7 +386,7 @@ enum class MovementGroupMode {
 @Composable
 fun MovementDateHeader(label: String, count: Int) {
     Row(
-        Modifier.fillMaxWidth().padding(top = 6.dp),
+        Modifier.fillMaxWidth().padding(top = ContaSpacing.xs),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -398,7 +399,7 @@ fun MovementDateHeader(label: String, count: Int) {
 fun MovementGroupHeader(label: String, movements: List<Movement>, hidden: Boolean) {
     val total = movements.sumOf { it.amount }
     Row(
-        Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 2.dp),
+        Modifier.fillMaxWidth().padding(top = ContaSpacing.xs, bottom = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -430,8 +431,8 @@ fun WalletMovementRow(
         shape = RoundedCornerShape(ContaRadius.md)
     ) {
         Row(
-            Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -459,7 +460,7 @@ fun WalletMovementRow(
                     )
                 }
             }
-            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                 Text(money(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountSmall, fontWeight = FontWeight.Black)
                 if (!movement.reviewed) {
                     StatusChip(stringResource(R.string.movements_pend), ContaWarning)
@@ -505,8 +506,8 @@ fun MovementFilterSheet(
             .fillMaxWidth()
             .heightIn(max = 720.dp)
             .navigationBarsPadding()
-            .padding(horizontal = 18.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+            .padding(horizontal = ContaSpacing.lg, vertical = ContaSpacing.sm),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)
     ) {
         SectionHeader(stringResource(R.string.movements_filtros_de_movimientos), "busqueda avanzada")
         Text(
@@ -516,7 +517,7 @@ fun MovementFilterSheet(
         )
         LazyColumn(
             modifier = Modifier.weight(1f, fill = false),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)
         ) {
             item {
                 OutlinedTextField(
@@ -543,7 +544,7 @@ fun MovementFilterSheet(
                 }
             }
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(value = dateFrom, onValueChange = onDateFrom, label = { Text(stringResource(R.string.movements_desde)) }, singleLine = true, modifier = Modifier.weight(1f))
                     OutlinedTextField(value = dateTo, onValueChange = onDateTo, label = { Text(stringResource(R.string.movements_hasta)) }, singleLine = true, modifier = Modifier.weight(1f))
                 }
@@ -579,7 +580,7 @@ fun MovementFilterSheet(
                 }
             }
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(value = minAmount, onValueChange = onMinAmount, label = { Text(stringResource(R.string.movements_importe_min)) }, singleLine = true, modifier = Modifier.weight(1f))
                     OutlinedTextField(value = maxAmount, onValueChange = onMaxAmount, label = { Text(stringResource(R.string.movements_importe_max)) }, singleLine = true, modifier = Modifier.weight(1f))
                 }
@@ -592,7 +593,7 @@ fun MovementFilterSheet(
                 }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
             WalletActionButton(stringResource(R.string.movements_limpiar), onClear, Modifier.weight(1f))
             Button(onClick = onApply, shape = RoundedCornerShape(50), modifier = Modifier.weight(1f)) { Text(stringResource(R.string.movements_aplicar)) }
         }
@@ -602,14 +603,14 @@ fun MovementFilterSheet(
 @Composable
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 fun CompactFilterSection(@DrawableRes iconRes: Int, title: String, content: @Composable () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Icon(painterResource(iconRes), contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
             Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
         }
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs),
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs),
             modifier = Modifier.fillMaxWidth()
         ) {
             content()
@@ -768,7 +769,7 @@ fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
                     Text(stringResource(R.string.movements_resultado_visible), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
@@ -776,7 +777,7 @@ fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
                 }
                 StatusChip(stringResource(R.string.movements_mov, movements.size), ExecutiveBlue)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 Box(
                     Modifier
                         .weight((income / total).toFloat().coerceAtLeast(0.08f))
@@ -790,7 +791,7 @@ fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
                         .background(ContaExpense, RoundedCornerShape(50))
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 PulseLine(stringResource(R.string.movements_ingresos), money(income, hidden), ContaIncome, Modifier.weight(1f))
                 PulseLine(stringResource(R.string.movements_gastos), money(expense, hidden), ContaExpense, Modifier.weight(1f))
             }

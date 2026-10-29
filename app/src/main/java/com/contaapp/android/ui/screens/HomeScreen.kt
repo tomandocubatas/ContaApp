@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
@@ -110,7 +111,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(if (isTablet) 24.dp else 16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)
         ) {
             item {
                 PremiumPeriodSelector(
@@ -153,7 +154,7 @@ fun HomeScreen(
             }
             item {
                 if (isTablet && dashboard != null) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
                         FinancialPulseCard(dashboard, state.privacyMode, Modifier.weight(1f))
                         CategoryRankingCard(
                             title = stringResource(R.string.home_top_gastos),
@@ -181,7 +182,7 @@ fun HomeScreen(
             }
             item {
                 if (isTablet) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
                         HomeAttentionSection(state = state, isTablet = true, modifier = Modifier.weight(1f))
                         HomeHealthCard(dashboard, state, Modifier.weight(1f))
                     }
@@ -243,7 +244,7 @@ fun HomeAgendaCard(state: ContaUiState) {
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             SectionHeader(stringResource(R.string.home_agenda_financiera), "${entries.size} proximos hitos")
             entries.forEach { entry ->
                 AgendaRow(entry, state.privacyMode)
@@ -265,7 +266,7 @@ data class AgendaEntry(
 fun AgendaRow(entry: AgendaEntry, hidden: Boolean) {
     Row(
         Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -297,9 +298,9 @@ fun HomePeriodComparisonCard(state: ContaUiState) {
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             SectionHeader(stringResource(R.string.home_resumen_del_periodo), periodLabel)
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 ComparisonMetric(stringResource(R.string.home_ingresos), dashboard.income, ContaIncome, state.privacyMode, Modifier.weight(1f))
                 ComparisonMetric(stringResource(R.string.home_gastos), dashboard.expense, ContaExpense, state.privacyMode, Modifier.weight(1f))
                 ComparisonMetric(stringResource(R.string.home_balance), dashboard.net, if (dashboard.net >= 0.0) ContaIncome else ContaDanger, state.privacyMode, Modifier.weight(1f))
@@ -350,8 +351,8 @@ fun ComparisonMetric(title: String, value: Double, color: Color, hidden: Boolean
     Column(
         modifier
             .background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md))
-            .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+            .padding(ContaSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)
     ) {
         Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)
         FitText(
@@ -373,11 +374,11 @@ fun HomePeriodCombo(period: QuickRange, onPeriod: (QuickRange) -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().clickable { expanded = true }.padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier = Modifier.fillMaxWidth().clickable { expanded = true }.padding(horizontal = ContaSpacing.lg, vertical = ContaSpacing.md),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.weight(1f)) {
                 Box(
                     Modifier.size(38.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.md)),
                     contentAlignment = Alignment.Center
@@ -428,18 +429,18 @@ fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
                     heroBrush,
                     RoundedCornerShape(ContaRadius.xl)
                 )
-                .padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(ContaSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.lg)
         ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                     Text(stringResource(R.string.home_balance_disponible), color = heroMuted, style = MaterialTheme.typography.labelLarge)
                     Text(money(dashboard.totalBalance, hidden), color = heroText, style = MaterialTheme.typography.amountHero, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(stringResource(R.string.home_resumen_ejecutivo_del_periodo_actual), color = heroMuted, style = MaterialTheme.typography.bodySmall)
                 }
                 StatusChip(if (dashboard.net >= 0.0) "positivo" else "atencion", if (dashboard.net >= 0.0) ContaIncome else ContaWarning)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 LightHeroMiniMetric(stringResource(R.string.home_neto), money(dashboard.net, hidden), netColor, Modifier.weight(1f))
                 LightHeroMiniMetric(stringResource(R.string.home_revisado), percent(dashboard.reviewedPct), ExecutiveBlue, Modifier.weight(1f))
                 LightHeroMiniMetric(stringResource(R.string.home_categ), percent(dashboard.categorizedPct), ContaWarning, Modifier.weight(1f))
@@ -451,8 +452,8 @@ fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
 @Composable
 fun HeroMiniMetric(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier.background(Color.White.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)).padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier.background(Color.White.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.sm),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)
     ) {
         Text(label, color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.labelMedium)
         FitText(value, color = color, fontWeight = FontWeight.Black)
@@ -462,8 +463,8 @@ fun HeroMiniMetric(label: String, value: String, color: Color, modifier: Modifie
 @Composable
 fun LightHeroMiniMetric(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.78f), RoundedCornerShape(ContaRadius.md)).padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.78f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.sm),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)
     ) {
         Text(label, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f), style = MaterialTheme.typography.labelMedium)
         FitText(value, color = color, fontWeight = FontWeight.Black)
@@ -479,9 +480,9 @@ fun HomeQuickMetrics(dashboard: DashboardSummary?, hidden: Boolean, isTablet: Bo
         ExecutiveMetricSpec("Deuda", money(activeDebt?.takeIf { it > 0.0 } ?: dashboard?.totalDebts ?: 0.0, hidden), "exposicion", R.drawable.ic_credit_card, ContaDebt, listOf(5.0, 4.8, 4.6, 4.4, 4.1, 3.9)),
         ExecutiveMetricSpec(stringResource(R.string.home_pendientes), pendingReview.toString(), stringResource(R.string.home_movimientos_por_revisar), R.drawable.ic_shield, ExecutiveBlue, listOf(1.0, 2.0, 2.8, 3.4, 4.2, 5.0))
     )
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
         metrics.chunked(columns).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 row.forEach { metric ->
                     ExecutiveKpiCard(
                         title = metric.title,
@@ -516,7 +517,7 @@ fun WalletMetricCard(title: String, value: String, color: Color, modifier: Modif
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier
     ) {
-        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Box(Modifier.size(28.dp).background(color.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)), contentAlignment = Alignment.Center) {
                 Box(Modifier.size(9.dp).background(color, RoundedCornerShape(50)))
             }
@@ -536,13 +537,13 @@ fun FinancialPulseCard(dashboard: DashboardSummary, hidden: Boolean, modifier: M
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             SectionHeader(stringResource(R.string.home_pulso_financiero), "periodo")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 Box(Modifier.weight(incomeProgress.toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaIncome, RoundedCornerShape(50)))
                 Box(Modifier.weight((1.0 - incomeProgress).toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaExpense, RoundedCornerShape(50)))
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
                 PulseLine(stringResource(R.string.home_ingresos), money(dashboard.income, hidden), ContaIncome, Modifier.weight(1f))
                 PulseLine(stringResource(R.string.home_gastos), money(dashboard.expense, hidden), ContaExpense, Modifier.weight(1f))
             }
@@ -618,7 +619,7 @@ fun HomeHealthCard(dashboard: DashboardSummary?, state: ContaUiState, modifier: 
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
                     Text(stringResource(R.string.home_salud_financiera), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
@@ -641,10 +642,10 @@ fun HomeAttentionSection(state: ContaUiState, isTablet: Boolean, modifier: Modif
         date != null && !date.isBefore(LocalDate.now()) && !date.isAfter(LocalDate.now().plusDays(30))
     }
 
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
         SectionHeader(stringResource(R.string.home_requiere_atencion), "lectura rapida")
         if (isTablet) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
                 AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaWarning, Modifier.weight(1f))
                 AttentionCard(stringResource(R.string.home_deudas_con_aviso), urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger, Modifier.weight(1f))
                 AttentionCard(stringResource(R.string.home_seguros_proximos), upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal, Modifier.weight(1f))
@@ -665,7 +666,7 @@ fun WelcomeEmptyState(error: String?) {
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Text(stringResource(R.string.home_preparando_tus_datos), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(
                 "Cuando la API responda, aqui veras el balance, ingresos, gastos y movimientos recientes.",

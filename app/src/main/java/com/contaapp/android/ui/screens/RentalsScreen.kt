@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
@@ -79,7 +80,7 @@ fun RentalsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(if (isTablet) 24.dp else 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)
         ) {
             item { SectionHeader(stringResource(R.string.rentals_alquileres), "${summary?.activeProperties ?: state.rentalProperties.size} activos") }
             item {
@@ -169,9 +170,9 @@ fun RentalHeroCard(
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                     Text(stringResource(R.string.rentals_rentabilidad_neta), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                     Text(money(profit, hidden), color = if (profit >= 0.0) ContaIncome else ContaDanger, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                     Text(stringResource(R.string.rentals_de_margen_propiedades_activas, percent(profitability), activeProperties), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
@@ -183,7 +184,7 @@ fun RentalHeroCard(
                     Icon(painterResource(R.drawable.ic_home), contentDescription = null, tint = ContaTeal)
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 PulseLine(stringResource(R.string.rentals_ingresos), money(income, hidden), ContaIncome, Modifier.weight(1f))
                 PulseLine(stringResource(R.string.rentals_gastos), money(expense, hidden), ContaExpense, Modifier.weight(1f))
             }
@@ -205,8 +206,8 @@ fun RentalPropertyRow(property: RentalProperty, hidden: Boolean, onClick: () -> 
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -251,13 +252,13 @@ fun RentalPropertyDetailDialog(
         },
         title = { Text(property.name.ifBlank { "Propiedad" }) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)),
                     shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.lg)),
                                 contentAlignment = Alignment.Center
@@ -270,7 +271,7 @@ fun RentalPropertyDetailDialog(
                             }
                             StatusChip(percent(property.profitability), accent)
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                             LightHeroMiniMetric(stringResource(R.string.rentals_ingresos), money(property.income, hidden), ContaIncome, Modifier.weight(1f))
                             LightHeroMiniMetric(stringResource(R.string.rentals_gastos), money(property.expense, hidden), ContaExpense, Modifier.weight(1f))
                         }
@@ -283,7 +284,7 @@ fun RentalPropertyDetailDialog(
                         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                         shape = RoundedCornerShape(ContaRadius.lg)
                     ) {
-                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                             bestMonth?.let { DetailLine(stringResource(R.string.rentals_mejor_mes), "${it.monthName} · ${money(it.profit, hidden)}") }
                             worstMonth?.let { DetailLine(stringResource(R.string.rentals_mes_mas_flojo), "${it.monthName} · ${money(it.profit, hidden)}") }
                         }
@@ -297,7 +298,7 @@ fun RentalPropertyDetailDialog(
                             shape = RoundedCornerShape(ContaRadius.md),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Column(Modifier.fillMaxWidth().padding(ContaSpacing.sm), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text(month.monthName, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                                     Text(money(month.profit, hidden), color = if (month.profit >= 0.0) ContaIncome else ContaDanger, fontWeight = FontWeight.Black)
@@ -330,7 +331,7 @@ fun RentalMonthsCard(months: List<com.contaapp.android.domain.RentalMonth>, hidd
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             SectionHeader(stringResource(R.string.rentals_detalle_mensual), "${months.count { it.income > 0.0 || it.expense > 0.0 }} meses activos")
             if (months.isEmpty()) {
                 Text(stringResource(R.string.rentals_no_hay_detalle_mensual_para_este_eje), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -346,7 +347,7 @@ fun RentalMonthsCard(months: List<com.contaapp.android.domain.RentalMonth>, hidd
 @Composable
 fun RentalMonthRow(month: com.contaapp.android.domain.RentalMonth, hidden: Boolean) {
     val accent = if (month.profit >= 0.0) ContaIncome else ContaDanger
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(month.monthName, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)

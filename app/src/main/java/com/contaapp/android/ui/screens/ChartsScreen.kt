@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.Canvas
+import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
@@ -88,7 +89,7 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
             modifier = Modifier
                 .fillMaxSize()
                 .padding(if (isTablet) 24.dp else 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)
         ) {
             item { SectionHeader(stringResource(R.string.charts_graficas), "evolucion economica") }
             item {
@@ -142,12 +143,12 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                     }
                     item {
                         if (isTablet) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
                                 CategoryRankingCard(stringResource(R.string.charts_top_gastos), dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaExpense, Modifier.weight(1f))
                                 CategoryRankingCard(stringResource(R.string.charts_top_ingresos), dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaIncome, Modifier.weight(1f))
                             }
                         } else {
-                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                                 CategoryRankingCard(stringResource(R.string.charts_top_gastos), dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaExpense)
                                 CategoryRankingCard(stringResource(R.string.charts_top_ingresos), dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaIncome)
                             }
@@ -239,7 +240,7 @@ fun DebtSnapshotChartCard(state: ContaUiState) {
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             ChartCardHeader(stringResource(R.string.charts_detalle_de_deuda), "prestamos y financiaciones")
             visibleDebt.take(5).forEach { debt ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -263,7 +264,7 @@ fun RentalsSnapshotChartCard(state: ContaUiState) {
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             ChartCardHeader(stringResource(R.string.charts_alquileres_por_propiedad), "rentabilidad y cashflow")
             state.rentalProperties.take(5).forEach { property ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -292,7 +293,7 @@ fun FinancialEvolutionDashboardCard(
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             ChartCardHeader(stringResource(R.string.charts_evolucion_financiera), "Ingresos, gastos y neto del periodo")
             Text(
                 "Modo ${chartMode.label.lowercase()} · eje X ${if (granularity == "day") "dias" else "meses"}",
@@ -318,18 +319,18 @@ fun QuickDistributionDashboardCard(dashboard: com.contaapp.android.domain.Dashbo
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             ChartCardHeader(stringResource(R.string.charts_distribucion_rapida), "Resumen de ingresos y gastos")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 Box(Modifier.weight((income / total).toFloat().coerceAtLeast(0.08f)).background(ContaIncome, RoundedCornerShape(50)).size(height = 10.dp, width = 1.dp))
                 Box(Modifier.weight((expense / total).toFloat().coerceAtLeast(0.08f)).background(ContaExpense, RoundedCornerShape(50)).size(height = 10.dp, width = 1.dp))
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 PulseLine(stringResource(R.string.charts_ingresos), money(income, hidden), ContaIncome, Modifier.weight(1f))
                 PulseLine(stringResource(R.string.charts_gastos), money(expense, hidden), ContaExpense, Modifier.weight(1f))
                 PulseLine(stringResource(R.string.charts_balance), money(net, hidden), if (net >= 0.0) ContaIncome else ContaDanger, Modifier.weight(1f))
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
                 StatusChip(stringResource(R.string.charts_cat_gasto, dashboard?.expenseCategories?.size ?: 0), ContaExpense, Modifier.weight(1f))
                 StatusChip(stringResource(R.string.charts_cat_ingreso, dashboard?.incomeCategories?.size ?: 0), ContaIncome, Modifier.weight(1f))
             }
@@ -348,9 +349,9 @@ fun CategoryPeriodDashboardCard(expenses: List<CategoryBreakdown>, income: List<
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             ChartCardHeader(stringResource(R.string.charts_categorias_del_periodo), "Distribucion por categoria")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                 FilterButton(stringResource(R.string.charts_gastos), type == "expense") { type = "expense" }
                 FilterButton(stringResource(R.string.charts_ingresos), type == "income") { type = "income" }
             }
@@ -367,7 +368,7 @@ fun CategoryDistributionBars(categories: List<CategoryBreakdown>, hidden: Boolea
         EmptyHint(true, "Sin categorias en este periodo.")
     } else {
         sorted.forEach { category ->
-            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(category.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f), maxLines = 1)
                     Text(money(kotlin.math.abs(category.total), hidden), color = accent, fontWeight = FontWeight.Bold)
@@ -393,9 +394,9 @@ fun HistoricalCategoriesDashboardCard(
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             ChartCardHeader(stringResource(R.string.charts_historico_por_categorias), "Evolucion mensual de categorias")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                 FilterButton(stringResource(R.string.charts_gastos), type == "expense") { type = "expense" }
                 FilterButton(stringResource(R.string.charts_ingresos), type == "income") { type = "income" }
             }
@@ -435,7 +436,7 @@ fun ChartPeriodPanel(
             title = stringResource(R.string.charts_periodo_de_graficas),
             detail = "El historico se recalcula con este rango"
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
             OutlinedTextField(value = dateFrom, onValueChange = onDateFrom, label = { Text(stringResource(R.string.charts_desde)) }, singleLine = true, modifier = Modifier.weight(1f))
             OutlinedTextField(value = dateTo, onValueChange = onDateTo, label = { Text(stringResource(R.string.charts_hasta)) }, singleLine = true, modifier = Modifier.weight(1f))
         }
@@ -457,8 +458,8 @@ fun ChartsSummaryCard(state: ContaUiState) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.lg),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -467,7 +468,7 @@ fun ChartsSummaryCard(state: ContaUiState) {
             ) {
                 Icon(painterResource(R.drawable.ic_receipt), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                 Text(stringResource(R.string.charts_panel_de_evolucion), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 Text(
                     "Balance ${money(dashboard?.totalBalance ?: 0.0, state.privacyMode)} · Neto ${money(dashboard?.net ?: 0.0, state.privacyMode)}",
@@ -517,8 +518,8 @@ fun InlineChartPanel(
         modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f), RoundedCornerShape(ContaRadius.lg))
-            .padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+            .padding(ContaSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -543,7 +544,7 @@ fun InlineChartPanel(
                 Text(stringResource(R.string.charts_rango, money(min, hidden), money(max, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Row(
-                Modifier.fillMaxWidth().background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(10.dp),
+                Modifier.fillMaxWidth().background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.sm),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -600,7 +601,7 @@ fun InlineChartPanel(
             AxisLabels(labels)
         } else if (cleanValues.size == 1) {
             Row(
-                Modifier.fillMaxWidth().background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(12.dp),
+                Modifier.fillMaxWidth().background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.md),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -617,7 +618,7 @@ fun InlineChartPanel(
 fun ChartPointSelector(size: Int, selected: Int, onSelected: (Int) -> Unit) {
     if (size < 2) return
     val options = listOf(0, size / 2, size - 1).distinct()
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
         options.forEach { index ->
             val active = selected == index
             Box(
@@ -628,7 +629,7 @@ fun ChartPointSelector(size: Int, selected: Int, onSelected: (Int) -> Unit) {
                         RoundedCornerShape(50)
                     )
                     .clickable { onSelected(index) }
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = ContaSpacing.sm),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -674,7 +675,7 @@ fun ChartOrEmpty(title: String, subtitle: String, values: List<Double>, labels: 
             shape = RoundedCornerShape(ContaRadius.xl),
             modifier = modifier.fillMaxWidth()
         ) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                 SectionHeader(title, subtitle)
                 EmptyHint(true, "No hay suficientes puntos para dibujar esta evolucion.")
             }
