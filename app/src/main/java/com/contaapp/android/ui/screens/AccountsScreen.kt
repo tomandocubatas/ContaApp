@@ -401,7 +401,7 @@ fun AccountMovementMiniRow(movement: com.contaapp.android.domain.Movement, hidde
             Text(movement.description, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(movement.date.take(10), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
         }
-        Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.labelMedium)
+        Text(signedMoney(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.labelMedium)
     }
 }
 

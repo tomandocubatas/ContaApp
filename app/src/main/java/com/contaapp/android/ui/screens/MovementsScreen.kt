@@ -424,6 +424,7 @@ fun WalletMovementRow(
 ) {
     val category = movementCategory(movement, categories)
     val accent = categoryColor(category, if (movement.amount >= 0.0) ContaIncome else ContaDanger)
+    val amountColor = if (movement.amount >= 0.0) ContaIncome else ContaExpense
     val accountName = movementAccountName(movement, accounts)
     val link = movementLinkLabel(movement, debts, insurances)
     Card(
@@ -462,7 +463,7 @@ fun WalletMovementRow(
                 }
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
-                Text(money(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountSmall, fontWeight = FontWeight.Black)
+                Text(signedMoney(movement.amount, hidden), color = amountColor, style = MaterialTheme.typography.amountSmall, fontWeight = FontWeight.Black)
                 if (!movement.reviewed) {
                     StatusChip(stringResource(R.string.movements_pend), ContaWarning)
                 }

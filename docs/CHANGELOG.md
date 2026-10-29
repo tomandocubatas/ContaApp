@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Importes - Signo explicito y color por signo (v0.10.0)
+
+- Nuevo `signedMoney` en `Formatters.kt`: antepone `+` a los importes positivos (el `-` ya lo pone el formato); con privacidad activa sigue `•••• €`. Se usa en las filas de movimientos, el detalle y la mini fila de Cuentas.
+- Fix: en `WalletMovementRow` el importe tomaba el color de la categoria, de modo que un ingreso (p. ej. un reembolso) podia salir en rojo. Ahora el importe va en verde/rojo segun su signo; el icono conserva el color de categoria.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil un reembolso `+5,64 €` sale en verde junto a un gasto `-37,60 €` en rojo.
+
 ## 2026-10-29 - UX/Tema - Hero de saldo derivado del tema (v0.9.0)
 
 - `HomeHeroDashboard` (hero de Inicio) usa un degradado de `primaryContainer` a `secondaryContainer` y textos `onSurface`/`onSurfaceVariant`; desaparece la deteccion de modo oscuro por color de fondo y los degradados fijos. Gana el borde de tarjeta (pendiente de v0.7.0).

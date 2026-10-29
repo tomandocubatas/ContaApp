@@ -376,7 +376,7 @@ fun MovementRow(movement: Movement, hidden: Boolean, onClick: () -> Unit) {
                 Text(movement.description, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("${movement.date.take(10)} - ${movement.categoryName ?: movement.type}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
-            Text(money(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountSmall)
+            Text(signedMoney(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountSmall)
         }
     }
 }
@@ -423,7 +423,7 @@ fun MovementDetailDialog(
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 Text(if (movement.amount >= 0.0) "Ingreso" else "Gasto", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-                                Text(money(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountLarge)
+                                Text(signedMoney(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountLarge)
                             }
                             StatusChip(if (movement.reviewed) "Revisado" else "Pendiente", if (movement.reviewed) ContaIncome else ContaWarning)
                         }
