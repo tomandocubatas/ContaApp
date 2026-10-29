@@ -12,6 +12,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.draw.clip
@@ -387,8 +390,9 @@ fun MovementRow(movement: Movement, hidden: Boolean, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovementDetailDialog(
+fun MovementDetailSheet(
     movement: Movement,
     hidden: Boolean,
     categories: List<CategoryOption> = emptyList(),
@@ -401,59 +405,58 @@ fun MovementDetailDialog(
     val accent = categoryColor(category, if (movement.amount >= 0.0) ContaIncome else ContaDanger)
     val accountName = movementAccountName(movement, accounts)
     val link = movementLinkLabel(movement, debts, insurances)
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.commoncomponents_cerrar)) }
-        },
-        title = { Text(stringResource(R.string.commoncomponents_detalle_del_movimiento), fontWeight = FontWeight.Bold) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.76f)),
-                    shape = RoundedCornerShape(ContaRadius.xl)
-                ) {
-                    Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
-                            Box(
-                                Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.lg)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(painterResource(categoryIcon(category, movement)), contentDescription = null, tint = accent, modifier = Modifier.size(26.dp))
-                            }
-                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                                Text(movement.description, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                Text("${movement.date.take(10)} · ${category?.name ?: movement.categoryName ?: movement.type}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                            }
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+        Column(
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = ContaSpacing.lg).padding(bottom = ContaSpacing.xl),
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)
+        ) {
+            Text(stringResource(R.string.commoncomponents_detalle_del_movimiento), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.76f)),
+                shape = RoundedCornerShape(ContaRadius.xl)
+            ) {
+                Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
+                        Box(
+                            Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.lg)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(painterResource(categoryIcon(category, movement)), contentDescription = null, tint = accent, modifier = Modifier.size(26.dp))
                         }
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                Text(if (movement.amount >= 0.0) "Ingreso" else "Gasto", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-                                Text(signedMoney(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountLarge)
-                            }
-                            StatusChip(if (movement.reviewed) "Revisado" else "Pendiente", if (movement.reviewed) ContaIncome else ContaWarning)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Text(movement.description, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text("${movement.date.take(10)} · ${category?.name ?: movement.categoryName ?: movement.type}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                         }
-                        ProgressBar(
-                            progress = if (movement.amount >= 0.0) 1.0 else 0.72,
-                            color = accent
-                        )
                     }
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(if (movement.amount >= 0.0) "Ingreso" else "Gasto", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                            Text(signedMoney(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountLarge)
+                        }
+                        StatusChip(if (movement.reviewed) "Revisado" else "Pendiente", if (movement.reviewed) ContaIncome else ContaWarning)
+                    }
+                    ProgressBar(
+                        progress = if (movement.amount >= 0.0) 1.0 else 0.72,
+                        color = accent
+                    )
                 }
-                QualityBadges(movement = movement, accountName = accountName, category = category, link = link)
-                MovementContextCard(
-                    type = movement.type,
-                    account = accountName ?: "Cuenta no informada por la API",
-                    category = category?.name ?: movement.categoryName ?: "Sin categoria",
-                    link = link ?: "Sin vinculacion detectada",
-                    accent = accent
-                )
-                if (movement.hasSplits) DetailLine(stringResource(R.string.commoncomponents_desglose), "Movimiento con splits")
-                if (movement.isDuplicate) DetailLine(stringResource(R.string.commoncomponents_duplicado), "Marcado como posible duplicado")
-                movement.notes?.let { DetailLine(stringResource(R.string.commoncomponents_notas), it) }
             }
-        },
-        shape = RoundedCornerShape(ContaRadius.xl)
-    )
+            QualityBadges(movement = movement, accountName = accountName, category = category, link = link)
+            MovementContextCard(
+                type = movement.type,
+                account = accountName ?: "Cuenta no informada por la API",
+                category = category?.name ?: movement.categoryName ?: "Sin categoria",
+                link = link ?: "Sin vinculacion detectada",
+                accent = accent
+            )
+            if (movement.hasSplits) DetailLine(stringResource(R.string.commoncomponents_desglose), "Movimiento con splits")
+            if (movement.isDuplicate) DetailLine(stringResource(R.string.commoncomponents_duplicado), "Marcado como posible duplicado")
+            movement.notes?.let { DetailLine(stringResource(R.string.commoncomponents_notas), it) }
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = RoundedCornerShape(50)) {
+                Text(stringResource(R.string.commoncomponents_cerrar))
+            }
+        }
+    }
 }
 
 @Composable

@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Detalle - Detalle del movimiento en panel inferior (v0.22.0)
+
+- `MovementDetailDialog` (cuadro de dialogo) pasa a `MovementDetailSheet`, un `ModalBottomSheet` que sube desde abajo: contenido desplazable, boton "Cerrar" de 48 dp y cierre por gesto o tocando fuera. Se usa desde Inicio y Movimientos.
+- Observacion: el fondo del panel usa el gris por defecto de Material, ligeramente distinto del azul oscuro de las tarjetas.
+- Verificacion: `:app:assembleDebug` y tests correctos; panel abierto en el movil desde Movimientos y desde Inicio.
+
 ## 2026-10-29 - UX/Accesibilidad - Contraste, fuente grande y color dinamico (v0.21.0)
 
 - Contraste AA: el unico texto bajo 4,5:1 era el rojo de gasto del tema claro (`#E0463F`, 4,10); pasa a `#C62F2A` (5,47 sobre blanco).

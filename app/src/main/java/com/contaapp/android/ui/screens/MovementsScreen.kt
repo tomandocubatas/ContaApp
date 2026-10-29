@@ -319,7 +319,7 @@ fun MovementsScreen(
     }
 
     selectedMovement?.let { movement ->
-        MovementDetailDialog(
+        MovementDetailSheet(
             movement = movement,
             hidden = state.privacyMode,
             categories = state.categories,
