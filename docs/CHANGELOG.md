@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Seguros y Deuda - Progreso y proxima fecha (v0.17.0)
+
+- `InsuranceHeroCard` deriva su degradado del tema (antes colores fijos oscuros), anade barra "X de Y al dia" (activos menos por renovar, del resumen de la API) y un bloque "Proxima renovacion" con poliza, fecha y dias restantes (`List<InsurancePolicy>.nextRenewal()`).
+- `DebtDetailRow` explica su barra con "Cuota X · Y% del pendiente".
+- Hallazgo (backend manda): el contador "Por renovar" del resumen de la API (1) no coincide con las tarjetas de 30/60 dias (0) y Vencidas (2), que se calculan en la app con otra ventana. `DebtDetail` no incluye lo pagado, asi que no hay barra pagado/pendiente por fila.
+- Verificacion: `:app:assembleDebug` y tests correctos; Seguros y Deuda revisados en el movil.
+
 ## 2026-10-29 - UX/Navegacion - NavigationBar de Material en movil (v0.16.0)
 
 - `ContaBottomBar` sustituye la barra hecha a mano por `NavigationBar`/`NavigationBarItem` de Material: Inicio, Movs, Cuentas, Grafs y Mas, etiqueta siempre visible, indicador de seleccion y estado accesible. "Mas" queda activo cuando el destino actual cuelga de el (Agenda, Deuda, Seguros...).

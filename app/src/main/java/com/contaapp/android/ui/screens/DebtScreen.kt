@@ -313,6 +313,7 @@ fun DebtDetailRow(debt: DebtDetail, hidden: Boolean, onClick: () -> Unit) {
                     progress = debt.monthlyPayment / (debt.pendingAmount.takeIf { it > 0 } ?: 1.0),
                     color = statusColor
                 )
+                Text("Cuota ${money(debt.monthlyPayment, hidden)} · ${if (debt.pendingAmount > 0) "%.1f".format(java.util.Locale("es", "ES"), debt.monthlyPayment / debt.pendingAmount * 100) else "0"}% del pendiente", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(money(debt.pendingAmount, hidden), fontWeight = FontWeight.Bold)

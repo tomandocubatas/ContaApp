@@ -116,6 +116,7 @@ fun InsuranceScreen(
                             active = insurance.activeCount,
                             expiring = insurance.expiringSoon,
                             annualPremium = insurance.annualPremium,
+                            nextPolicy = visiblePolicies.nextRenewal(),
                             hidden = state.privacyMode
                         )
                         InsuranceCalendarSummary(filteredPolicies, insurance.annualPremium, state.privacyMode)
@@ -310,29 +311,59 @@ fun InsuranceCalendarSummary(policies: List<InsurancePolicy>, annualPremium: Dou
     }
 }
 
+/** Póliza cuya renovación o fin es la más próxima desde hoy (las ya vencidas se excluyen: aparecen como «Vencido» en la lista). */
+fun List<InsurancePolicy>.nextRenewal(): InsurancePolicy? {
+    val today = LocalDate.now()
+    return mapNotNull { policy ->
+        val date = (policy.renewalDate ?: policy.endDate)?.take(10)?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+        date?.takeIf { !it.isBefore(today) }?.let { policy to it }
+    }.minByOrNull { it.second }?.first
+}
+
 @Composable
-fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, hidden: Boolean) {
+fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, nextPolicy: InsurancePolicy?, hidden: Boolean) {
+    val colors = MaterialTheme.colorScheme
+    val upToDate = (active - expiring).coerceAtLeast(0)
+    val upToDateShare = if (active > 0) upToDate.toDouble() / active else 0.0
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF17212B)),
-        shape = RoundedCornerShape(ContaRadius.md),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        shape = RoundedCornerShape(ContaRadius.xl),
+        border = ContaCardDefaults.border(),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
+        Column(
+            Modifier
+                .background(Brush.horizontalGradient(listOf(colors.primaryContainer, colors.secondaryContainer)), RoundedCornerShape(ContaRadius.xl))
+                .padding(ContaSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)
+        ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
-                    Text(stringResource(R.string.insurance_prima_anual), color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
-                    Text(money(annualPremium, hidden), color = Color.White, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.insurance_prima_anual), color = colors.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text(money(annualPremium, hidden), color = colors.onSurface, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 }
-                Box(
-                    Modifier.size(54.dp).background(Color(0xFFFF5A52), RoundedCornerShape(ContaRadius.md)),
-                    contentAlignment = Alignment.Center
+                StatusChip("$upToDate de $active al dia", if (expiring == 0) ContaTeal else ContaWarning)
+            }
+            ProgressBar(progress = upToDateShare, color = if (expiring == 0) ContaTeal else ContaWarning)
+            nextPolicy?.let { policy ->
+                val date = policy.renewalDate ?: policy.endDate
+                val days = date?.take(10)?.let { runCatching { java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(it)) }.getOrNull() }
+                Column(
+                    Modifier.fillMaxWidth().background(colors.surface.copy(alpha = 0.78f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.md),
+                    verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)
                 ) {
-                    Text(expiring.toString(), color = Color.White, fontWeight = FontWeight.Black)
+                    Text("Proxima renovacion", color = colors.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text(policy.name.ifBlank { "Seguro" }, color = colors.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        listOfNotNull(date?.take(10), days?.let { if (it == 0L) "hoy" else if (it == 1L) "manana" else "en $it dias" }).joinToString(" · "),
+                        color = if ((days ?: 99L) <= 30L) ContaWarning else colors.onSurfaceVariant,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
-                DarkMiniMetric(stringResource(R.string.insurance_activos), active.toString(), Color(0xFF2DD4BF), Modifier.weight(1f))
-                DarkMiniMetric(stringResource(R.string.insurance_por_renovar), expiring.toString(), Color(0xFFFBBF24), Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.insurance_activos), active.toString(), ContaTeal, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.insurance_por_renovar), expiring.toString(), ContaWarning, Modifier.weight(1f))
             }
         }
     }
