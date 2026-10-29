@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Accesibilidad - Selector de periodo con botones accesibles (v0.8.0)
+
+- El selector de mes de Agenda sustituye los textos `<` y `>` por flechas con `contentDescription` ("Mes anterior", "Mes siguiente") y altura minima de 48 dp.
+- `PeriodHeader` (sin usos hoy) pasa a `IconButton` de 48 dp con "Periodo anterior/siguiente"; sin accion conserva el hueco para no mover el titulo.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil Agenda pasa de Octubre a Noviembre 2026 con la flecha siguiente.
+
 ## 2026-10-29 - UX/Tarjetas - Elevacion y borde unicos (v0.7.0)
 
 - Nuevo `ContaCardDefaults` en `Dimens.kt`: elevacion de 1 dp y borde de 1 dp (`outline` al 70 %) para todas las tarjetas de contenido. En tema oscuro la sombra apenas se ve y las tarjetas se fundian con el fondo; el borde las separa.

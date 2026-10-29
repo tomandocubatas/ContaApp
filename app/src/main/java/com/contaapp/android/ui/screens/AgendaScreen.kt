@@ -23,6 +23,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -168,9 +172,13 @@ fun AgendaHeader(
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = onPrevious, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text("<") }
-                OutlinedButton(onClick = onToday, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text(stringResource(R.string.agenda_hoy)) }
-                OutlinedButton(onClick = onNext, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text(">") }
+                OutlinedButton(onClick = onPrevious, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(50)) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Mes anterior")
+                }
+                OutlinedButton(onClick = onToday, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(50)) { Text(stringResource(R.string.agenda_hoy)) }
+                OutlinedButton(onClick = onNext, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(50)) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Mes siguiente")
+                }
             }
         }
     }
