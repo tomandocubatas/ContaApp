@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Iconos - Iconos por categoria (v0.13.0)
+
+- Nuevos vectores `ic_cat_restaurant`, `ic_cat_cart`, `ic_cat_car`, `ic_cat_fuel`, `ic_cat_health`, `ic_cat_leisure`, `ic_cat_transfer`, `ic_cat_repeat` y `ic_cat_work`.
+- `categoryIcon` elige primero por el nombre de la categoria (restaurantes, supermercado, gasolina, transportes, salud, ocio, traspasos/bizum, suscripciones, nomina); si nada coincide mantiene las reglas anteriores y el icono por defecto (recibo).
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil se ven los iconos de restaurante, gasolina, coche, transferencia y casa, y el recibo por defecto en "Otros gastos". Tambien se confirma el singular "1 filtro activo" de v0.11.0.
+
 ## 2026-10-29 - UX/Listas - Agrupacion por dia con cabeceras pegajosas (v0.12.0)
 
 - Nuevo `DayHeader` (con `stickyHeader`, fondo opaco): etiqueta del dia ("Hoy", "Ayer", "lun 27 oct"), numero de elementos y total con signo y color.

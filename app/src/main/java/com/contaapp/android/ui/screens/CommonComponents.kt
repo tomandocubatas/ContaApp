@@ -526,7 +526,17 @@ fun movementIcon(movement: Movement): Int {
 fun categoryIcon(category: CategoryOption?, movement: Movement): Int {
     val icon = category?.icon.orEmpty().lowercase()
     val name = "${category?.name.orEmpty()} ${movement.description}".lowercase()
+    val categoryName = (category?.name ?: movement.categoryName).orEmpty().lowercase()
     return when {
+        listOf("restaur", "comida", "cafe", "café", "bar", "menu").any { it in categoryName } -> R.drawable.ic_cat_restaurant
+        listOf("supermercado", "aliment", "compra").any { it in categoryName } -> R.drawable.ic_cat_cart
+        listOf("gasolina", "gasoil", "combustible").any { it in categoryName } -> R.drawable.ic_cat_fuel
+        listOf("transporte", "vehiculo", "vehículo", "coche", "parking", "peaje", "taxi").any { it in categoryName } -> R.drawable.ic_cat_car
+        listOf("salud", "farmacia", "medic", "sanidad").any { it in categoryName } -> R.drawable.ic_cat_health
+        listOf("ocio", "cine", "viaje", "vacacion", "deporte").any { it in categoryName } -> R.drawable.ic_cat_leisure
+        listOf("traspaso", "transferencia", "bizum").any { it in categoryName } -> R.drawable.ic_cat_transfer
+        listOf("suscrip", "recurrente").any { it in categoryName } -> R.drawable.ic_cat_repeat
+        listOf("nomina", "nómina", "salario", "sueldo", "ingreso").any { it in categoryName } -> R.drawable.ic_cat_work
         "🏠" in icon || "home" in icon || "house" in icon || "apartment" in icon || "hipoteca" in name || "hogar" in name || "comunidad" in name || "alquiler" in name -> R.drawable.ic_home
         "🏦" in icon || "bank" in icon || "account_balance" in icon || "impuesto" in name || "banco" in name || "interes" in name || "interés" in name -> R.drawable.ic_bank
         "🛡" in icon || "shield" in icon || "seguro" in name || "alarma" in name || "security" in icon || "proteccion" in name -> R.drawable.ic_shield
