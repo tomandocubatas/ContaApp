@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Carga - Cápsula de sincronización más evidente (v0.24.1)
+
+- La cápsula pasa a color sólido de acento (verde al terminar), texto `titleMedium` en negrita, icono de 28 dp, barra de 180 dp y sombra de 16 dp, para que se note a primera vista.
+- Verificado en móvil: "Sincronizando…" y "Actualizado".
+- Archivos: CommonComponents.kt.
+
 ## 2026-10-29 - UX/Carga - Cápsula de sincronización (v0.24.0)
 
 - `SyncCapsule`: píldora flotante arriba ("Sincronizando…" con barra fina) que pasa a "Actualizado" en verde y se retira; `rememberSyncPhase` la mantiene visible al menos 1,2 s aunque la API responda antes.

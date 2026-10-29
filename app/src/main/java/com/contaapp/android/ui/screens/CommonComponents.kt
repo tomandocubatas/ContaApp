@@ -1251,39 +1251,43 @@ fun SyncCapsule(phase: SyncPhase, modifier: Modifier = Modifier) {
         exit = androidx.compose.animation.slideOutVertically { -it } + androidx.compose.animation.fadeOut()
     ) {
         val shape = RoundedCornerShape(50)
+        val done = phase == SyncPhase.Done
+        val container = if (done) LocalContaPalette.current.income else MaterialTheme.colorScheme.primary
+        val content = if (done) Color(0xFF04210F) else MaterialTheme.colorScheme.onPrimary
         Row(
             Modifier
-                .padding(top = ContaSpacing.sm)
-                .androidx_shadow(shape)
-                .background(MaterialTheme.colorScheme.surfaceVariant, shape)
-                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), shape)
-                .padding(horizontal = ContaSpacing.lg, vertical = ContaSpacing.sm)
+                .padding(top = ContaSpacing.md)
+                .shadow(16.dp, shape)
+                .background(container, shape)
+                .padding(horizontal = 28.dp, vertical = 16.dp)
                 .semantics(mergeDescendants = true) { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite },
-            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (phase == SyncPhase.Done) {
-                Icon(Icons.Filled.Check, contentDescription = null, tint = LocalContaPalette.current.income, modifier = Modifier.size(18.dp))
-                Text("Actualizado", color = LocalContaPalette.current.income, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+            if (done) {
+                Icon(Icons.Filled.Check, contentDescription = null, tint = content, modifier = Modifier.size(28.dp))
+                Text("Actualizado", color = content, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black)
             } else {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Sincronizando…", color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
-                    ThinProgressBar(Modifier.width(120.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Sincronizando…", color = content, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black)
+                    ThinProgressBar(Modifier.width(180.dp), color = content, trackColor = content.copy(alpha = 0.25f))
                 }
             }
         }
     }
 }
 
-private fun Modifier.androidx_shadow(shape: androidx.compose.ui.graphics.Shape): Modifier =
-    this.shadow(6.dp, shape)
-
 /** Barra de progreso indeterminada y fina, sustituye a la rueda circular. */
 @Composable
-fun ThinProgressBar(modifier: Modifier = Modifier) {
+fun ThinProgressBar(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary,
+    trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+) {
     LinearProgressIndicator(
-        modifier = modifier.fillMaxWidth().height(3.dp).clip(RoundedCornerShape(50)),
-        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+        modifier = modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(50)),
+        color = color,
+        trackColor = trackColor
     )
 }
 
