@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
@@ -237,7 +238,7 @@ fun AppTopBar(
                 Box(
                     Modifier
                         .size(38.dp)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.13f), RoundedCornerShape(14.dp)),
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.13f), RoundedCornerShape(ContaRadius.md)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(painterResource(R.drawable.ic_brand_mark), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(30.dp))
@@ -276,7 +277,7 @@ fun HeaderIconButton(@DrawableRes iconRes: Int, contentDescription: String, onCl
         modifier = Modifier
             .padding(end = 6.dp)
             .size(36.dp)
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(ContaRadius.md)),
         contentAlignment = Alignment.Center
     ) {
         IconButton(onClick = onClick) {
@@ -311,7 +312,7 @@ fun ContaNavigationRail(selectedTab: Tab, onSelected: (Tab) -> Unit) {
         Box(
             Modifier
                 .size(52.dp)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
             contentAlignment = Alignment.Center
         ) {
             Icon(painterResource(R.drawable.ic_brand_mark), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(42.dp))
@@ -349,7 +350,7 @@ fun ContaBottomBar(selectedTab: Tab, onSelected: (Tab) -> Unit) {
                         .weight(1f)
                         .background(
                             if (selected) ContaCoral.copy(alpha = 0.16f) else Color.Transparent,
-                            RoundedCornerShape(18.dp)
+                            RoundedCornerShape(ContaRadius.xl)
                         )
                         .clickable { onSelected(tab) }
                         .padding(horizontal = 3.dp, vertical = 7.dp),

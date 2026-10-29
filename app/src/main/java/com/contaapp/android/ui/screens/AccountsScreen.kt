@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
@@ -175,7 +176,7 @@ fun BankCombo(
     Box {
         OutlinedButton(
             onClick = { expanded = true },
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(ContaRadius.md),
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp)
         ) {
@@ -218,14 +219,14 @@ fun BankAccountsCard(
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                     Box(
-                        Modifier.size(38.dp).background(ContaTeal.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                        Modifier.size(38.dp).background(ContaTeal.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = ContaTeal, modifier = Modifier.size(21.dp))
@@ -273,7 +274,7 @@ fun AccountsTotalCard(accounts: List<BankAccountBalance>, hidden: Boolean) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -287,7 +288,7 @@ fun AccountsTotalCard(accounts: List<BankAccountBalance>, hidden: Boolean) {
                 Text(stringResource(R.string.accounts_cuentas_en_negativo, negative), color = if (negative > 0) ContaDanger else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
             Box(
-                Modifier.size(48.dp).background(ContaCoral.copy(alpha = 0.16f), RoundedCornerShape(14.dp)),
+                Modifier.size(48.dp).background(ContaCoral.copy(alpha = 0.16f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(accounts.size.toString(), color = ContaCoral, fontWeight = FontWeight.Black)
@@ -301,7 +302,7 @@ fun AccountRow(account: BankAccountBalance, hidden: Boolean, onClick: () -> Unit
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(ContaRadius.md)
     ) {
         Row(
             Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
@@ -309,7 +310,7 @@ fun AccountRow(account: BankAccountBalance, hidden: Boolean, onClick: () -> Unit
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.size(40.dp).background(ExecutiveSky.copy(alpha = 0.14f), RoundedCornerShape(12.dp)),
+                Modifier.size(40.dp).background(ExecutiveSky.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(account.bankName.take(1).ifBlank { "C" }, color = ExecutiveSky, fontWeight = FontWeight.Black)
@@ -344,7 +345,7 @@ fun AccountDetailDialog(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = if (account.balance >= 0.0) ContaIncome.copy(alpha = 0.12f) else ContaDanger.copy(alpha = 0.12f)),
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -353,7 +354,7 @@ fun AccountDetailDialog(
                                 Text(money(account.balance, hidden), color = if (account.balance >= 0.0) ContaIncome else ContaDanger, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             Box(
-                                Modifier.size(48.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)),
+                                Modifier.size(48.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(ContaRadius.lg)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = if (account.balance >= 0.0) ContaIncome else ContaDanger)
@@ -383,7 +384,7 @@ fun AccountDetailDialog(
                 }
             }
         },
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     )
 }
 
@@ -391,7 +392,7 @@ fun AccountDetailDialog(
 fun AccountMovementMiniRow(movement: com.contaapp.android.domain.Movement, hidden: Boolean) {
     val accent = if (movement.amount >= 0.0) ContaIncome else ContaDanger
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(30.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(30.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)), contentAlignment = Alignment.Center) {
             Icon(painterResource(movementIcon(movement)), contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))
         }
         Column(Modifier.weight(1f)) {
@@ -405,7 +406,7 @@ fun AccountMovementMiniRow(movement: com.contaapp.android.domain.Movement, hidde
 @Composable
 fun AccountDetailMetric(title: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier.background(color.copy(alpha = 0.10f), RoundedCornerShape(12.dp)).padding(9.dp),
+        modifier.background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(9.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)

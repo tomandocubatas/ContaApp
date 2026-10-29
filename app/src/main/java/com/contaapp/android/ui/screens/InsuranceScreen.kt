@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
@@ -219,7 +220,7 @@ fun InsuranceCoverageCard(coverages: List<com.contaapp.android.domain.InsuranceC
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -253,7 +254,7 @@ fun InsuranceRenewalCalendarCard(renewals: List<com.contaapp.android.domain.Insu
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -261,7 +262,7 @@ fun InsuranceRenewalCalendarCard(renewals: List<com.contaapp.android.domain.Insu
             upcoming.forEach { renewal ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        Modifier.size(44.dp).background(ContaWarning.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                        Modifier.size(44.dp).background(ContaWarning.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(renewal.date.takeLast(2), color = ContaWarning, fontWeight = FontWeight.Black)
@@ -295,7 +296,7 @@ fun InsuranceCalendarSummary(policies: List<InsurancePolicy>, annualPremium: Dou
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -311,7 +312,7 @@ fun InsuranceCalendarSummary(policies: List<InsurancePolicy>, annualPremium: Dou
 fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, hidden: Boolean) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF17212B)),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -321,7 +322,7 @@ fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, hidden:
                     Text(money(annualPremium, hidden), color = Color.White, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 }
                 Box(
-                    Modifier.size(54.dp).background(Color(0xFFFF5A52), RoundedCornerShape(14.dp)),
+                    Modifier.size(54.dp).background(Color(0xFFFF5A52), RoundedCornerShape(ContaRadius.md)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(expiring.toString(), color = Color.White, fontWeight = FontWeight.Black)
@@ -348,7 +349,7 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -358,7 +359,7 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
-                    Modifier.size(44.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(14.dp)),
+                    Modifier.size(44.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.md)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(painterResource(R.drawable.ic_shield), contentDescription = null, tint = accent, modifier = Modifier.size(22.dp))
@@ -414,7 +415,7 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
                 }
                 Card(
                     colors = CardDefaults.cardColors(containerColor = accent.copy(alpha = 0.12f)),
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -422,7 +423,7 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
                                 Text(policy.company ?: "Compania no informada", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                                 Text(money(policy.annualPremium, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
-                            Box(Modifier.size(48.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+                            Box(Modifier.size(48.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(ContaRadius.lg)), contentAlignment = Alignment.Center) {
                                 Icon(painterResource(R.drawable.ic_shield), contentDescription = null, tint = accent)
                             }
                         }
@@ -445,7 +446,7 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
                 DetailLine(stringResource(R.string.insurance_identificador), policy.id.ifBlank { "No informado" })
             }
         },
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     )
 }
 

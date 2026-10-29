@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
@@ -108,7 +109,7 @@ fun LoginScreen(
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
-                shape = RoundedCornerShape(26.dp),
+                shape = RoundedCornerShape(ContaRadius.xxl),
                 modifier = Modifier
                     .fillMaxWidth()
                     .widthIn(max = 460.dp)
@@ -243,7 +244,7 @@ fun ServerAccessButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.size(56.dp),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(ContaRadius.xxl),
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
     ) {
@@ -256,7 +257,7 @@ fun ServerStatusPill(baseUrl: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(ContaRadius.md))
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -268,7 +269,7 @@ fun ServerStatusPill(baseUrl: String) {
         Box(
             Modifier
                 .size(34.dp)
-                .background(ContaTeal.copy(alpha = 0.16f), RoundedCornerShape(12.dp)),
+                .background(ContaTeal.copy(alpha = 0.16f), RoundedCornerShape(ContaRadius.md)),
             contentAlignment = Alignment.Center
         ) {
             Icon(painterResource(R.drawable.ic_wifi), contentDescription = null, tint = ContaTeal, modifier = Modifier.size(18.dp))
@@ -282,7 +283,7 @@ fun AuthBrandMark() {
         Box(
             modifier = Modifier
                 .size(82.dp)
-                .background(Color.White.copy(alpha = 0.10f), RoundedCornerShape(24.dp)),
+                .background(Color.White.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.xxl)),
             contentAlignment = Alignment.Center
         ) {
             Icon(painterResource(R.drawable.ic_brand_mark), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(68.dp))
@@ -374,7 +375,7 @@ fun ServerDialog(
                 }
             }
         },
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     )
 }
 
@@ -398,12 +399,12 @@ fun LockedScreen(
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
-                shape = RoundedCornerShape(26.dp),
+                shape = RoundedCornerShape(ContaRadius.xxl),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Box(
-                        Modifier.size(76.dp).background(Color(0xFF00DDB4).copy(alpha = 0.12f), RoundedCornerShape(24.dp)),
+                        Modifier.size(76.dp).background(Color(0xFF00DDB4).copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.xxl)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(painterResource(R.drawable.ic_fingerprint), contentDescription = null, tint = Color(0xFF00A884), modifier = Modifier.size(44.dp))

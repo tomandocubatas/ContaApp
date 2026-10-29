@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
@@ -239,7 +240,7 @@ fun HomeAgendaCard(state: ContaUiState) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -268,7 +269,7 @@ fun AgendaRow(entry: AgendaEntry, hidden: Boolean) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            Modifier.size(40.dp).background(entry.accent.copy(alpha = 0.12f), RoundedCornerShape(13.dp)),
+            Modifier.size(40.dp).background(entry.accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
             contentAlignment = Alignment.Center
         ) {
             Icon(painterResource(entry.iconRes), contentDescription = null, tint = entry.accent, modifier = Modifier.size(20.dp))
@@ -293,7 +294,7 @@ fun HomePeriodComparisonCard(state: ContaUiState) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -348,7 +349,7 @@ private fun String.privacySafeTitle(hidden: Boolean): String {
 fun ComparisonMetric(title: String, value: Double, color: Color, hidden: Boolean, modifier: Modifier = Modifier) {
     Column(
         modifier
-            .background(color.copy(alpha = 0.10f), RoundedCornerShape(14.dp))
+            .background(color.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md))
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -368,7 +369,7 @@ fun HomePeriodCombo(period: QuickRange, onPeriod: (QuickRange) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -378,7 +379,7 @@ fun HomePeriodCombo(period: QuickRange, onPeriod: (QuickRange) -> Unit) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                 Box(
-                    Modifier.size(38.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(14.dp)),
+                    Modifier.size(38.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.md)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(painterResource(R.drawable.ic_credit_card), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
@@ -418,14 +419,14 @@ fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
     val heroMuted = if (dark) Color.White.copy(alpha = 0.68f) else ContaMuted
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             Modifier
                 .background(
                     heroBrush,
-                    RoundedCornerShape(18.dp)
+                    RoundedCornerShape(ContaRadius.xl)
                 )
                 .padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -450,7 +451,7 @@ fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
 @Composable
 fun HeroMiniMetric(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier.background(Color.White.copy(alpha = 0.12f), RoundedCornerShape(14.dp)).padding(10.dp),
+        modifier.background(Color.White.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)).padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(label, color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.labelMedium)
@@ -461,7 +462,7 @@ fun HeroMiniMetric(label: String, value: String, color: Color, modifier: Modifie
 @Composable
 fun LightHeroMiniMetric(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.78f), RoundedCornerShape(14.dp)).padding(10.dp),
+        modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.78f), RoundedCornerShape(ContaRadius.md)).padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(label, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f), style = MaterialTheme.typography.labelMedium)
@@ -512,11 +513,11 @@ fun WalletMetricCard(title: String, value: String, color: Color, modifier: Modif
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier
     ) {
         Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Box(Modifier.size(28.dp).background(color.copy(alpha = 0.12f), RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(28.dp).background(color.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)), contentAlignment = Alignment.Center) {
                 Box(Modifier.size(9.dp).background(color, RoundedCornerShape(50)))
             }
             Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
@@ -532,7 +533,7 @@ fun FinancialPulseCard(dashboard: DashboardSummary, hidden: Boolean, modifier: M
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -614,7 +615,7 @@ fun HomeHealthCard(dashboard: DashboardSummary?, state: ContaUiState, modifier: 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -660,7 +661,7 @@ fun HomeAttentionSection(state: ContaUiState, isTablet: Boolean, modifier: Modif
 fun WelcomeEmptyState(error: String?) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier = Modifier.fillMaxWidth()
     ) {

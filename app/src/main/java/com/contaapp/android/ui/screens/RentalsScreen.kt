@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -165,7 +166,7 @@ fun RentalHeroCard(
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -176,7 +177,7 @@ fun RentalHeroCard(
                     Text(stringResource(R.string.rentals_de_margen_propiedades_activas, percent(profitability), activeProperties), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
                 Box(
-                    Modifier.size(52.dp).background(ContaTeal.copy(alpha = 0.12f), RoundedCornerShape(16.dp)),
+                    Modifier.size(52.dp).background(ContaTeal.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.lg)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(painterResource(R.drawable.ic_home), contentDescription = null, tint = ContaTeal)
@@ -200,7 +201,7 @@ fun RentalPropertyRow(property: RentalProperty, hidden: Boolean, onClick: () -> 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
         Row(
@@ -209,7 +210,7 @@ fun RentalPropertyRow(property: RentalProperty, hidden: Boolean, onClick: () -> 
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.size(44.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                Modifier.size(44.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(painterResource(R.drawable.ic_home), contentDescription = null, tint = accent)
@@ -253,12 +254,12 @@ fun RentalPropertyDetailDialog(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)),
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(
-                                Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp)),
+                                Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.lg)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(painterResource(R.drawable.ic_home), contentDescription = null, tint = accent, modifier = Modifier.size(26.dp))
@@ -280,7 +281,7 @@ fun RentalPropertyDetailDialog(
                     Card(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(ContaRadius.lg)
                     ) {
                         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             bestMonth?.let { DetailLine(stringResource(R.string.rentals_mejor_mes), "${it.monthName} · ${money(it.profit, hidden)}") }
@@ -293,7 +294,7 @@ fun RentalPropertyDetailDialog(
                     activeMonths.take(6).forEach { month ->
                         Card(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(ContaRadius.md),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -318,7 +319,7 @@ fun RentalPropertyDetailDialog(
                 }
             }
         },
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     )
 }
 @Composable
@@ -326,7 +327,7 @@ fun RentalMonthsCard(months: List<com.contaapp.android.domain.RentalMonth>, hidd
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

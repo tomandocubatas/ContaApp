@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -131,7 +132,7 @@ fun OfflinePolicyCard(ttlMinutes: Int) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(stringResource(R.string.settings_modo_consulta_offline), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
@@ -153,7 +154,7 @@ fun CacheStatusCard(entries: List<CacheStatusUi>, onRefreshEntry: (String) -> Un
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(stringResource(R.string.settings_estado_de_cache_por_pantalla), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
@@ -175,13 +176,13 @@ fun CacheStatusRow(entry: CacheStatusUi, onRefresh: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f), RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f), RoundedCornerShape(ContaRadius.md))
             .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            Modifier.background(accent.copy(alpha = 0.12f), RoundedCornerShape(12.dp)).padding(9.dp),
+            Modifier.background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)).padding(9.dp),
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.material3.Icon(painterResource(R.drawable.ic_refresh), contentDescription = null, tint = accent)
@@ -200,7 +201,7 @@ fun CacheTtlCard(selectedMinutes: Int, onSelected: (Int) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(stringResource(R.string.settings_cache_de_datos), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
@@ -224,7 +225,7 @@ fun SettingsRoadmapCard(onShowAttentionNotification: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(stringResource(R.string.settings_avisos_y_widget), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
@@ -248,7 +249,7 @@ fun SettingsHero(baseUrl: String) {
     Card(
         colors = CardDefaults.cardColors(containerColor = if (dark) MaterialTheme.colorScheme.surfaceVariant else Color(0xFF17212B)),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -265,7 +266,7 @@ fun SettingsToggleRow(title: String, detail: String, checked: Boolean, iconRes: 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     ) {
         Row(
             Modifier.fillMaxWidth().padding(16.dp),
@@ -273,7 +274,7 @@ fun SettingsToggleRow(title: String, detail: String, checked: Boolean, iconRes: 
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.background(ExecutiveBlue.copy(alpha = 0.10f), RoundedCornerShape(14.dp)).padding(10.dp),
+                Modifier.background(ExecutiveBlue.copy(alpha = 0.10f), RoundedCornerShape(ContaRadius.md)).padding(10.dp),
                 contentAlignment = Alignment.Center
             ) {
                 androidx.compose.material3.Icon(painterResource(iconRes), contentDescription = null, tint = ExecutiveBlue)
@@ -301,7 +302,7 @@ fun SettingsActionCard(
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(title, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
@@ -322,7 +323,7 @@ fun SettingsActionCard(
 @Composable
 fun StatusNote(title: String, detail: String) {
     Column(
-        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface, RoundedCornerShape(14.dp)).padding(14.dp),
+        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface, RoundedCornerShape(ContaRadius.md)).padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(title, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)

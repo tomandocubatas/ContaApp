@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Tokens - Escala de espaciado y radios (v0.6.0)
+
+- Nuevo `ui/theme/Dimens.kt` con `ContaSpacing` (4/8/12/16/24) y `ContaRadius` (8/12/16/20/28).
+- Los 147 radios sueltos de las 13 pantallas pasan a `ContaRadius`; los espaciados de `CommonComponents.kt` pasan a `ContaSpacing`, redondeando al escalon mas cercano (empates hacia el menor).
+- Pendiente: usar `ContaSpacing` en el resto de pantallas.
+- Verificacion: `:app:assembleDebug` y tests correctos; Inicio, Movimientos, Cuentas y Mas revisados en el movil.
+
 ## 2026-10-29 - UX/Tipografia - Jerarquia y cifras tabulares (v0.5.0)
 
 - `AppTypography` define pesos y espaciado por nivel (titulares Bold con tracking cerrado, titulos SemiBold, cuerpo y etiquetas mas contenidos) y activa cifras tabulares (`tnum`) en todos los estilos.

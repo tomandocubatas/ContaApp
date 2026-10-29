@@ -3,6 +3,8 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaRadius
+import com.contaapp.android.ui.theme.ContaSpacing
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
@@ -106,17 +108,17 @@ val ContaDebt: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.c
 fun HeroBalance(title: String, value: String, subtitle: String) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             Modifier
                 .background(
                     Brush.horizontalGradient(listOf(Color(0xFFFF5A52), Color(0xFFFF8A65))),
-                    RoundedCornerShape(14.dp)
+                    RoundedCornerShape(ContaRadius.md)
                 )
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(ContaSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)
         ) {
             Text(title, color = Color(0xFFFFE4E0), style = MaterialTheme.typography.titleMedium)
             Text(value, color = Color.White, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
@@ -134,12 +136,12 @@ fun PeriodHeader(
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = ContaSpacing.lg, vertical = ContaSpacing.md),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -173,16 +175,16 @@ fun FinanceRingCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF17212B)),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         modifier = modifier.fillMaxWidth()
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(18.dp),
-            horizontalArrangement = Arrangement.spacedBy(18.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.lg),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.lg),
             verticalAlignment = Alignment.CenterVertically
         ) {
             FinanceRing(income = income, expense = expense, debt = debt, size = 132.dp)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                 Text(stringResource(R.string.commoncomponents_actividad), color = Color.White, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 LegendLine(stringResource(R.string.commoncomponents_ingresos), money(income, hidden), Color(0xFF2DD4BF))
                 LegendLine(stringResource(R.string.commoncomponents_gastos), money(expense, hidden), Color(0xFFFF5A52))
@@ -238,8 +240,8 @@ fun FinanceRing(income: Double, expense: Double, debt: Double, size: Dp) {
 
 @Composable
 fun LegendLine(label: String, value: String, color: Color) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Box(Modifier.size(10.dp).background(color, RoundedCornerShape(8.dp)))
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
+        Box(Modifier.size(10.dp).background(color, RoundedCornerShape(ContaRadius.sm)))
         Column {
             Text(label, color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.labelMedium)
             Text(value, color = Color.White, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -267,11 +269,11 @@ fun CategoryRankingCard(
             containerColor = cardColor,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text("${top.sumOf { it.count }} mov.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
@@ -301,11 +303,11 @@ fun CategoryBarRow(
     hidden: Boolean,
     accent: Color
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.weight(1f)) {
                 Box(
-                    Modifier.size(28.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(8.dp)),
+                    Modifier.size(28.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.sm)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(index.toString(), color = accent, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
@@ -323,10 +325,10 @@ fun MetricCard(title: String, value: String, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         modifier = modifier
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             FitText(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelLarge)
             FitText(value, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         }
@@ -344,20 +346,20 @@ fun MovementRow(movement: Movement, hidden: Boolean, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(ContaRadius.md)
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 Modifier
                     .size(40.dp)
-                    .background(accent.copy(alpha = 0.12f), RoundedCornerShape(12.dp)),
+                    .background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(painterResource(icon), contentDescription = null, tint = accent, modifier = Modifier.size(21.dp))
@@ -393,15 +395,15 @@ fun MovementDetailDialog(
         },
         title = { Text(stringResource(R.string.commoncomponents_detalle_del_movimiento), fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.76f)),
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                             Box(
-                                Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp)),
+                                Modifier.size(50.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.lg)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(painterResource(categoryIcon(category, movement)), contentDescription = null, tint = accent, modifier = Modifier.size(26.dp))
@@ -437,7 +439,7 @@ fun MovementDetailDialog(
                 movement.notes?.let { DetailLine(stringResource(R.string.commoncomponents_notas), it) }
             }
         },
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     )
 }
 
@@ -446,16 +448,16 @@ fun MovementContextCard(type: String, account: String, category: String, link: S
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(ContaRadius.lg)
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Text(stringResource(R.string.commoncomponents_contexto), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
             DetailLine(stringResource(R.string.commoncomponents_tipo), type)
             DetailLine(stringResource(R.string.commoncomponents_cuenta), account)
             DetailLine(stringResource(R.string.commoncomponents_categoria), category)
             Row(
-                Modifier.fillMaxWidth().background(accent.copy(alpha = 0.09f), RoundedCornerShape(12.dp)).padding(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                Modifier.fillMaxWidth().background(accent.copy(alpha = 0.09f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.sm),
+                horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(painterResource(R.drawable.ic_receipt), contentDescription = null, tint = accent, modifier = Modifier.size(18.dp))
@@ -482,13 +484,13 @@ fun ProgressBar(progress: Double, color: Color) {
         Modifier
             .fillMaxWidth()
             .height(8.dp)
-            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.22f), RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.22f), RoundedCornerShape(ContaRadius.sm))
     ) {
         Box(
             Modifier
                 .fillMaxWidth(progress.coerceIn(0.0, 1.0).toFloat())
                 .height(8.dp)
-                .background(color, RoundedCornerShape(8.dp))
+                .background(color, RoundedCornerShape(ContaRadius.sm))
         )
     }
 }
@@ -603,19 +605,19 @@ fun PremiumPeriodSelector(
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier
             .fillMaxWidth()
             .semantics { contentDescription = "Selector de periodo ${selected.homeLabel()}" }
             .clickable { open = true }
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.size(42.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                Modifier.size(42.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(painterResource(R.drawable.ic_chart), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(21.dp))
@@ -656,8 +658,8 @@ fun PeriodSelectorSheet(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 18.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+            .padding(horizontal = ContaSpacing.lg, vertical = ContaSpacing.sm),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)
     ) {
         SectionHeader(stringResource(R.string.commoncomponents_seleccionar_periodo), "afecta a KPIs, graficas y listados")
         premiumPeriodOptions().forEach { option ->
@@ -667,7 +669,7 @@ fun PeriodSelectorSheet(
                 onClick = { onSelected(option) }
             )
         }
-        WalletActionButton(stringResource(R.string.commoncomponents_cerrar), onDismiss, Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 18.dp))
+        WalletActionButton(stringResource(R.string.commoncomponents_cerrar), onDismiss, Modifier.fillMaxWidth().padding(top = ContaSpacing.xs, bottom = ContaSpacing.lg))
     }
 }
 
@@ -680,16 +682,16 @@ fun PeriodOptionRow(option: QuickRange, selected: Boolean, onClick: () -> Unit) 
             containerColor = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.size(38.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(13.dp)),
+                Modifier.size(38.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(painterResource(R.drawable.ic_credit_card), contentDescription = null, tint = accent, modifier = Modifier.size(19.dp))
@@ -726,7 +728,7 @@ fun PremiumPeriodChip(text: String, selected: Boolean, onClick: () -> Unit) {
             .background(bg, RoundedCornerShape(50))
             .border(1.dp, border, RoundedCornerShape(50))
             .clickable(onClick = onClick)
-            .padding(horizontal = 13.dp, vertical = 8.dp)
+            .padding(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm)
     ) {
         Text(
             text,
@@ -745,13 +747,13 @@ fun FilterButton(text: String, selected: Boolean, onClick: () -> Unit) {
             onClick = onClick,
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(containerColor = ContaCoral),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+            contentPadding = PaddingValues(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm)
         ) { Text(text, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, maxLines = 1) }
     } else {
         OutlinedButton(
             onClick = onClick,
             shape = RoundedCornerShape(50),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+            contentPadding = PaddingValues(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm)
         ) { Text(text, style = MaterialTheme.typography.labelMedium, maxLines = 1) }
     }
 }
@@ -761,7 +763,7 @@ fun StatusChip(text: String, color: Color, modifier: Modifier = Modifier) {
     Box(
         modifier
             .background(color.copy(alpha = 0.12f), RoundedCornerShape(50))
-            .padding(horizontal = 10.dp, vertical = 6.dp)
+            .padding(horizontal = ContaSpacing.sm, vertical = ContaSpacing.xs)
     ) {
         Text(text, color = color, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
     }
@@ -775,7 +777,7 @@ fun QualityBadges(
     link: String?,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier, horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs), verticalAlignment = Alignment.CenterVertically) {
         if (accountName.isNullOrBlank()) StatusChip(stringResource(R.string.commoncomponents_sin_cuenta), ContaWarning)
         if (category == null && movement.categoryName.isNullOrBlank()) StatusChip(stringResource(R.string.commoncomponents_sin_categoria), ContaWarning)
         if (!movement.reviewed) StatusChip(stringResource(R.string.commoncomponents_pendiente), ContaWarning)
@@ -790,20 +792,20 @@ fun AttentionCard(title: String, value: String, detail: String, color: Color, mo
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         modifier = modifier.fillMaxWidth()
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 Modifier
                     .height(42.dp)
                     .widthIn(min = if (compactValue) 42.dp else 82.dp, max = 116.dp)
-                    .background(color.copy(alpha = 0.12f), RoundedCornerShape(12.dp))
-                    .padding(horizontal = 8.dp),
+                    .background(color.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md))
+                    .padding(horizontal = ContaSpacing.sm),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -839,7 +841,7 @@ fun WalletActionButton(text: String, onClick: () -> Unit, modifier: Modifier = M
         onClick = onClick,
         shape = RoundedCornerShape(50),
         modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+        contentPadding = PaddingValues(horizontal = ContaSpacing.md, vertical = ContaSpacing.sm)
     ) {
         Text(
             text,
@@ -867,16 +869,16 @@ fun ExecutiveKpiCard(
     Card(
         colors = CardDefaults.cardColors(containerColor = surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.size(42.dp).background(color.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                Modifier.size(42.dp).background(color.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(painterResource(iconRes), contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
@@ -927,10 +929,10 @@ fun ExecutiveProgressCard(
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
@@ -964,10 +966,10 @@ fun FinancialLineChart(
     Card(
         colors = CardDefaults.cardColors(containerColor = surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
             SectionHeader(title, subtitle)
             if (cleanValues.isNotEmpty()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -979,7 +981,7 @@ fun FinancialLineChart(
                     Text(stringResource(R.string.commoncomponents_rango, axisMoney(minValue, hidden), axisMoney(maxValue, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
                 Column(
                     Modifier.height(150.dp),
                     verticalArrangement = Arrangement.SpaceBetween,
@@ -1054,21 +1056,21 @@ fun ActiveFilterBar(filters: List<String>, onOpenFilters: () -> Unit, modifier: 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier.fillMaxWidth()
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            Modifier.fillMaxWidth().padding(ContaSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.size(40.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(14.dp)),
+                Modifier.size(40.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(painterResource(R.drawable.ic_settings), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                 Text(stringResource(R.string.commoncomponents_vista_filtrada), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Black)
                 Text(
                     if (filters.isEmpty()) "Todos los datos" else filters.joinToString(" · "),
@@ -1082,7 +1084,7 @@ fun ActiveFilterBar(filters: List<String>, onOpenFilters: () -> Unit, modifier: 
                 onClick = onOpenFilters,
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 9.dp)
+                contentPadding = PaddingValues(horizontal = ContaSpacing.lg, vertical = ContaSpacing.sm)
             ) {
                 Text(
                     if (filters.isEmpty()) "Filtrar" else "Filtrar · ${filters.size}",
@@ -1100,10 +1102,10 @@ fun FilterPanel(content: @Composable () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             content()
         }
     }
@@ -1114,9 +1116,9 @@ fun InlineLoading(text: String) {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(14.dp))
-            .padding(14.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(ContaRadius.md))
+            .padding(ContaSpacing.md),
+        horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
         verticalAlignment = Alignment.CenterVertically
     ) {
         CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
@@ -1129,10 +1131,10 @@ fun SkeletonCard(lines: Int = 3, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.70f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             repeat(lines) { index ->
                 Box(
                     Modifier
@@ -1158,10 +1160,10 @@ fun EmptyHint(show: Boolean, text: String) {
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(ContaRadius.md),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Box(Modifier.fillMaxWidth().padding(18.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().padding(ContaSpacing.lg), contentAlignment = Alignment.Center) {
                 Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -1174,17 +1176,17 @@ fun PremiumEmptyState(show: Boolean, title: String, detail: String, @DrawableRes
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.70f)),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-            shape = RoundedCornerShape(18.dp),
+            shape = RoundedCornerShape(ContaRadius.xl),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(Modifier.fillMaxWidth().padding(18.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().padding(ContaSpacing.lg), horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    Modifier.size(46.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(16.dp)),
+                    Modifier.size(46.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.lg)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(painterResource(iconRes), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 }
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
                     Text(title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
                     Text(detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
@@ -1196,8 +1198,8 @@ fun PremiumEmptyState(show: Boolean, title: String, detail: String, @DrawableRes
 @Composable
 fun DarkMiniMetric(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier.background(Color.White.copy(alpha = 0.08f), RoundedCornerShape(14.dp)).padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier.background(Color.White.copy(alpha = 0.08f), RoundedCornerShape(ContaRadius.md)).padding(ContaSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)
     ) {
         Text(label, color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
         FitText(value, color = color, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)

@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
@@ -195,7 +196,7 @@ fun DebtSourceSummaryCard(label: String, debts: List<DebtDetail>, hidden: Boolea
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -257,7 +258,7 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -286,7 +287,7 @@ fun DebtDetailRow(debt: DebtDetail, hidden: Boolean, onClick: () -> Unit) {
         else -> ContaTeal
     }
 
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(12.dp)) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(ContaRadius.md)) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -298,7 +299,7 @@ fun DebtDetailRow(debt: DebtDetail, hidden: Boolean, onClick: () -> Unit) {
             Box(
                 Modifier
                     .size(44.dp)
-                    .background(statusColor.copy(alpha = 0.12f), RoundedCornerShape(12.dp)),
+                    .background(statusColor.copy(alpha = 0.12f), RoundedCornerShape(ContaRadius.md)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(painterResource(R.drawable.ic_credit_card), contentDescription = null, tint = statusColor, modifier = Modifier.size(22.dp))
@@ -342,12 +343,12 @@ fun DebtDetailDialog(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)),
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(ContaRadius.xl)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(
-                                Modifier.size(50.dp).background(statusColor.copy(alpha = 0.14f), RoundedCornerShape(16.dp)),
+                                Modifier.size(50.dp).background(statusColor.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.lg)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(painterResource(R.drawable.ic_credit_card), contentDescription = null, tint = statusColor, modifier = Modifier.size(26.dp))
@@ -370,7 +371,7 @@ fun DebtDetailDialog(
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(ContaRadius.lg)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         DetailLine(stringResource(R.string.debt_proximo_pago), nextPaymentText(debt))
@@ -381,7 +382,7 @@ fun DebtDetailDialog(
                 }
             }
         },
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(ContaRadius.xl)
     )
 }
 
@@ -401,7 +402,7 @@ fun nextPaymentText(debt: DebtDetail): String {
 
 @Composable
 fun DebtRow(debt: DebtSummary, hidden: Boolean) {
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(14.dp)) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(ContaRadius.md)) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(debt.title, fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
