@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -103,7 +104,7 @@ fun InsuranceScreen(
         val isTablet = maxWidth >= 760.dp
 
         LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { SectionHeader("Seguros", "${filteredPolicies.size} polizas") }
+            item { SectionHeader(stringResource(R.string.insurance_seguros), "${filteredPolicies.size} polizas") }
             item {
                 val insurance = state.insurance
                 if (insurance != null) {
@@ -131,14 +132,14 @@ fun InsuranceScreen(
                     OutlinedTextField(
                         value = query,
                         onValueChange = { query = it },
-                        label = { Text("Buscar seguro") },
+                        label = { Text(stringResource(R.string.insurance_buscar_seguro)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     CompactFilterSection(R.drawable.ic_shield, "Vencimiento") {
-                        FilterButton("Todos", range == InsuranceRange.All) { range = InsuranceRange.All }
-                        FilterButton("30 dias", range == InsuranceRange.Days30) { range = InsuranceRange.Days30 }
-                        FilterButton("60 dias", range == InsuranceRange.Days60) { range = InsuranceRange.Days60 }
+                        FilterButton(stringResource(R.string.insurance_todos), range == InsuranceRange.All) { range = InsuranceRange.All }
+                        FilterButton(stringResource(R.string.insurance_30_dias), range == InsuranceRange.Days30) { range = InsuranceRange.Days30 }
+                        FilterButton(stringResource(R.string.insurance_60_dias), range == InsuranceRange.Days60) { range = InsuranceRange.Days60 }
                     }
                 }
             }
@@ -146,7 +147,7 @@ fun InsuranceScreen(
                 item { SkeletonCard(lines = 4) }
                 item { SkeletonCard(lines = 4) }
             }
-            item { SectionTitle("Detalle de seguros") }
+            item { SectionTitle(stringResource(R.string.insurance_detalle_de_seguros)) }
             items(filteredPolicies, key = { it.id.ifBlank { "${it.name}-${it.policyNumber.orEmpty()}" } }) { policy ->
                 InsurancePolicyRow(policy, state.privacyMode) { selectedPolicy = policy }
             }
@@ -188,13 +189,13 @@ fun InsuranceCoverageCard(coverages: List<com.contaapp.android.domain.InsuranceC
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionHeader("Coberturas", "comparativa por tipo")
+            SectionHeader(stringResource(R.string.insurance_coberturas), "comparativa por tipo")
             sorted.forEach { item ->
                 Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(item.type, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text("Prima ${money(item.totalPremium, hidden)} · ratio ${item.ratio.toInt()}x", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(R.string.insurance_prima_ratio_x, money(item.totalPremium, hidden), item.ratio.toInt()), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                         }
                         Text(money(item.maxCoverage, hidden), color = ContaTeal, fontWeight = FontWeight.Black)
                     }
@@ -222,7 +223,7 @@ fun InsuranceRenewalCalendarCard(renewals: List<com.contaapp.android.domain.Insu
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionHeader("Calendario de renovaciones", "${upcoming.size} fechas")
+            SectionHeader(stringResource(R.string.insurance_calendario_de_renovaciones), "${upcoming.size} fechas")
             upcoming.forEach { renewal ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(
@@ -245,7 +246,7 @@ fun InsuranceRenewalCalendarCard(renewals: List<com.contaapp.android.domain.Insu
 @Composable
 fun InsuranceMonthlyCard(annualPremium: Double, hidden: Boolean) {
     AttentionCard(
-        title = "Coste mensual equivalente",
+        title = stringResource(R.string.insurance_coste_mensual_equivalente),
         value = money(annualPremium / 12.0, hidden),
         detail = "Calculado desde la prima anual total",
         color = ContaTeal
@@ -263,9 +264,9 @@ fun InsuranceCalendarSummary(policies: List<InsurancePolicy>, annualPremium: Dou
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            MetricCard("Mensual", money(annualPremium / 12.0, hidden), Modifier.weight(1f))
-            MetricCard("30 dias", next30.toString(), Modifier.weight(1f))
-            MetricCard("60 dias", next60.toString(), Modifier.weight(1f))
+            MetricCard(stringResource(R.string.insurance_mensual), money(annualPremium / 12.0, hidden), Modifier.weight(1f))
+            MetricCard(stringResource(R.string.insurance_30_dias), next30.toString(), Modifier.weight(1f))
+            MetricCard(stringResource(R.string.insurance_60_dias), next60.toString(), Modifier.weight(1f))
         }
     }
 }
@@ -280,7 +281,7 @@ fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, hidden:
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
-                    Text("Prima anual", color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.insurance_prima_anual), color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
                     Text(money(annualPremium, hidden), color = Color.White, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 }
                 Box(
@@ -291,8 +292,8 @@ fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, hidden:
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                DarkMiniMetric("Activos", active.toString(), Color(0xFF2DD4BF), Modifier.weight(1f))
-                DarkMiniMetric("Vencen pronto", expiring.toString(), Color(0xFFFBBF24), Modifier.weight(1f))
+                DarkMiniMetric(stringResource(R.string.insurance_activos), active.toString(), Color(0xFF2DD4BF), Modifier.weight(1f))
+                DarkMiniMetric(stringResource(R.string.insurance_vencen_pronto), expiring.toString(), Color(0xFFFBBF24), Modifier.weight(1f))
             }
         }
     }
@@ -330,7 +331,7 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
                     Text(policy.name.ifBlank { "Seguro" }, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(policy.company ?: policy.type, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     policy.policyNumber?.let {
-                        Text("Poliza $it", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(stringResource(R.string.insurance_poliza, it), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
                 Column(horizontalAlignment = Alignment.End) {
@@ -350,8 +351,8 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Toca para ver coberturas, prima y estado", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                Text("Ver detalle", color = accent, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.insurance_toca_para_ver_coberturas_prima_y_est), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.insurance_ver_detalle), color = accent, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -364,7 +365,7 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cerrar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.insurance_cerrar)) }
         },
         title = { Text(policy.name.ifBlank { "Detalle del seguro" }) },
         text = {
@@ -395,17 +396,17 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
                         }
                     }
                 }
-                DetailLine("Compania", policy.company ?: "No informada")
-                DetailLine("Tipo", policy.type.ifBlank { "No informado" })
-                DetailLine("Numero de poliza", policy.policyNumber ?: "No informado")
-                DetailLine("Estado tecnico", policy.status ?: "No informado")
-                DetailLine("Prima anual", money(policy.annualPremium, hidden))
-                DetailLine("Prima mensual", money(policy.annualPremium / 12.0, hidden))
-                DetailLine("Periodicidad", policy.periodicity ?: "No informada")
-                DetailLine("Renovacion", date?.take(10) ?: "Sin fecha")
-                DetailLine("Estado", urgency.label)
-                DetailLine("Cobertura", policy.coverage ?: "No informada")
-                DetailLine("Identificador", policy.id.ifBlank { "No informado" })
+                DetailLine(stringResource(R.string.insurance_compania), policy.company ?: "No informada")
+                DetailLine(stringResource(R.string.insurance_tipo), policy.type.ifBlank { "No informado" })
+                DetailLine(stringResource(R.string.insurance_numero_de_poliza), policy.policyNumber ?: "No informado")
+                DetailLine(stringResource(R.string.insurance_estado_tecnico), policy.status ?: "No informado")
+                DetailLine(stringResource(R.string.insurance_prima_anual), money(policy.annualPremium, hidden))
+                DetailLine(stringResource(R.string.insurance_prima_mensual), money(policy.annualPremium / 12.0, hidden))
+                DetailLine(stringResource(R.string.insurance_periodicidad), policy.periodicity ?: "No informada")
+                DetailLine(stringResource(R.string.insurance_renovacion), date?.take(10) ?: "Sin fecha")
+                DetailLine(stringResource(R.string.insurance_estado), urgency.label)
+                DetailLine(stringResource(R.string.insurance_cobertura), policy.coverage ?: "No informada")
+                DetailLine(stringResource(R.string.insurance_identificador), policy.id.ifBlank { "No informado" })
             }
         },
         shape = RoundedCornerShape(18.dp)

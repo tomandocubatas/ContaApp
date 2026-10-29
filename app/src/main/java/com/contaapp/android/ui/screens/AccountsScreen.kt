@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -111,7 +112,7 @@ fun AccountsScreen(
         val isTablet = maxWidth >= 760.dp
 
         LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            item { SectionHeader("Cuentas", "${filteredAccounts.size} visibles") }
+            item { SectionHeader(stringResource(R.string.accounts_cuentas), "${filteredAccounts.size} visibles") }
             item {
                 AccountsTotalCard(accounts = filteredAccounts, hidden = state.privacyMode)
             }
@@ -121,7 +122,7 @@ fun AccountsScreen(
                         value = query,
                         onValueChange = { query = it },
                         leadingIcon = { Icon(painterResource(R.drawable.ic_bank), contentDescription = null) },
-                        label = { Text("Buscar cuenta") },
+                        label = { Text(stringResource(R.string.accounts_buscar_cuenta)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -131,9 +132,9 @@ fun AccountsScreen(
                         onSelected = { bankFilter = it }
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                        FilterButton("Todas", balanceFilter == AccountBalanceFilter.All) { balanceFilter = AccountBalanceFilter.All }
-                        FilterButton("Positivas", balanceFilter == AccountBalanceFilter.Positive) { balanceFilter = AccountBalanceFilter.Positive }
-                        FilterButton("Negativas", balanceFilter == AccountBalanceFilter.Negative) { balanceFilter = AccountBalanceFilter.Negative }
+                        FilterButton(stringResource(R.string.accounts_todas), balanceFilter == AccountBalanceFilter.All) { balanceFilter = AccountBalanceFilter.All }
+                        FilterButton(stringResource(R.string.accounts_positivas), balanceFilter == AccountBalanceFilter.Positive) { balanceFilter = AccountBalanceFilter.Positive }
+                        FilterButton(stringResource(R.string.accounts_negativas), balanceFilter == AccountBalanceFilter.Negative) { balanceFilter = AccountBalanceFilter.Negative }
                     }
                 }
             }
@@ -181,11 +182,11 @@ fun BankCombo(
             Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = ContaTeal, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
             Text(selected ?: "Todos los bancos", modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text("v", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.accounts_v), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
-                text = { Text("Todos los bancos") },
+                text = { Text(stringResource(R.string.accounts_todos_los_bancos)) },
                 onClick = {
                     onSelected(null)
                     expanded = false
@@ -231,7 +232,7 @@ fun BankAccountsCard(
                     }
                     Column {
                         Text(bank, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text("${accounts.size} cuentas", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.accounts_cuentas_2, accounts.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                     }
                 }
                 StatusChip(money(total, hidden), if (total >= 0.0) ContaTeal else ContaDanger)
@@ -281,9 +282,9 @@ fun AccountsTotalCard(accounts: List<BankAccountBalance>, hidden: Boolean) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("Patrimonio en cuentas", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.accounts_patrimonio_en_cuentas), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                 Text(money(total, hidden), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("$negative cuentas en negativo", color = if (negative > 0) ContaDanger else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.accounts_cuentas_en_negativo, negative), color = if (negative > 0) ContaDanger else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
             Box(
                 Modifier.size(48.dp).background(ContaCoral.copy(alpha = 0.16f), RoundedCornerShape(14.dp)),
@@ -336,7 +337,7 @@ fun AccountDetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cerrar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_cerrar)) }
         },
         title = { Text(account.accountName.ifBlank { "Cuenta" }) },
         text = {
@@ -364,16 +365,16 @@ fun AccountDetailDialog(
                         }
                     }
                 }
-                DetailLine("Cuenta", account.accountName.ifBlank { "Cuenta" })
-                DetailLine("Identificador", account.id.ifBlank { "No informado" })
+                DetailLine(stringResource(R.string.accounts_cuenta), account.accountName.ifBlank { "Cuenta" })
+                DetailLine(stringResource(R.string.accounts_identificador), account.id.ifBlank { "No informado" })
                 if (movements.isNotEmpty()) {
-                    Text("Resumen visible", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.accounts_resumen_visible), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        AccountDetailMetric("Ingresos", money(income, hidden), ContaTeal, Modifier.weight(1f))
-                        AccountDetailMetric("Gastos", money(expense, hidden), ContaCoral, Modifier.weight(1f))
-                        AccountDetailMetric("Neto", money(net, hidden), if (net >= 0.0) ContaTeal else ContaDanger, Modifier.weight(1f))
+                        AccountDetailMetric(stringResource(R.string.accounts_ingresos), money(income, hidden), ContaTeal, Modifier.weight(1f))
+                        AccountDetailMetric(stringResource(R.string.accounts_gastos), money(expense, hidden), ContaCoral, Modifier.weight(1f))
+                        AccountDetailMetric(stringResource(R.string.accounts_neto), money(net, hidden), if (net >= 0.0) ContaTeal else ContaDanger, Modifier.weight(1f))
                     }
-                    Text("Actividad reciente", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.accounts_actividad_reciente), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                     movements.sortedByDescending { it.date }.take(4).forEach { movement ->
                         AccountMovementMiniRow(movement, hidden)
                     }

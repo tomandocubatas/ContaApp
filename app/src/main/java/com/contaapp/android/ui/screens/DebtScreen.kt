@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -109,7 +110,7 @@ fun DebtScreen(
         val isTablet = maxWidth >= 760.dp
 
         LazyColumn(Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            item { SectionHeader("Posicion de deuda", "${filteredDetails.size} detalles") }
+            item { SectionHeader(stringResource(R.string.debt_posicion_de_deuda), "${filteredDetails.size} detalles") }
             item {
                 DebtHeroCard(debts = visibleSummaries, hidden = state.privacyMode)
             }
@@ -125,21 +126,21 @@ fun DebtScreen(
                         OutlinedTextField(
                             value = query,
                             onValueChange = { query = it },
-                            label = { Text("Buscar deuda o entidad") },
+                            label = { Text(stringResource(R.string.debt_buscar_deuda_o_entidad)) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
-                        Text("Origen", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.debt_origen), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                            FilterButton("Todo", source == null) { source = null }
-                            FilterButton("Prestamos", source == "Prestamo") { source = "Prestamo" }
-                            FilterButton("Financ.", source == "Financiacion") { source = "Financiacion" }
+                            FilterButton(stringResource(R.string.debt_todo), source == null) { source = null }
+                            FilterButton(stringResource(R.string.debt_prestamos), source == "Prestamo") { source = "Prestamo" }
+                            FilterButton(stringResource(R.string.debt_financ), source == "Financiacion") { source = "Financiacion" }
                         }
-                        Text("Estado", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.debt_estado), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                            FilterButton("Estados", status == null) { status = null }
-                            FilterButton("Avisos", status == "warning") { status = "warning" }
-                            FilterButton("Vencidas", status == "overdue") { status = "overdue" }
+                            FilterButton(stringResource(R.string.debt_estados), status == null) { status = null }
+                            FilterButton(stringResource(R.string.debt_avisos), status == "warning") { status = "warning" }
+                            FilterButton(stringResource(R.string.debt_vencidas), status == "overdue") { status = "overdue" }
                         }
                     }
                 }
@@ -204,7 +205,7 @@ fun DebtSourceSummaryCard(label: String, debts: List<DebtDetail>, hidden: Boolea
         ) {
             Column {
                 Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
-                Text("${debts.size} operaciones · cuota ${money(payment, hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.debt_operaciones_cuota, debts.size, money(payment, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
             StatusChip(money(pending, hidden), ContaDanger)
         }
@@ -219,7 +220,7 @@ fun DebtCalendarCard(debts: List<DebtDetail>, hidden: Boolean) {
     }
     val total = next30.sumOf { it.monthlyPayment }
     AttentionCard(
-        title = "Pagos proximos 30 dias",
+        title = stringResource(R.string.debt_pagos_proximos_30_dias),
         value = money(total, hidden),
         detail = "${next30.size} cuotas previstas o vencidas",
         color = if (next30.any { (it.daysUntilPayment ?: 99) < 0 }) ContaDanger else ContaAmber
@@ -234,7 +235,7 @@ fun DebtNextPaymentCard(debts: List<DebtDetail>, hidden: Boolean) {
         .firstOrNull()
     if (next != null) {
         AttentionCard(
-            title = "Proximo pago: ${next.name}",
+            title = stringResource(R.string.debt_proximo_pago_2, next.name),
             value = money(next.monthlyPayment, hidden),
             detail = "${next.entity} - ${nextPaymentText(next)}",
             color = when (next.status.lowercase()) {
@@ -262,16 +263,16 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
         Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text("Exposicion financiera", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.debt_exposicion_financiera), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                     Text(money(pending, hidden), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                    Text("Pendiente sobre deuda historica", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.debt_pendiente_sobre_deuda_historica), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
                 StatusChip("${((pending / total) * 100).toInt()}%", ContaDanger)
             }
             ProgressBar(progress = pending / total, color = Color(0xFFFF5A52))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                LightHeroMiniMetric("Pagado", money(paid, hidden), ContaTeal, Modifier.weight(1f))
-                LightHeroMiniMetric("Intereses", money(interest, hidden), ContaAmber, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.debt_pagado), money(paid, hidden), ContaTeal, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.debt_intereses), money(interest, hidden), ContaAmber, Modifier.weight(1f))
             }
         }
     }
@@ -334,7 +335,7 @@ fun DebtDetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cerrar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.debt_cerrar)) }
         },
         title = { Text(debt.name) },
         text = {
@@ -357,12 +358,12 @@ fun DebtDetailDialog(
                             }
                             StatusChip(debt.status.ifBlank { "Activo" }, statusColor)
                         }
-                        Text("Pendiente", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.debt_pendiente), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                         Text(money(debt.pendingAmount, hidden), color = statusColor, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall)
                         ProgressBar(progress = monthlyRatio.coerceIn(0.0, 1.0), color = statusColor)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                            LightHeroMiniMetric("Meses est.", monthsLeft?.toString() ?: "N/D", ContaAmber, Modifier.weight(1f))
-                            LightHeroMiniMetric("Cuota", money(debt.monthlyPayment, hidden), ContaTeal, Modifier.weight(1f))
+                            LightHeroMiniMetric(stringResource(R.string.debt_meses_est), monthsLeft?.toString() ?: "N/D", ContaAmber, Modifier.weight(1f))
+                            LightHeroMiniMetric(stringResource(R.string.debt_cuota), money(debt.monthlyPayment, hidden), ContaTeal, Modifier.weight(1f))
                         }
                     }
                 }
@@ -372,10 +373,10 @@ fun DebtDetailDialog(
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        DetailLine("Proximo pago", nextPaymentText(debt))
-                        DetailLine("Cuota mensual", money(debt.monthlyPayment, hidden))
-                        DetailLine("Origen", debt.source)
-                        DetailLine("Tipo", debt.type)
+                        DetailLine(stringResource(R.string.debt_proximo_pago), nextPaymentText(debt))
+                        DetailLine(stringResource(R.string.debt_cuota_mensual), money(debt.monthlyPayment, hidden))
+                        DetailLine(stringResource(R.string.debt_origen), debt.source)
+                        DetailLine(stringResource(R.string.debt_tipo), debt.type)
                     }
                 }
             }
@@ -404,14 +405,14 @@ fun DebtRow(debt: DebtSummary, hidden: Boolean) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(debt.title, fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                MetricCard("Pendiente", money(debt.pending, hidden), Modifier.weight(1f))
-                MetricCard("Pagado", money(debt.paid, hidden), Modifier.weight(1f))
+                MetricCard(stringResource(R.string.debt_pendiente), money(debt.pending, hidden), Modifier.weight(1f))
+                MetricCard(stringResource(R.string.debt_pagado), money(debt.paid, hidden), Modifier.weight(1f))
             }
             ProgressBar(
                 progress = debt.pending / ((debt.pending + debt.paid).takeIf { it > 0 } ?: 1.0),
                 color = Color(0xFFFF5A52)
             )
-            Text("Intereses: ${money(debt.interest, hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.debt_intereses_2, money(debt.interest, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

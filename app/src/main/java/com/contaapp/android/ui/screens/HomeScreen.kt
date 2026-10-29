@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -115,7 +116,7 @@ fun HomeScreen(
                         period = it
                         preferencesStore.setString("homePeriod", it.name)
                     },
-                    title = "Vista financiera",
+                    title = stringResource(R.string.home_vista_financiera),
                     detail = "Cambia periodo sin salir del dashboard"
                 )
             }
@@ -139,8 +140,8 @@ fun HomeScreen(
             if (dashboard != null) {
                 item {
                     FinancialLineChart(
-                        title = "Ingresos vs gastos",
-                        subtitle = "tendencia estimada",
+                        title = stringResource(R.string.home_ingresos_vs_gastos),
+                        subtitle = stringResource(R.string.home_tendencia_estimada),
                         values = executiveTrend(dashboard.income, dashboard.expense, dashboard.net),
                         color = ExecutiveBlue,
                         hidden = state.privacyMode
@@ -152,7 +153,7 @@ fun HomeScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
                         FinancialPulseCard(dashboard, state.privacyMode, Modifier.weight(1f))
                         CategoryRankingCard(
-                            title = "Top gastos",
+                            title = stringResource(R.string.home_top_gastos),
                             categories = dashboard.expenseCategories,
                             hidden = state.privacyMode,
                             accent = ContaCoral,
@@ -168,7 +169,7 @@ fun HomeScreen(
             if (!isTablet && dashboard != null) {
                 item {
                     CategoryRankingCard(
-                        title = "Top gastos",
+                        title = stringResource(R.string.home_top_gastos),
                         categories = dashboard.expenseCategories,
                         hidden = state.privacyMode,
                         accent = ContaCoral
@@ -191,7 +192,7 @@ fun HomeScreen(
                 HomeAgendaCard(state)
             }
             item { ErrorText(state.error) }
-            item { SectionHeader("Actividad reciente", "${state.movements.size} mov.") }
+            item { SectionHeader(stringResource(R.string.home_actividad_reciente), "${state.movements.size} mov.") }
             items(
                 state.movements.take(if (isTablet) 8 else 5),
                 key = { it.id.ifBlank { "${it.date}-${it.description}-${it.amount}" } }
@@ -240,7 +241,7 @@ fun HomeAgendaCard(state: ContaUiState) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionHeader("Agenda financiera", "${entries.size} proximos hitos")
+            SectionHeader(stringResource(R.string.home_agenda_financiera), "${entries.size} proximos hitos")
             entries.forEach { entry ->
                 AgendaRow(entry, state.privacyMode)
             }
@@ -294,11 +295,11 @@ fun HomePeriodComparisonCard(state: ContaUiState) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionHeader("Resumen del periodo", periodLabel)
+            SectionHeader(stringResource(R.string.home_resumen_del_periodo), periodLabel)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                ComparisonMetric("Ingresos", dashboard.income, ContaTeal, state.privacyMode, Modifier.weight(1f))
-                ComparisonMetric("Gastos", dashboard.expense, ContaCoral, state.privacyMode, Modifier.weight(1f))
-                ComparisonMetric("Balance", dashboard.net, if (dashboard.net >= 0.0) ContaTeal else ContaDanger, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.home_ingresos), dashboard.income, ContaTeal, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.home_gastos), dashboard.expense, ContaCoral, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.home_balance), dashboard.net, if (dashboard.net >= 0.0) ContaTeal else ContaDanger, state.privacyMode, Modifier.weight(1f))
             }
         }
     }
@@ -382,11 +383,11 @@ fun HomePeriodCombo(period: QuickRange, onPeriod: (QuickRange) -> Unit) {
                     Icon(painterResource(R.drawable.ic_credit_card), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                 }
                 Column {
-                    Text("Vista financiera", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.home_vista_financiera), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                     Text(period.homeLabel(), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 }
             }
-            Text("v", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Black)
+            Text(stringResource(R.string.home_v), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Black)
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 QuickRange.entries.forEach { option ->
                     DropdownMenuItem(
@@ -430,16 +431,16 @@ fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
         ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Balance disponible", color = heroMuted, style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(R.string.home_balance_disponible), color = heroMuted, style = MaterialTheme.typography.labelLarge)
                     Text(money(dashboard.totalBalance, hidden), color = heroText, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text("Resumen ejecutivo del periodo actual", color = heroMuted, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.home_resumen_ejecutivo_del_periodo_actual), color = heroMuted, style = MaterialTheme.typography.bodySmall)
                 }
                 StatusChip(if (dashboard.net >= 0.0) "positivo" else "atencion", if (dashboard.net >= 0.0) ContaTeal else ContaAmber)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                LightHeroMiniMetric("Neto", money(dashboard.net, hidden), netColor, Modifier.weight(1f))
-                LightHeroMiniMetric("Revisado", percent(dashboard.reviewedPct), ExecutiveBlue, Modifier.weight(1f))
-                LightHeroMiniMetric("Categ.", percent(dashboard.categorizedPct), ContaAmber, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.home_neto), money(dashboard.net, hidden), netColor, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.home_revisado), percent(dashboard.reviewedPct), ExecutiveBlue, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.home_categ), percent(dashboard.categorizedPct), ContaAmber, Modifier.weight(1f))
             }
         }
     }
@@ -534,16 +535,16 @@ fun FinancialPulseCard(dashboard: DashboardSummary, hidden: Boolean, modifier: M
         modifier = modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionHeader("Pulso financiero", "periodo")
+            SectionHeader(stringResource(R.string.home_pulso_financiero), "periodo")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 Box(Modifier.weight(incomeProgress.toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaTeal, RoundedCornerShape(50)))
                 Box(Modifier.weight((1.0 - incomeProgress).toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaCoral, RoundedCornerShape(50)))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                PulseLine("Ingresos", money(dashboard.income, hidden), ContaTeal, Modifier.weight(1f))
-                PulseLine("Gastos", money(dashboard.expense, hidden), ContaCoral, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.home_ingresos), money(dashboard.income, hidden), ContaTeal, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.home_gastos), money(dashboard.expense, hidden), ContaCoral, Modifier.weight(1f))
             }
-            PulseLine("Neto del periodo", money(dashboard.net, hidden), if (dashboard.net >= 0.0) ContaTeal else ContaDanger)
+            PulseLine(stringResource(R.string.home_neto_del_periodo), money(dashboard.net, hidden), if (dashboard.net >= 0.0) ContaTeal else ContaDanger)
         }
     }
 }
@@ -618,8 +619,8 @@ fun HomeHealthCard(dashboard: DashboardSummary?, state: ContaUiState, modifier: 
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
-                    Text("Salud financiera", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-                    Text("$pendingMovements pendientes · $urgentDebt avisos", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.home_salud_financiera), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.home_pendientes_avisos, pendingMovements, urgentDebt), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
                 StatusChip(percent(score), color)
             }
@@ -639,17 +640,17 @@ fun HomeAttentionSection(state: ContaUiState, isTablet: Boolean, modifier: Modif
     }
 
     Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        SectionHeader("Requiere atencion", "lectura rapida")
+        SectionHeader(stringResource(R.string.home_requiere_atencion), "lectura rapida")
         if (isTablet) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                AttentionCard("Movimientos pendientes", pendingMovements.toString(), "Revisa clasificacion y estado", ContaAmber, Modifier.weight(1f))
-                AttentionCard("Deudas con aviso", urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger, Modifier.weight(1f))
-                AttentionCard("Seguros proximos", upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal, Modifier.weight(1f))
+                AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaAmber, Modifier.weight(1f))
+                AttentionCard(stringResource(R.string.home_deudas_con_aviso), urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger, Modifier.weight(1f))
+                AttentionCard(stringResource(R.string.home_seguros_proximos), upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal, Modifier.weight(1f))
             }
         } else {
-            AttentionCard("Movimientos pendientes", pendingMovements.toString(), "Revisa clasificacion y estado", ContaAmber)
-            AttentionCard("Deudas con aviso", urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger)
-            AttentionCard("Seguros proximos", upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal)
+            AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaAmber)
+            AttentionCard(stringResource(R.string.home_deudas_con_aviso), urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger)
+            AttentionCard(stringResource(R.string.home_seguros_proximos), upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal)
         }
     }
 }
@@ -663,7 +664,7 @@ fun WelcomeEmptyState(error: String?) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Preparando tus datos", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.home_preparando_tus_datos), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(
                 "Cuando la API responda, aqui veras el balance, ingresos, gastos y movimientos recientes.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant

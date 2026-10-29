@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -88,7 +89,7 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                 .padding(if (isTablet) 24.dp else 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item { SectionHeader("Graficas", "evolucion economica") }
+            item { SectionHeader(stringResource(R.string.charts_graficas), "evolucion economica") }
             item {
                 ChartPeriodPanel(
                     range = range,
@@ -141,13 +142,13 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                     item {
                         if (isTablet) {
                             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                                CategoryRankingCard("Top gastos", dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaCoral, Modifier.weight(1f))
-                                CategoryRankingCard("Top ingresos", dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaTeal, Modifier.weight(1f))
+                                CategoryRankingCard(stringResource(R.string.charts_top_gastos), dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaCoral, Modifier.weight(1f))
+                                CategoryRankingCard(stringResource(R.string.charts_top_ingresos), dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaTeal, Modifier.weight(1f))
                             }
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                CategoryRankingCard("Top gastos", dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaCoral)
-                                CategoryRankingCard("Top ingresos", dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaTeal)
+                                CategoryRankingCard(stringResource(R.string.charts_top_gastos), dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaCoral)
+                                CategoryRankingCard(stringResource(R.string.charts_top_ingresos), dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaTeal)
                             }
                         }
                     }
@@ -162,8 +163,8 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                 ChartSection.Trends -> {
                     item {
                         ChartOrEmpty(
-                            title = "Balance en cuentas",
-                            subtitle = "evolucion del patrimonio bancario",
+                            title = stringResource(R.string.charts_balance_en_cuentas),
+                            subtitle = stringResource(R.string.charts_evolucion_del_patrimonio_bancario),
                             values = charts.balanceTrend.map { it.value },
                             labels = charts.balanceTrend.map { it.label.toAxisLabel() },
                             color = ExecutiveBlue,
@@ -181,8 +182,8 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                 ChartSection.Debt -> {
                     item {
                         ChartOrEmpty(
-                            title = "Evolucion de deuda",
-                            subtitle = "capital pendiente historico",
+                            title = stringResource(R.string.charts_evolucion_de_deuda),
+                            subtitle = stringResource(R.string.charts_capital_pendiente_historico),
                             values = charts.debtTrend.map { it.value },
                             labels = charts.debtTrend.map { it.label.toAxisLabel() },
                             color = ContaAmber,
@@ -194,8 +195,8 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                 ChartSection.Rentals -> {
                     item {
                         ChartOrEmpty(
-                            title = "Cashflow de alquileres",
-                            subtitle = "rentabilidad por periodo",
+                            title = stringResource(R.string.charts_cashflow_de_alquileres),
+                            subtitle = stringResource(R.string.charts_rentabilidad_por_periodo),
                             values = charts.rentalCashflow.map { it.value },
                             labels = charts.rentalCashflow.map { it.label.toAxisLabel() },
                             color = ContaTeal,
@@ -238,7 +239,7 @@ fun DebtSnapshotChartCard(state: ContaUiState) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            ChartCardHeader("Detalle de deuda", "prestamos y financiaciones")
+            ChartCardHeader(stringResource(R.string.charts_detalle_de_deuda), "prestamos y financiaciones")
             visibleDebt.take(5).forEach { debt ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
@@ -262,12 +263,12 @@ fun RentalsSnapshotChartCard(state: ContaUiState) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            ChartCardHeader("Alquileres por propiedad", "rentabilidad y cashflow")
+            ChartCardHeader(stringResource(R.string.charts_alquileres_por_propiedad), "rentabilidad y cashflow")
             state.rentalProperties.take(5).forEach { property ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(property.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text("Margen ${percent(property.profitability)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.charts_margen, percent(property.profitability)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
                     Text(money(property.profit, state.privacyMode), color = if (property.profit >= 0.0) ContaTeal else ContaDanger, fontWeight = FontWeight.Bold)
                 }
@@ -291,15 +292,15 @@ fun FinancialEvolutionDashboardCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            ChartCardHeader("Evolucion financiera", "Ingresos, gastos y neto del periodo")
+            ChartCardHeader(stringResource(R.string.charts_evolucion_financiera), "Ingresos, gastos y neto del periodo")
             Text(
                 "Modo ${chartMode.label.lowercase()} · eje X ${if (granularity == "day") "dias" else "meses"}",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium
             )
-            InlineChartPanel("Neto", "Balance del periodo", financial.net, financial.labels, MaterialTheme.colorScheme.primary, hidden = hidden)
-            InlineChartPanel("Ingresos", "Serie ${chartMode.label.lowercase()}", financial.income, financial.labels, ContaTeal, hidden = hidden)
-            InlineChartPanel("Gastos", "Serie ${chartMode.label.lowercase()}", financial.expense, financial.labels, ContaCoral, hidden = hidden)
+            InlineChartPanel(stringResource(R.string.charts_neto), "Balance del periodo", financial.net, financial.labels, MaterialTheme.colorScheme.primary, hidden = hidden)
+            InlineChartPanel(stringResource(R.string.charts_ingresos), "Serie ${chartMode.label.lowercase()}", financial.income, financial.labels, ContaTeal, hidden = hidden)
+            InlineChartPanel(stringResource(R.string.charts_gastos), "Serie ${chartMode.label.lowercase()}", financial.expense, financial.labels, ContaCoral, hidden = hidden)
         }
     }
 }
@@ -317,19 +318,19 @@ fun QuickDistributionDashboardCard(dashboard: com.contaapp.android.domain.Dashbo
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            ChartCardHeader("Distribucion rapida", "Resumen de ingresos y gastos")
+            ChartCardHeader(stringResource(R.string.charts_distribucion_rapida), "Resumen de ingresos y gastos")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 Box(Modifier.weight((income / total).toFloat().coerceAtLeast(0.08f)).background(ContaTeal, RoundedCornerShape(50)).size(height = 10.dp, width = 1.dp))
                 Box(Modifier.weight((expense / total).toFloat().coerceAtLeast(0.08f)).background(ContaCoral, RoundedCornerShape(50)).size(height = 10.dp, width = 1.dp))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                PulseLine("Ingresos", money(income, hidden), ContaTeal, Modifier.weight(1f))
-                PulseLine("Gastos", money(expense, hidden), ContaCoral, Modifier.weight(1f))
-                PulseLine("Balance", money(net, hidden), if (net >= 0.0) ContaTeal else ContaDanger, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.charts_ingresos), money(income, hidden), ContaTeal, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.charts_gastos), money(expense, hidden), ContaCoral, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.charts_balance), money(net, hidden), if (net >= 0.0) ContaTeal else ContaDanger, Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                StatusChip("${dashboard?.expenseCategories?.size ?: 0} cat. gasto", ContaCoral, Modifier.weight(1f))
-                StatusChip("${dashboard?.incomeCategories?.size ?: 0} cat. ingreso", ContaTeal, Modifier.weight(1f))
+                StatusChip(stringResource(R.string.charts_cat_gasto, dashboard?.expenseCategories?.size ?: 0), ContaCoral, Modifier.weight(1f))
+                StatusChip(stringResource(R.string.charts_cat_ingreso, dashboard?.incomeCategories?.size ?: 0), ContaTeal, Modifier.weight(1f))
             }
         }
     }
@@ -347,10 +348,10 @@ fun CategoryPeriodDashboardCard(expenses: List<CategoryBreakdown>, income: List<
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            ChartCardHeader("Categorias del periodo", "Distribucion por categoria")
+            ChartCardHeader(stringResource(R.string.charts_categorias_del_periodo), "Distribucion por categoria")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterButton("Gastos", type == "expense") { type = "expense" }
-                FilterButton("Ingresos", type == "income") { type = "income" }
+                FilterButton(stringResource(R.string.charts_gastos), type == "expense") { type = "expense" }
+                FilterButton(stringResource(R.string.charts_ingresos), type == "income") { type = "income" }
             }
             CategoryDistributionBars(categories, hidden, accent)
         }
@@ -392,14 +393,14 @@ fun HistoricalCategoriesDashboardCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            ChartCardHeader("Historico por categorias", "Evolucion mensual de categorias")
+            ChartCardHeader(stringResource(R.string.charts_historico_por_categorias), "Evolucion mensual de categorias")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterButton("Gastos", type == "expense") { type = "expense" }
-                FilterButton("Ingresos", type == "income") { type = "income" }
+                FilterButton(stringResource(R.string.charts_gastos), type == "expense") { type = "expense" }
+                FilterButton(stringResource(R.string.charts_ingresos), type == "income") { type = "income" }
             }
             ChartOrEmpty(
                 title = if (type == "expense") "Gastos por mes" else "Ingresos por mes",
-                subtitle = "total mensual por categorias",
+                subtitle = stringResource(R.string.charts_total_mensual_por_categorias),
                 values = points.map { it.value },
                 labels = points.map { it.label.toAxisLabel() },
                 color = accent,
@@ -430,12 +431,12 @@ fun ChartPeriodPanel(
         PremiumPeriodSelector(
             selected = range,
             onSelected = onRange,
-            title = "Periodo de graficas",
+            title = stringResource(R.string.charts_periodo_de_graficas),
             detail = "El historico se recalcula con este rango"
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(value = dateFrom, onValueChange = onDateFrom, label = { Text("Desde") }, singleLine = true, modifier = Modifier.weight(1f))
-            OutlinedTextField(value = dateTo, onValueChange = onDateTo, label = { Text("Hasta") }, singleLine = true, modifier = Modifier.weight(1f))
+            OutlinedTextField(value = dateFrom, onValueChange = onDateFrom, label = { Text(stringResource(R.string.charts_desde)) }, singleLine = true, modifier = Modifier.weight(1f))
+            OutlinedTextField(value = dateTo, onValueChange = onDateTo, label = { Text(stringResource(R.string.charts_hasta)) }, singleLine = true, modifier = Modifier.weight(1f))
         }
         CompactFilterSection(R.drawable.ic_chart, "Modo de grafica") {
             FinancialChartMode.entries.forEach { mode ->
@@ -466,7 +467,7 @@ fun ChartsSummaryCard(state: ContaUiState) {
                 Icon(painterResource(R.drawable.ic_receipt), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Panel de evolucion", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.charts_panel_de_evolucion), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 Text(
                     "Balance ${money(dashboard?.totalBalance ?: 0.0, state.privacyMode)} · Neto ${money(dashboard?.net ?: 0.0, state.privacyMode)}",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -537,8 +538,8 @@ fun InlineChartPanel(
             val safeIndex = selectedIndex.coerceIn(0, cleanValues.lastIndex)
             val selectedLabel = labels.getOrNull(safeIndex).orEmpty()
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("${cleanValues.size} puntos", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                Text("Rango ${money(min, hidden)} / ${money(max, hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(stringResource(R.string.charts_puntos, cleanValues.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.charts_rango, money(min, hidden), money(max, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Row(
                 Modifier.fillMaxWidth().background(color.copy(alpha = 0.10f), RoundedCornerShape(14.dp)).padding(10.dp),
@@ -546,7 +547,7 @@ fun InlineChartPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(Modifier.weight(1f)) {
-                    Text("Punto destacado", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.charts_punto_destacado), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                     Text(selectedLabel.ifBlank { "Indice ${safeIndex + 1}" }, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 }
                 Text(money(cleanValues[safeIndex], hidden), color = color, fontWeight = FontWeight.Black)
@@ -602,7 +603,7 @@ fun InlineChartPanel(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Dato unico del periodo", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.charts_dato_unico_del_periodo), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                 Text(labels.firstOrNull().orEmpty(), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
             }
         } else {

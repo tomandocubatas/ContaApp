@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,7 +80,7 @@ fun RentalsScreen(
                 .padding(if (isTablet) 24.dp else 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item { SectionHeader("Alquileres", "${summary?.activeProperties ?: state.rentalProperties.size} activos") }
+            item { SectionHeader(stringResource(R.string.rentals_alquileres), "${summary?.activeProperties ?: state.rentalProperties.size} activos") }
             item {
                 RentalYearPanel(year = year, onYear = { year = it })
             }
@@ -100,8 +101,8 @@ fun RentalsScreen(
             if (cashflow.isNotEmpty()) {
                 item {
                     FinancialLineChart(
-                        title = "Cashflow de alquileres",
-                        subtitle = "evolucion por mes",
+                        title = stringResource(R.string.rentals_cashflow_de_alquileres),
+                        subtitle = stringResource(R.string.rentals_evolucion_por_mes),
                         values = cashflow,
                         color = ContaTeal,
                         labels = cashflowLabels,
@@ -115,7 +116,7 @@ fun RentalsScreen(
                 RentalMonthsCard(state.rentalMonths, state.privacyMode)
             }
             item {
-                SectionHeader("Propiedades", "${state.rentalProperties.size} con actividad")
+                SectionHeader(stringResource(R.string.rentals_propiedades), "${state.rentalProperties.size} con actividad")
             }
             if (state.isLoading && state.rentalProperties.isEmpty()) {
                 item { SkeletonCard(lines = 4) }
@@ -170,9 +171,9 @@ fun RentalHeroCard(
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Rentabilidad neta", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.rentals_rentabilidad_neta), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                     Text(money(profit, hidden), color = if (profit >= 0.0) ContaTeal else ContaDanger, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                    Text("${percent(profitability)} de margen · $activeProperties propiedades activas", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.rentals_de_margen_propiedades_activas, percent(profitability), activeProperties), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
                 Box(
                     Modifier.size(52.dp).background(ContaTeal.copy(alpha = 0.12f), RoundedCornerShape(16.dp)),
@@ -182,8 +183,8 @@ fun RentalHeroCard(
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                PulseLine("Ingresos", money(income, hidden), ContaTeal, Modifier.weight(1f))
-                PulseLine("Gastos", money(expense, hidden), ContaCoral, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.rentals_ingresos), money(income, hidden), ContaTeal, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.rentals_gastos), money(expense, hidden), ContaCoral, Modifier.weight(1f))
             }
             ProgressBar(
                 progress = income.takeIf { it > 0.0 }?.let { (profit / it).coerceIn(0.0, 1.0) } ?: 0.0,
@@ -245,7 +246,7 @@ fun RentalPropertyDetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cerrar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.rentals_cerrar)) }
         },
         title = { Text(property.name.ifBlank { "Propiedad" }) },
         text = {
@@ -263,14 +264,14 @@ fun RentalPropertyDetailDialog(
                                 Icon(painterResource(R.drawable.ic_home), contentDescription = null, tint = accent, modifier = Modifier.size(26.dp))
                             }
                             Column(Modifier.weight(1f)) {
-                                Text("Cashflow anual", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.rentals_cashflow_anual), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                                 Text(money(property.profit, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall)
                             }
                             StatusChip(percent(property.profitability), accent)
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                            LightHeroMiniMetric("Ingresos", money(property.income, hidden), ContaTeal, Modifier.weight(1f))
-                            LightHeroMiniMetric("Gastos", money(property.expense, hidden), ContaCoral, Modifier.weight(1f))
+                            LightHeroMiniMetric(stringResource(R.string.rentals_ingresos), money(property.income, hidden), ContaTeal, Modifier.weight(1f))
+                            LightHeroMiniMetric(stringResource(R.string.rentals_gastos), money(property.expense, hidden), ContaCoral, Modifier.weight(1f))
                         }
                         ProgressBar(progress = property.income.takeIf { it > 0.0 }?.let { (property.profit / it).coerceIn(0.0, 1.0) } ?: 0.0, color = accent)
                     }
@@ -282,13 +283,13 @@ fun RentalPropertyDetailDialog(
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            bestMonth?.let { DetailLine("Mejor mes", "${it.monthName} · ${money(it.profit, hidden)}") }
-                            worstMonth?.let { DetailLine("Mes mas flojo", "${it.monthName} · ${money(it.profit, hidden)}") }
+                            bestMonth?.let { DetailLine(stringResource(R.string.rentals_mejor_mes), "${it.monthName} · ${money(it.profit, hidden)}") }
+                            worstMonth?.let { DetailLine(stringResource(R.string.rentals_mes_mas_flojo), "${it.monthName} · ${money(it.profit, hidden)}") }
                         }
                     }
                 }
                 if (activeMonths.isNotEmpty()) {
-                    Text("Detalle mensual", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.rentals_detalle_mensual), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                     activeMonths.take(6).forEach { month ->
                         Card(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -329,9 +330,9 @@ fun RentalMonthsCard(months: List<com.contaapp.android.domain.RentalMonth>, hidd
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            SectionHeader("Detalle mensual", "${months.count { it.income > 0.0 || it.expense > 0.0 }} meses activos")
+            SectionHeader(stringResource(R.string.rentals_detalle_mensual), "${months.count { it.income > 0.0 || it.expense > 0.0 }} meses activos")
             if (months.isEmpty()) {
-                Text("No hay detalle mensual para este ejercicio.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.rentals_no_hay_detalle_mensual_para_este_eje), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 months.forEach { month ->
                     RentalMonthRow(month, hidden)

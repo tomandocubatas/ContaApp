@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -266,8 +267,8 @@ fun AppTopBar(
                 contentDescription = if (privacyMode) "Mostrar importes" else "Ocultar importes",
                 onClick = onTogglePrivacy
             )
-            HeaderIconButton(iconRes = R.drawable.ic_refresh, contentDescription = "Actualizar", onClick = onRefresh)
-            HeaderIconButton(iconRes = R.drawable.ic_logout, contentDescription = "Salir", onClick = onLogout)
+            HeaderIconButton(iconRes = R.drawable.ic_refresh, contentDescription = stringResource(R.string.navigation_actualizar), onClick = onRefresh)
+            HeaderIconButton(iconRes = R.drawable.ic_logout, contentDescription = stringResource(R.string.navigation_salir), onClick = onLogout)
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
     )

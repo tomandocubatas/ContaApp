@@ -179,14 +179,18 @@ class ContaRepository(
         }
         val items = mutableListOf<JSONObject>()
         for (page in 1..AppConfig.MOVEMENTS_MAX_PAGES) {
-            val pageItems = movementsPage(token, filters, page)
-            items += pageItems
-            if (pageItems.size < AppConfig.MOVEMENTS_PAGE_SIZE) break
+            val result = movementsPage(token, filters, page)
+            items += result.items
+            // El backend limita el tamaño de pagina: manda totalPages, no el tamaño pedido.
+            val lastPage = result.totalPages?.let { page >= it } ?: (result.items.size < AppConfig.MOVEMENTS_PAGE_SIZE)
+            if (lastPage || result.items.isEmpty()) break
         }
         return items.map { it.toMovement() }
     }
 
-    private fun movementsPage(token: String, filters: MovementFilters, page: Int): List<JSONObject> {
+    private class MovementsPage(val items: List<JSONObject>, val totalPages: Int?)
+
+    private fun movementsPage(token: String, filters: MovementFilters, page: Int): MovementsPage {
         val query = buildList {
             add("page=$page")
             add("limit=${AppConfig.MOVEMENTS_PAGE_SIZE}")
@@ -203,7 +207,8 @@ class ContaRepository(
             if (filters.maxAmount != null) add("amountMax=${filters.maxAmount}")
         }.joinToString("&")
         val response = api.get("movements-global?$query", token)
-        return response.firstArray("data", "movements").mapObjects { it }
+        val totalPages = response.optJSONObject("pagination")?.takeIf { it.has("totalPages") }?.optInt("totalPages")
+        return MovementsPage(response.firstArray("data", "movements").mapObjects { it }, totalPages)
     }
 
     private fun JSONObject.toMovement(): Movement {

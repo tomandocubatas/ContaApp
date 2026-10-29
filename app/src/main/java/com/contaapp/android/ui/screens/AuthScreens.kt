@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -113,7 +114,7 @@ fun LoginScreen(
                     .widthIn(max = 460.dp)
             ) {
                 Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Text("Acceso seguro", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Black, color = Color(0xFF081320))
+                    Text(stringResource(R.string.auths_acceso_seguro), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Black, color = Color(0xFF081320))
                     Text(
                         "Tu posicion financiera, movimientos y alertas en una vista privada y cacheada.",
                         color = Color(0xFF64748B),
@@ -124,14 +125,14 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email") },
+                        label = { Text(stringResource(R.string.auths_email)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Password") },
+                        label = { Text(stringResource(R.string.auths_password)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
@@ -140,7 +141,7 @@ fun LoginScreen(
                         OutlinedTextField(
                             value = twoFactorCode,
                             onValueChange = { twoFactorCode = it.filter(Char::isDigit).take(6) },
-                            label = { Text("Codigo 2FA") },
+                            label = { Text(stringResource(R.string.auths_codigo_2fa)) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -178,7 +179,7 @@ fun LoginScreen(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Usar otras credenciales")
+                            Text(stringResource(R.string.auths_usar_otras_credenciales))
                         }
                     }
                     ErrorText(state.error)
@@ -246,7 +247,7 @@ fun ServerAccessButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
     ) {
-        Icon(painterResource(R.drawable.ic_settings), contentDescription = "Configurar servidor")
+        Icon(painterResource(R.drawable.ic_settings), contentDescription = stringResource(R.string.auths_configurar_servidor))
     }
 }
 
@@ -261,7 +262,7 @@ fun ServerStatusPill(baseUrl: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f)) {
-            Text("Servidor activo", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.auths_servidor_activo), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
             Text(baseUrl, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
         }
         Box(
@@ -286,17 +287,17 @@ fun AuthBrandMark() {
         ) {
             Icon(painterResource(R.drawable.ic_brand_mark), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(68.dp))
         }
-        Text("ContaApp Executive", color = Color.White, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black)
-        Text("Informacion clara. Acceso protegido.", color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.auths_contaapp_executive), color = Color.White, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black)
+        Text(stringResource(R.string.auths_informacion_clara_acceso_protegido), color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.bodySmall)
     }
 }
 
 @Composable
 fun AuthTrustStrip() {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-        AuthMiniPill("Cache 6h", ContaTeal, Modifier.weight(1f))
-        AuthMiniPill("Biometria", ExecutiveBlue, Modifier.weight(1f))
-        AuthMiniPill("Privado", ContaAmber, Modifier.weight(1f))
+        AuthMiniPill(stringResource(R.string.auths_cache_6h), ContaTeal, Modifier.weight(1f))
+        AuthMiniPill(stringResource(R.string.auths_biometria), ExecutiveBlue, Modifier.weight(1f))
+        AuthMiniPill(stringResource(R.string.auths_privado), ContaAmber, Modifier.weight(1f))
     }
 }
 
@@ -324,43 +325,43 @@ fun ServerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Servidor API") },
+        title = { Text(stringResource(R.string.auths_servidor_api)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Selecciona la API a la que se conectara la app.")
+                Text(stringResource(R.string.auths_selecciona_la_api_a_la_que_se_conect))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(
                         onClick = { value = "http://10.0.2.2:4000/api" },
                         shape = RoundedCornerShape(50),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)
                     ) {
-                        Text("Emulador")
+                        Text(stringResource(R.string.auths_emulador))
                     }
                     OutlinedButton(
                         onClick = { value = "http://192.168.1.X:4000/api" },
                         shape = RoundedCornerShape(50),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)
                     ) {
-                        Text("Movil fisico")
+                        Text(stringResource(R.string.auths_movil_fisico))
                     }
                 }
                 OutlinedTextField(
                     value = value,
                     onValueChange = { value = it },
-                    label = { Text("URL base") },
+                    label = { Text(stringResource(R.string.auths_url_base)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Text("Emulador: http://10.0.2.2:4000/api", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                Text("Movil fisico: http://IP_DEL_PC:4000/api", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.auths_emulador_http_10_0_2_2_4000_api), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.auths_movil_fisico_http_ip_del_pc_4000_api), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 state.serverTestMessage?.let {
-                    Text(it, color = if (it == "Conexion correcta") Color(0xFF0F766E) else MaterialTheme.colorScheme.error)
+                    Text(it, color = if (it == stringResource(R.string.vm_connection_ok)) Color(0xFF0F766E) else MaterialTheme.colorScheme.error)
                 }
             }
         },
         confirmButton = {
             Button(onClick = { onSave(value) }) {
-                Text("Guardar")
+                Text(stringResource(R.string.auths_guardar))
             }
         },
         dismissButton = {
@@ -369,7 +370,7 @@ fun ServerDialog(
                     Text(if (state.isTestingServer) "Probando..." else "Probar")
                 }
                 TextButton(onClick = onDismiss) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.auths_cancelar))
                 }
             }
         },
@@ -407,8 +408,8 @@ fun LockedScreen(
                     ) {
                         Icon(painterResource(R.drawable.ic_fingerprint), contentDescription = null, tint = Color(0xFF00A884), modifier = Modifier.size(44.dp))
                     }
-                    Text("Datos protegidos", color = Color(0xFF081320), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                    Text("Confirma tu identidad para abrir el snapshot financiero.", color = Color(0xFF64748B), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.auths_datos_protegidos), color = Color(0xFF081320), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.auths_confirma_tu_identidad_para_abrir_el), color = Color(0xFF64748B), style = MaterialTheme.typography.bodyMedium)
                     Button(
                         onClick = onUnlock,
                         modifier = Modifier.fillMaxWidth(),
@@ -416,10 +417,10 @@ fun LockedScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A884)),
                         contentPadding = PaddingValues(vertical = 15.dp)
                     ) {
-                        Text("Desbloquear con huella", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.auths_desbloquear_con_huella), fontWeight = FontWeight.Bold)
                     }
                     TextButton(onClick = onLogout) {
-                        Text("Cerrar sesion")
+                        Text(stringResource(R.string.auths_cerrar_sesion))
                     }
                     ErrorText(state.error)
                 }

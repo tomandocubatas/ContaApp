@@ -4,6 +4,6 @@ package com.contaapp.android.core
 object AppConfig {
     const val DEFAULT_CURRENCY = "EUR"
     const val EXPIRING_INSURANCE_DAYS = 60
-    const val MOVEMENTS_PAGE_SIZE = 200
-    const val MOVEMENTS_MAX_PAGES = 5
+    const val MOVEMENTS_PAGE_SIZE = 100
+    const val MOVEMENTS_MAX_PAGES = 10
 }

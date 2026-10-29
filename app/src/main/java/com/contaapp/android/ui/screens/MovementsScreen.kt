@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -147,7 +148,7 @@ fun MovementsScreen(
             Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            item { SectionHeader("Movimientos recientes", "${visibleMovements.size} resultados") }
+            item { SectionHeader(stringResource(R.string.movements_movimientos_recientes), "${visibleMovements.size} resultados") }
             item {
                 MovementsInsightCard(
                     movements = visibleMovements,
@@ -244,7 +245,7 @@ fun MovementsScreen(
                 )
             }
             if (state.isMovementsLoading) {
-                item { InlineLoading("Actualizando movimientos...") }
+                item { InlineLoading(stringResource(R.string.movements_actualizando_movimientos)) }
                 if (state.movements.isEmpty()) {
                     item { SkeletonCard(lines = 5) }
                     item { SkeletonCard(lines = 4) }
@@ -274,7 +275,7 @@ fun MovementsScreen(
             item {
                 PremiumEmptyState(
                     show = state.movements.isEmpty() && !state.isMovementsLoading,
-                    title = "Sin movimientos visibles",
+                    title = stringResource(R.string.movements_sin_movimientos_visibles),
                     detail = "Prueba a ampliar el periodo, limpiar filtros o refrescar desde la cabecera.",
                     iconRes = R.drawable.ic_receipt
                 )
@@ -360,15 +361,15 @@ fun MovementQuickActions(
 ) {
     FilterPanel {
         CompactFilterSection(R.drawable.ic_receipt, "Accesos rapidos") {
-            FilterButton("Pendientes", pendingActive, onPending)
-            FilterButton("Gastos mes", monthExpensesActive, onMonthExpenses)
-            FilterButton("Ingresos mes", monthIncomeActive, onMonthIncome)
-            FilterButton("Vinculados", onlyLinked, onOnlyLinked)
-            FilterButton("Duplicados", onlyDuplicates, onOnlyDuplicates)
+            FilterButton(stringResource(R.string.movements_pendientes), pendingActive, onPending)
+            FilterButton(stringResource(R.string.movements_gastos_mes), monthExpensesActive, onMonthExpenses)
+            FilterButton(stringResource(R.string.movements_ingresos_mes), monthIncomeActive, onMonthIncome)
+            FilterButton(stringResource(R.string.movements_vinculados), onlyLinked, onOnlyLinked)
+            FilterButton(stringResource(R.string.movements_duplicados), onlyDuplicates, onOnlyDuplicates)
         }
         CompactFilterSection(R.drawable.ic_settings, "Vista guardada") {
-            FilterButton("Guardar actual", false, onSaveFilter)
-            FilterButton("Restaurar", hasSavedFilter, onRestoreFilter)
+            FilterButton(stringResource(R.string.movements_guardar_actual), false, onSaveFilter)
+            FilterButton(stringResource(R.string.movements_restaurar), hasSavedFilter, onRestoreFilter)
         }
     }
 }
@@ -401,7 +402,7 @@ fun MovementGroupHeader(label: String, movements: List<Movement>, hidden: Boolea
     ) {
         Column {
             Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-            Text("${movements.size} movimientos", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.movements_movimientos, movements.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
         }
         StatusChip(money(total, hidden), if (total >= 0.0) ContaTeal else ContaDanger)
     }
@@ -459,7 +460,7 @@ fun WalletMovementRow(
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black)
                 if (!movement.reviewed) {
-                    StatusChip("pend.", ContaAmber)
+                    StatusChip(stringResource(R.string.movements_pend), ContaAmber)
                 }
             }
         }
@@ -505,7 +506,7 @@ fun MovementFilterSheet(
             .padding(horizontal = 18.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        SectionHeader("Filtros de movimientos", "busqueda avanzada")
+        SectionHeader(stringResource(R.string.movements_filtros_de_movimientos), "busqueda avanzada")
         Text(
             "Combina texto, fechas, cuenta, categoria, importe y agrupacion.",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -520,7 +521,7 @@ fun MovementFilterSheet(
                     value = text,
                     onValueChange = onText,
                     leadingIcon = { Icon(painterResource(R.drawable.ic_receipt), contentDescription = null) },
-                    label = { Text("Buscar concepto, comercio o texto") },
+                    label = { Text(stringResource(R.string.movements_buscar_concepto_comercio_o_texto)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -541,20 +542,20 @@ fun MovementFilterSheet(
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(value = dateFrom, onValueChange = onDateFrom, label = { Text("Desde") }, singleLine = true, modifier = Modifier.weight(1f))
-                    OutlinedTextField(value = dateTo, onValueChange = onDateTo, label = { Text("Hasta") }, singleLine = true, modifier = Modifier.weight(1f))
+                    OutlinedTextField(value = dateFrom, onValueChange = onDateFrom, label = { Text(stringResource(R.string.movements_desde)) }, singleLine = true, modifier = Modifier.weight(1f))
+                    OutlinedTextField(value = dateTo, onValueChange = onDateTo, label = { Text(stringResource(R.string.movements_hasta)) }, singleLine = true, modifier = Modifier.weight(1f))
                 }
             }
             item {
                 CompactFilterSection(R.drawable.ic_receipt, "Tipo") {
-                    FilterButton("Todos", type == null) { onType(null) }
-                    FilterButton("Ingresos", type == MovementTypeGroups.Income) { onType(MovementTypeGroups.Income) }
-                    FilterButton("Gastos", type == MovementTypeGroups.Expense) { onType(MovementTypeGroups.Expense) }
+                    FilterButton(stringResource(R.string.movements_todos), type == null) { onType(null) }
+                    FilterButton(stringResource(R.string.movements_ingresos), type == MovementTypeGroups.Income) { onType(MovementTypeGroups.Income) }
+                    FilterButton(stringResource(R.string.movements_gastos), type == MovementTypeGroups.Expense) { onType(MovementTypeGroups.Expense) }
                 }
             }
             item {
                 CompactFilterSection(R.drawable.ic_bank, "Cuenta") {
-                    FilterButton("Todas", accountId == null) { onAccountId(null) }
+                    FilterButton(stringResource(R.string.movements_todas), accountId == null) { onAccountId(null) }
                     topAccounts.forEach { account ->
                         FilterButton(account.accountName.take(14), accountId == account.id) { onAccountId(account.id) }
                     }
@@ -562,7 +563,7 @@ fun MovementFilterSheet(
             }
             item {
                 CompactFilterSection(R.drawable.ic_settings, "Categoria") {
-                    FilterButton("Todas", categoryId == null) { onCategoryId(null) }
+                    FilterButton(stringResource(R.string.movements_todas), categoryId == null) { onCategoryId(null) }
                     topCategories.forEach { category ->
                         FilterButton(category.name.take(14), categoryId == category.id) { onCategoryId(category.id) }
                     }
@@ -570,28 +571,28 @@ fun MovementFilterSheet(
             }
             item {
                 CompactFilterSection(R.drawable.ic_shield, "Revision") {
-                    FilterButton("Todas", reviewed == null) { onReviewed(null) }
-                    FilterButton("Pendientes", reviewed == false) { onReviewed(false) }
-                    FilterButton("Revisadas", reviewed == true) { onReviewed(true) }
+                    FilterButton(stringResource(R.string.movements_todas), reviewed == null) { onReviewed(null) }
+                    FilterButton(stringResource(R.string.movements_pendientes), reviewed == false) { onReviewed(false) }
+                    FilterButton(stringResource(R.string.movements_revisadas), reviewed == true) { onReviewed(true) }
                 }
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(value = minAmount, onValueChange = onMinAmount, label = { Text("Importe min.") }, singleLine = true, modifier = Modifier.weight(1f))
-                    OutlinedTextField(value = maxAmount, onValueChange = onMaxAmount, label = { Text("Importe max.") }, singleLine = true, modifier = Modifier.weight(1f))
+                    OutlinedTextField(value = minAmount, onValueChange = onMinAmount, label = { Text(stringResource(R.string.movements_importe_min)) }, singleLine = true, modifier = Modifier.weight(1f))
+                    OutlinedTextField(value = maxAmount, onValueChange = onMaxAmount, label = { Text(stringResource(R.string.movements_importe_max)) }, singleLine = true, modifier = Modifier.weight(1f))
                 }
             }
             item {
                 CompactFilterSection(R.drawable.ic_bank, "Agrupar") {
-                    FilterButton("Fecha", groupMode == MovementGroupMode.Date) { onGroupMode(MovementGroupMode.Date) }
-                    FilterButton("Categoria", groupMode == MovementGroupMode.Category) { onGroupMode(MovementGroupMode.Category) }
-                    FilterButton("Cuenta", groupMode == MovementGroupMode.Account) { onGroupMode(MovementGroupMode.Account) }
+                    FilterButton(stringResource(R.string.movements_fecha), groupMode == MovementGroupMode.Date) { onGroupMode(MovementGroupMode.Date) }
+                    FilterButton(stringResource(R.string.movements_categoria), groupMode == MovementGroupMode.Category) { onGroupMode(MovementGroupMode.Category) }
+                    FilterButton(stringResource(R.string.movements_cuenta), groupMode == MovementGroupMode.Account) { onGroupMode(MovementGroupMode.Account) }
                 }
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-            WalletActionButton("Limpiar", onClear, Modifier.weight(1f))
-            Button(onClick = onApply, shape = RoundedCornerShape(50), modifier = Modifier.weight(1f)) { Text("Aplicar") }
+            WalletActionButton(stringResource(R.string.movements_limpiar), onClear, Modifier.weight(1f))
+            Button(onClick = onApply, shape = RoundedCornerShape(50), modifier = Modifier.weight(1f)) { Text(stringResource(R.string.movements_aplicar)) }
         }
     }
 }
@@ -768,10 +769,10 @@ fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
-                    Text("Resultado visible", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.movements_resultado_visible), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                     Text(money(net, hidden), color = if (net >= 0.0) ContaTeal else ContaDanger, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                 }
-                StatusChip("${movements.size} mov.", ExecutiveBlue)
+                StatusChip(stringResource(R.string.movements_mov, movements.size), ExecutiveBlue)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 Box(
@@ -788,8 +789,8 @@ fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PulseLine("Ingresos", money(income, hidden), ContaTeal, Modifier.weight(1f))
-                PulseLine("Gastos", money(expense, hidden), ContaCoral, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.movements_ingresos), money(income, hidden), ContaTeal, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.movements_gastos), money(expense, hidden), ContaCoral, Modifier.weight(1f))
             }
         }
     }

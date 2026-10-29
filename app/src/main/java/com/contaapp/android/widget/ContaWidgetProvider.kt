@@ -25,6 +25,8 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 class ContaWidgetProvider : AppWidgetProvider() {
+    private lateinit var ctx: Context
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         val snapshot = SnapshotStore(context).load()
         appWidgetIds.forEach { appWidgetId ->
@@ -48,6 +50,7 @@ class ContaWidgetProvider : AppWidgetProvider() {
     }
 
     private fun buildViews(context: Context, snapshot: FinancialSnapshot?): RemoteViews {
+        ctx = context
         val views = RemoteViews(context.packageName, R.layout.widget_conta_summary)
         val preferences = AppPreferencesStore(context)
         val hidden = preferences.isPrivacyDefault()
@@ -66,11 +69,11 @@ class ContaWidgetProvider : AppWidgetProvider() {
 
         views.setTextViewText(R.id.widget_updated, snapshot.freshnessLabel(preferences.cacheTtlMinutes()))
         views.setTextViewText(R.id.widget_balance, money(balance, hidden))
-        views.setTextViewText(R.id.widget_income, "Ing. ${money(income, hidden)}")
-        views.setTextViewText(R.id.widget_expense, "Gas. ${money(expense, hidden)}")
-        views.setTextViewText(R.id.widget_net, "Neto ${money(net, hidden)}")
+        views.setTextViewText(R.id.widget_income, ctx.getString(R.string.widget_income_short, money(income, hidden)))
+        views.setTextViewText(R.id.widget_expense, ctx.getString(R.string.widget_expense_short, money(expense, hidden)))
+        views.setTextViewText(R.id.widget_net, ctx.getString(R.string.widget_net_short, money(net, hidden)))
         views.setTextColor(R.id.widget_net, if (net >= 0.0) ContaTeal else ContaCoral)
-        views.setTextViewText(R.id.widget_health, "Salud $health%")
+        views.setTextViewText(R.id.widget_health, ctx.getString(R.string.widget_health_pct, health))
         views.setTextColor(R.id.widget_health, healthColor(health))
         views.setProgressBar(R.id.widget_health_bar, 100, health, false)
         views.setTextViewText(R.id.widget_mix, compositionLabel(income, expense))
@@ -102,13 +105,13 @@ class ContaWidgetProvider : AppWidgetProvider() {
     }
 
     private fun attentionText(hasCache: Boolean, pending: Int, debtAlerts: Int, insuranceAlerts: Int): String {
-        if (!hasCache) return "Abre la app para cargar datos"
+        if (!hasCache) return ctx.getString(R.string.widget_open_app)
         val parts = buildList {
-            if (debtAlerts > 0) add("$debtAlerts criticos")
-            if (pending > 0) add("$pending pendientes")
-            if (insuranceAlerts > 0) add("$insuranceAlerts seguros")
+            if (debtAlerts > 0) add(ctx.getString(R.string.widget_critical, debtAlerts))
+            if (pending > 0) add(ctx.getString(R.string.widget_pending, pending))
+            if (insuranceAlerts > 0) add(ctx.getString(R.string.widget_insurances, insuranceAlerts))
         }
-        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ") ?: "Todo al dia"
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ") ?: ctx.getString(R.string.widget_all_clear)
     }
 
     private fun openAppIntent(context: Context): PendingIntent {
@@ -148,7 +151,7 @@ class ContaWidgetProvider : AppWidgetProvider() {
     }
 
     private fun FinancialSnapshot?.freshnessLabel(ttlMinutes: Int): String {
-        val loadedAt = this?.loadedAtMillis?.takeIf { it > 0L } ?: return "Sin cache"
+        val loadedAt = this?.loadedAtMillis?.takeIf { it > 0L } ?: return ctx.getString(R.string.widget_no_cache)
         val elapsedMinutes = ((System.currentTimeMillis() - loadedAt) / 60_000L).coerceAtLeast(0)
         val remainingMinutes = (ttlMinutes - elapsedMinutes).coerceAtLeast(0)
         val time = Instant.ofEpochMilli(loadedAt)
@@ -156,9 +159,9 @@ class ContaWidgetProvider : AppWidgetProvider() {
             .format(DateTimeFormatter.ofPattern("HH:mm"))
         val status = if (remainingMinutes > 0) {
             val hours = remainingMinutes / 60
-            if (hours > 0) "${hours}h vig." else "${remainingMinutes}m vig."
+            if (hours > 0) ctx.getString(R.string.widget_valid_hours, hours) else ctx.getString(R.string.widget_valid_minutes, remainingMinutes)
         } else {
-            "vencida"
+            ctx.getString(R.string.widget_expired)
         }
         return "$time · $status"
     }
@@ -188,18 +191,18 @@ class ContaWidgetProvider : AppWidgetProvider() {
 
     private fun compositionLabel(income: Double, expense: Double): String {
         val total = kotlin.math.abs(income) + kotlin.math.abs(expense)
-        if (total <= 0.0) return "Sin actividad"
+        if (total <= 0.0) return ctx.getString(R.string.widget_no_activity)
         val incomePct = ((kotlin.math.abs(income) / total) * 100).roundToInt()
         val expensePct = 100 - incomePct
-        return "Mix $incomePct% ing. · $expensePct% gas."
+        return ctx.getString(R.string.widget_mix, incomePct, expensePct)
     }
 
     private fun topExpenseLabel(snapshot: FinancialSnapshot?, hidden: Boolean): String {
         val top = snapshot?.dashboard?.expenseCategories
             ?.filter { it.total > 0.0 }
             ?.maxByOrNull { it.total }
-            ?: return "Top: sin datos"
-        return "Top: ${top.name} · ${money(top.total, hidden)}"
+            ?: return ctx.getString(R.string.widget_top_none)
+        return ctx.getString(R.string.widget_top, top.name, money(top.total, hidden))
     }
 
     private fun nextObligationLabel(
@@ -210,23 +213,23 @@ class ContaWidgetProvider : AppWidgetProvider() {
         val nextDebt = debts
             .filter { it.daysUntilPayment != null }
             .minByOrNull { it.daysUntilPayment ?: Int.MAX_VALUE }
-            ?.let { obligation("Deuda", it.name, it.monthlyPayment, it.daysUntilPayment, hidden) }
+            ?.let { obligation(ctx.getString(R.string.widget_type_debt), it.name, it.monthlyPayment, it.daysUntilPayment, hidden) }
         val nextInsurance = insurances
             .mapNotNull { policy ->
                 val days = policy.daysUntil().takeIf { it != Int.MAX_VALUE } ?: return@mapNotNull null
-                obligation("Seguro", policy.name, policy.annualPremium / 12.0, days, hidden)
+                obligation(ctx.getString(R.string.widget_type_insurance), policy.name, policy.annualPremium / 12.0, days, hidden)
             }
             .minByOrNull { it.daysSort }
         val best = listOfNotNull(nextDebt, nextInsurance).minByOrNull { it.daysSort }
-        return best?.label ?: "Vence: sin vencimientos"
+        return best?.label ?: ctx.getString(R.string.widget_due_none)
     }
 
     private fun obligation(type: String, name: String, amount: Double, days: Int?, hidden: Boolean): WidgetObligation {
         val dayText = when {
-            days == null -> "sin fecha"
-            days < 0 -> "vencido ${kotlin.math.abs(days)}d"
-            days == 0 -> "hoy"
-            else -> "en ${days}d"
+            days == null -> ctx.getString(R.string.widget_no_date)
+            days < 0 -> ctx.getString(R.string.widget_overdue_days, kotlin.math.abs(days))
+            days == 0 -> ctx.getString(R.string.widget_today)
+            else -> ctx.getString(R.string.widget_in_days, days)
         }
         return WidgetObligation(
             label = "${type.take(6)}: ${name.take(18)} · $dayText · ${money(amount, hidden)}",

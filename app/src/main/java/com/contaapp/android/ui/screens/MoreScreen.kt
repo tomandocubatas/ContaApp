@@ -1,6 +1,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +50,7 @@ fun MoreScreen(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item { SectionHeader("Mas opciones", "navegacion completa") }
+        item { SectionHeader(stringResource(R.string.more_mas_opciones), "navegacion completa") }
         item {
             MoreExecutiveCard(
                 balance = money(state.dashboard?.totalBalance ?: 0.0, state.privacyMode),
@@ -70,7 +71,7 @@ fun MoreScreen(
             }
             item { EmptyHint(searchResults.isEmpty(), "No hay coincidencias en la cache actual.") }
         }
-        item { SectionTitle("Analisis y operaciones") }
+        item { SectionTitle(stringResource(R.string.more_analisis_y_operaciones)) }
         item { MoreRow(Tab.Charts, "Graficas por resumen, categorias, deuda y alquileres", onOpen) }
         item { MoreRow(Tab.Agenda, "Pagos previstos, recurrentes, seguros y confirmaciones", onOpen) }
         item { MoreRow(Tab.Accounts, "Detalle por banco, cuenta y saldo disponible", onOpen) }
@@ -78,7 +79,7 @@ fun MoreScreen(
         item { MoreRow(Tab.Debt, "Prestamos, financiaciones y proximos pagos", onOpen) }
         item { MoreRow(Tab.Insurance, "Polizas, primas y renovaciones", onOpen) }
         item { MoreRow(Tab.Rentals, "Rentabilidad y cashflow por propiedad", onOpen) }
-        item { SectionTitle("Sistema") }
+        item { SectionTitle(stringResource(R.string.more_sistema)) }
         item { MoreRow(Tab.Settings, "Servidor, privacidad, cache y sesion", onOpen) }
     }
 }
@@ -100,11 +101,11 @@ fun MoreExecutiveCard(balance: String, pending: Int, alerts: Int) {
                     Icon(painterResource(R.drawable.ic_brand_mark), contentDescription = null, tint = androidx.compose.ui.graphics.Color.Unspecified, modifier = Modifier.size(42.dp))
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text("ContaApp Executive", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
-                    Text("Vista financiera protegida y cacheada", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.more_contaapp_executive), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.more_vista_financiera_protegida_y_cachead), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
                 Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Balance", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.more_balance), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                     Text(
                         balance,
                         color = MaterialTheme.colorScheme.primary,
@@ -116,9 +117,9 @@ fun MoreExecutiveCard(balance: String, pending: Int, alerts: Int) {
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                MoreCompactMetric("Pendientes", pending.toString(), Modifier.weight(1f))
-                MoreCompactMetric("Avisos", alerts.toString(), Modifier.weight(1f))
-                MoreCompactMetric("Cache", "TTL", Modifier.weight(1f))
+                MoreCompactMetric(stringResource(R.string.more_pendientes), pending.toString(), Modifier.weight(1f))
+                MoreCompactMetric(stringResource(R.string.more_avisos), alerts.toString(), Modifier.weight(1f))
+                MoreCompactMetric(stringResource(R.string.more_cache), "TTL", Modifier.weight(1f))
             }
         }
     }
@@ -151,7 +152,7 @@ fun GlobalSearchCard(query: String, onQuery: (String) -> Unit, resultCount: Int)
                 value = query,
                 onValueChange = onQuery,
                 leadingIcon = { Icon(painterResource(R.drawable.ic_menu), contentDescription = null) },
-                label = { Text("Buscar en toda la cache") },
+                label = { Text(stringResource(R.string.more_buscar_en_toda_la_cache)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )

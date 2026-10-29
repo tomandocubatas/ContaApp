@@ -70,4 +70,8 @@ dependencies {
     implementation(libs.okhttp)
 
     debugImplementation(libs.compose.ui.tooling)
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("org.json:json:20240303")
 }

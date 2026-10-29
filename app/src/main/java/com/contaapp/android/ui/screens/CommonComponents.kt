@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -174,10 +175,10 @@ fun FinanceRingCard(
         ) {
             FinanceRing(income = income, expense = expense, debt = debt, size = 132.dp)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Actividad", color = Color.White, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                LegendLine("Ingresos", money(income, hidden), Color(0xFF2DD4BF))
-                LegendLine("Gastos", money(expense, hidden), Color(0xFFFF5A52))
-                LegendLine("Deuda", money(debt, hidden), Color(0xFFFBBF24))
+                Text(stringResource(R.string.commoncomponents_actividad), color = Color.White, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                LegendLine(stringResource(R.string.commoncomponents_ingresos), money(income, hidden), Color(0xFF2DD4BF))
+                LegendLine(stringResource(R.string.commoncomponents_gastos), money(expense, hidden), Color(0xFFFF5A52))
+                LegendLine(stringResource(R.string.commoncomponents_deuda), money(debt, hidden), Color(0xFFFBBF24))
             }
         }
     }
@@ -221,7 +222,7 @@ fun FinanceRing(income: Double, expense: Double, debt: Double, size: Dp) {
             }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Periodo", color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.commoncomponents_periodo), color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
             Text(if (debt > 0.0) "Activo" else "100%", color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
@@ -268,7 +269,7 @@ fun CategoryRankingCard(
                 Text("${top.sumOf { it.count }} mov.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
             }
             if (top.isEmpty()) {
-                Text("Sin categorias en este periodo.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.commoncomponents_sin_categorias_en_este_periodo), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 top.forEachIndexed { index, category ->
                     CategoryBarRow(
@@ -380,9 +381,9 @@ fun MovementDetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cerrar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.commoncomponents_cerrar)) }
         },
-        title = { Text("Detalle del movimiento", fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.commoncomponents_detalle_del_movimiento), fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Card(
@@ -423,9 +424,9 @@ fun MovementDetailDialog(
                     link = link ?: "Sin vinculacion detectada",
                     accent = accent
                 )
-                if (movement.hasSplits) DetailLine("Desglose", "Movimiento con splits")
-                if (movement.isDuplicate) DetailLine("Duplicado", "Marcado como posible duplicado")
-                movement.notes?.let { DetailLine("Notas", it) }
+                if (movement.hasSplits) DetailLine(stringResource(R.string.commoncomponents_desglose), "Movimiento con splits")
+                if (movement.isDuplicate) DetailLine(stringResource(R.string.commoncomponents_duplicado), "Marcado como posible duplicado")
+                movement.notes?.let { DetailLine(stringResource(R.string.commoncomponents_notas), it) }
             }
         },
         shape = RoundedCornerShape(18.dp)
@@ -440,10 +441,10 @@ fun MovementContextCard(type: String, account: String, category: String, link: S
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Contexto", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
-            DetailLine("Tipo", type)
-            DetailLine("Cuenta", account)
-            DetailLine("Categoria", category)
+            Text(stringResource(R.string.commoncomponents_contexto), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
+            DetailLine(stringResource(R.string.commoncomponents_tipo), type)
+            DetailLine(stringResource(R.string.commoncomponents_cuenta), account)
+            DetailLine(stringResource(R.string.commoncomponents_categoria), category)
             Row(
                 Modifier.fillMaxWidth().background(accent.copy(alpha = 0.09f), RoundedCornerShape(12.dp)).padding(10.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -451,7 +452,7 @@ fun MovementContextCard(type: String, account: String, category: String, link: S
             ) {
                 Icon(painterResource(R.drawable.ic_receipt), contentDescription = null, tint = accent, modifier = Modifier.size(18.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Vinculacion", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.commoncomponents_vinculacion), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                     Text(link, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 }
             }
@@ -599,7 +600,7 @@ fun PremiumPeriodSelector(
         shape = RoundedCornerShape(18.dp),
         modifier = modifier
             .fillMaxWidth()
-            .semantics { contentDescription = "Selector de periodo ${selected.homeLabel()}" }
+            .semantics { contentDescription = "Selector de periodo ${selected.homeLabel()}" }
             .clickable { open = true }
     ) {
         Row(
@@ -623,7 +624,7 @@ fun PremiumPeriodSelector(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            StatusChip("Cambiar", MaterialTheme.colorScheme.primary)
+            StatusChip(stringResource(R.string.commoncomponents_cambiar), MaterialTheme.colorScheme.primary)
         }
     }
 
@@ -653,7 +654,7 @@ fun PeriodSelectorSheet(
             .padding(horizontal = 18.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        SectionHeader("Seleccionar periodo", "afecta a KPIs, graficas y listados")
+        SectionHeader(stringResource(R.string.commoncomponents_seleccionar_periodo), "afecta a KPIs, graficas y listados")
         premiumPeriodOptions().forEach { option ->
             PeriodOptionRow(
                 option = option,
@@ -661,7 +662,7 @@ fun PeriodSelectorSheet(
                 onClick = { onSelected(option) }
             )
         }
-        WalletActionButton("Cerrar", onDismiss, Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 18.dp))
+        WalletActionButton(stringResource(R.string.commoncomponents_cerrar), onDismiss, Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 18.dp))
     }
 }
 
@@ -696,7 +697,7 @@ fun PeriodOptionRow(option: QuickRange, selected: Boolean, onClick: () -> Unit) 
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-            if (selected) StatusChip("Activo", MaterialTheme.colorScheme.primary)
+            if (selected) StatusChip(stringResource(R.string.commoncomponents_activo), MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -770,11 +771,11 @@ fun QualityBadges(
     modifier: Modifier = Modifier
 ) {
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (accountName.isNullOrBlank()) StatusChip("Sin cuenta", ContaAmber)
-        if (category == null && movement.categoryName.isNullOrBlank()) StatusChip("Sin categoria", ContaAmber)
-        if (!movement.reviewed) StatusChip("Pendiente", ContaAmber)
-        if (link != null) StatusChip("Vinculado", ExecutiveBlue)
-        if (movement.isDuplicate) StatusChip("Duplicado", ContaDanger)
+        if (accountName.isNullOrBlank()) StatusChip(stringResource(R.string.commoncomponents_sin_cuenta), ContaAmber)
+        if (category == null && movement.categoryName.isNullOrBlank()) StatusChip(stringResource(R.string.commoncomponents_sin_categoria), ContaAmber)
+        if (!movement.reviewed) StatusChip(stringResource(R.string.commoncomponents_pendiente), ContaAmber)
+        if (link != null) StatusChip(stringResource(R.string.commoncomponents_vinculado), ExecutiveBlue)
+        if (movement.isDuplicate) StatusChip(stringResource(R.string.commoncomponents_duplicado), ContaDanger)
     }
 }
 
@@ -965,12 +966,12 @@ fun FinancialLineChart(
             SectionHeader(title, subtitle)
             if (cleanValues.isNotEmpty()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Inicio ${money(cleanValues.first(), hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                    Text("Fin ${money(cleanValues.last(), hidden)}", color = color, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.commoncomponents_inicio, money(cleanValues.first(), hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.commoncomponents_fin, money(cleanValues.last(), hidden)), color = color, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("${cleanValues.size} puntos", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                    Text("Rango ${axisMoney(minValue, hidden)} / ${axisMoney(maxValue, hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(stringResource(R.string.commoncomponents_puntos, cleanValues.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.commoncomponents_rango, axisMoney(minValue, hidden), axisMoney(maxValue, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1008,8 +1009,8 @@ fun FinancialLineChart(
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Eje X: $xAxisLabel", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                Text("Eje Y: $yAxisLabel", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.commoncomponents_eje_x, xAxisLabel), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.commoncomponents_eje_y, yAxisLabel), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
             }
             if (labels.isNotEmpty()) {
                 val first = labels.firstOrNull().orEmpty()
@@ -1063,7 +1064,7 @@ fun ActiveFilterBar(filters: List<String>, onOpenFilters: () -> Unit, modifier: 
                 Icon(painterResource(R.drawable.ic_settings), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Vista filtrada", color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Black)
+                Text(stringResource(R.string.commoncomponents_vista_filtrada), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Black)
                 Text(
                     if (filters.isEmpty()) "Todos los datos" else filters.joinToString(" · "),
                     color = MaterialTheme.colorScheme.onSurface,

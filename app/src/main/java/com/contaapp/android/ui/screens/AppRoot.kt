@@ -3,6 +3,8 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.animation.Crossfade
+import com.contaapp.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import com.contaapp.android.ContaUiState
 import com.contaapp.android.data.MovementFilters
@@ -37,7 +39,7 @@ fun AppRoot(
             !state.isUnlocked -> "locked"
             else -> "app"
         },
-        label = "root"
+        label = stringResource(R.string.approot_root)
     ) { target ->
         when (target) {
             "login" -> LoginScreen(state, onLogin, onVerifyTwoFactor, onCancelTwoFactor, onBaseUrlChanged, onServerTest)

@@ -1,8 +1,10 @@
 package com.contaapp.android
 
 import android.app.Application
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.contaapp.android.R
 import com.contaapp.android.core.cache.FinancialSnapshot
 import com.contaapp.android.core.cache.SnapshotStore
 import com.contaapp.android.core.network.ApiException
@@ -212,12 +214,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             isLoading = false,
                             pendingTwoFactorToken = throwable.pendingToken,
                             pendingTwoFactorEmail = email,
-                            error = "Introduce el codigo de doble factor"
+                            error = str(R.string.vm_two_factor_required)
                         )
                     }
                 } else {
                     _uiState.update {
-                        it.copy(isLoading = false, error = throwable.message ?: "No se pudo iniciar sesion")
+                        it.copy(isLoading = false, error = throwable.message ?: str(R.string.vm_login_failed))
                     }
                 }
             }
@@ -235,7 +237,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 completeLogin(session.copy(email = email))
             }.onFailure { throwable ->
                 _uiState.update {
-                    it.copy(isLoading = false, error = throwable.message ?: "No se pudo verificar el codigo")
+                    it.copy(isLoading = false, error = throwable.message ?: str(R.string.vm_verify_failed))
                 }
             }
         }
@@ -289,6 +291,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         lastMovementFilters = null
         _uiState.value = ContaUiState()
     }
+
+    private fun str(@StringRes id: Int, vararg args: Any): String = getApplication<Application>().getString(id, *args)
 
     private fun exportsDir(): File = File(getApplication<Application>().getExternalFilesDir(null), "exports")
 
@@ -344,7 +348,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 charts = ChartsSnapshot(),
                 calendarMonth = null,
                 lastUpdatedLabel = null,
-                error = "Cache local borrada"
+                error = str(R.string.vm_cache_cleared)
             )
         }
         refreshCacheStatus()
@@ -352,7 +356,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun showAttentionNotification() {
         AttentionNotifier(getApplication()).show(snapshotStore.load())
-        _uiState.update { it.copy(error = "Aviso local solicitado. En Android 13+ debes conceder permiso de notificaciones.") }
+        _uiState.update { it.copy(error = str(R.string.vm_notification_requested)) }
     }
 
     fun updateBaseUrl(baseUrl: String) {
@@ -367,14 +371,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             runCatching { repository.healthCheck() }
                 .onSuccess {
                     _uiState.update {
-                        it.copy(isTestingServer = false, serverTestMessage = "Conexion correcta")
+                        it.copy(isTestingServer = false, serverTestMessage = str(R.string.vm_connection_ok))
                     }
                 }
                 .onFailure { throwable ->
                     _uiState.update {
                         it.copy(
                             isTestingServer = false,
-                            serverTestMessage = throwable.message ?: "No se pudo conectar"
+                            serverTestMessage = throwable.message ?: str(R.string.vm_connection_failed)
                         )
                     }
                 }
@@ -404,7 +408,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 applyHomePayload(payload, label, isLoading = false)
                 if (!complete) {
                     _uiState.update {
-                        it.copy(error = "No se pudieron cargar: ${payload.failedSections.joinToString(", ")}")
+                        it.copy(error = str(R.string.vm_sections_failed, payload.failedSections.joinToString(", ")))
                     }
                 }
             }.onFailure { throwable ->
@@ -429,12 +433,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             rentalMonths = snapshot.rentalMonths,
                             charts = snapshot.charts,
                             calendarMonth = snapshot.calendarMonth,
-                            lastUpdatedLabel = "Cache local",
+                            lastUpdatedLabel = str(R.string.vm_cache_local),
                             cacheStatus = buildCacheStatus(),
-                            error = "Mostrando ultimos datos guardados. ${throwable.message ?: "No se pudieron cargar los datos"}"
+                            error = str(R.string.vm_showing_saved, throwable.message ?: str(R.string.vm_load_failed))
                         )
                     } else {
-                        it.copy(isLoading = false, error = throwable.message ?: "No se pudieron cargar los datos")
+                        it.copy(isLoading = false, error = throwable.message ?: str(R.string.vm_load_failed))
                     }
                 }
                 refreshCacheStatus()
@@ -482,7 +486,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.update { it.copy(isMovementsLoading = false, movements = movements, lastUpdatedLabel = label, cacheStatus = buildCacheStatus()) }
                 }.onFailure { throwable ->
                     _uiState.update {
-                        it.copy(isMovementsLoading = false, error = throwable.message ?: "No se pudieron cargar los movimientos")
+                        it.copy(isMovementsLoading = false, error = throwable.message ?: str(R.string.vm_movements_failed))
                     }
                 }
         }
@@ -504,7 +508,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }.onFailure { throwable ->
                     _uiState.update {
-                        it.copy(isCalendarLoading = false, error = throwable.message ?: "No se pudo cargar la agenda")
+                        it.copy(isCalendarLoading = false, error = throwable.message ?: str(R.string.vm_agenda_failed))
                     }
                 }
         }
@@ -532,9 +536,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 file.writeText((listOf(header) + rows).joinToString("\n"))
                 file.absolutePath
             }.onSuccess { path ->
-                _uiState.update { it.copy(lastExportPath = path, error = "CSV exportado en $path") }
+                _uiState.update { it.copy(lastExportPath = path, error = str(R.string.vm_csv_exported, path)) }
             }.onFailure { throwable ->
-                _uiState.update { it.copy(error = throwable.message ?: "No se pudo exportar CSV") }
+                _uiState.update { it.copy(error = throwable.message ?: str(R.string.vm_csv_failed)) }
             }
         }
     }

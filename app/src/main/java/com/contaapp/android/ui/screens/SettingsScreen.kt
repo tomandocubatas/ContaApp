@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -50,14 +51,14 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxSize().padding(if (isTablet) 24.dp else 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item { SectionHeader("Ajustes", "seguridad y datos") }
+            item { SectionHeader(stringResource(R.string.settings_ajustes), "seguridad y datos") }
             item {
                 SettingsHero(baseUrl = state.baseUrl)
             }
-            item { SectionHeader("Apariencia y seguridad") }
+            item { SectionHeader(stringResource(R.string.settings_apariencia_y_seguridad)) }
             item {
                 SettingsToggleRow(
-                    title = "Modo oscuro",
+                    title = stringResource(R.string.settings_modo_oscuro),
                     detail = "Paleta nocturna premium para revisar datos con menos brillo",
                     checked = state.darkMode,
                     iconRes = R.drawable.ic_visibility,
@@ -66,14 +67,14 @@ fun SettingsScreen(
             }
             item {
                 SettingsToggleRow(
-                    title = "Privacidad por defecto",
+                    title = stringResource(R.string.settings_privacidad_por_defecto),
                     detail = "Oculta importes al abrir la app y mantiene el layout estable",
                     checked = state.privacyDefault,
                     iconRes = R.drawable.ic_shield,
                     onChange = onTogglePrivacyDefault
                 )
             }
-            item { SectionHeader("Datos") }
+            item { SectionHeader(stringResource(R.string.settings_datos)) }
             item {
                 CacheTtlCard(
                     selectedMinutes = state.cacheTtlMinutes,
@@ -91,7 +92,7 @@ fun SettingsScreen(
             }
             item {
                 SettingsActionCard(
-                    title = "Datos y cache",
+                    title = stringResource(R.string.settings_datos_y_cache),
                     detail = "Refresca datos, exporta movimientos o limpia el snapshot offline",
                     primary = "Actualizar",
                     secondary = "Exportar CSV",
@@ -104,10 +105,10 @@ fun SettingsScreen(
             item {
                 SettingsRoadmapCard(onShowAttentionNotification)
             }
-            item { SectionHeader("Sesion") }
+            item { SectionHeader(stringResource(R.string.settings_sesion)) }
             item {
                 SettingsActionCard(
-                    title = "Sesion",
+                    title = stringResource(R.string.settings_sesion),
                     detail = "Cerrar sesion borra credenciales locales y cache financiera",
                     primary = "Cerrar sesion",
                     secondary = null,
@@ -117,7 +118,7 @@ fun SettingsScreen(
             }
             item {
                 state.lastExportPath?.let {
-                    StatusNote("Ultima exportacion", it)
+                    StatusNote(stringResource(R.string.settings_ultima_exportacion), it)
                 }
             }
             item { ErrorText(state.error) }
@@ -133,15 +134,15 @@ fun OfflinePolicyCard(ttlMinutes: Int) {
         shape = RoundedCornerShape(18.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Modo consulta offline", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+            Text(stringResource(R.string.settings_modo_consulta_offline), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "Si no hay servidor, la app usa el ultimo snapshot disponible. La informacion se considera fresca durante ${ttlMinutes / 60}h, salvo refresco manual desde cabecera.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                StatusChip("Snapshot financiero", ContaTeal, Modifier.weight(1f))
-                StatusChip("Refresco forzado", ExecutiveBlue, Modifier.weight(1f))
+                StatusChip(stringResource(R.string.settings_snapshot_financiero), ContaTeal, Modifier.weight(1f))
+                StatusChip(stringResource(R.string.settings_refresco_forzado), ExecutiveBlue, Modifier.weight(1f))
             }
         }
     }
@@ -155,7 +156,7 @@ fun CacheStatusCard(entries: List<CacheStatusUi>, onRefreshEntry: (String) -> Un
         shape = RoundedCornerShape(18.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Estado de cache por pantalla", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+            Text(stringResource(R.string.settings_estado_de_cache_por_pantalla), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "La foto financiera se reutiliza durante el TTL configurado. Puedes refrescar una pantalla concreta o usar la cabecera para forzar todo.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -190,7 +191,7 @@ fun CacheStatusRow(entry: CacheStatusUi, onRefresh: () -> Unit) {
             Text(entry.detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("${entry.cachedAt} · ${entry.remaining}", color = accent, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
         }
-        WalletActionButton("Refrescar", onRefresh)
+        WalletActionButton(stringResource(R.string.settings_refrescar), onRefresh)
     }
 }
 
@@ -202,7 +203,7 @@ fun CacheTtlCard(selectedMinutes: Int, onSelected: (Int) -> Unit) {
         shape = RoundedCornerShape(18.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Cache de datos", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+            Text(stringResource(R.string.settings_cache_de_datos), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "Evita recargas automaticas al navegar. El boton superior de actualizar fuerza una carga inmediata.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -226,16 +227,16 @@ fun SettingsRoadmapCard(onShowAttentionNotification: () -> Unit) {
         shape = RoundedCornerShape(18.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Avisos y widget", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-            StatusChip("Notificacion local de atencion", ContaAmber)
-            StatusChip("Widget Android de balance y alertas", ContaTeal)
+            Text(stringResource(R.string.settings_avisos_y_widget), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+            StatusChip(stringResource(R.string.settings_notificacion_local_de_atencion), ContaAmber)
+            StatusChip(stringResource(R.string.settings_widget_android_de_balance_y_alertas), ContaTeal)
             Text(
                 "El widget se puede anadir desde el launcher. En Android 13+ la notificacion requiere conceder permiso del sistema.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall
             )
             OutlinedButton(onClick = onShowAttentionNotification, shape = RoundedCornerShape(50)) {
-                Text("Probar aviso")
+                Text(stringResource(R.string.settings_probar_aviso))
             }
         }
     }
@@ -251,9 +252,9 @@ fun SettingsHero(baseUrl: String) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Entorno API", color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.settings_entorno_api), color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
             Text(baseUrl, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold)
-            Text("HTTP permitido temporalmente hasta disponer de endpoint HTTPS definitivo.", color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.settings_http_permitido_temporalmente_hasta_d), color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.bodySmall)
         }
     }
 }

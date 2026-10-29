@@ -38,11 +38,11 @@ class AttentionNotifier(private val context: Context) {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_shield)
-            .setContentTitle("ContaApp requiere atencion")
-            .setContentText("$pendingMovements movimientos, $debtAlerts deudas y $insuranceAlerts seguros a revisar")
+            .setContentTitle(context.getString(R.string.notification_title))
+            .setContentText(context.getString(R.string.notification_text, pendingMovements, debtAlerts, insuranceAlerts))
             .setStyle(
                 NotificationCompat.BigTextStyle()
-                    .bigText("$pendingMovements movimientos pendientes, $debtAlerts deudas vencidas/proximas y $insuranceAlerts seguros con renovacion a 30 dias.")
+                    .bigText(context.getString(R.string.notification_big_text, pendingMovements, debtAlerts, insuranceAlerts))
             )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
@@ -55,10 +55,10 @@ class AttentionNotifier(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Alertas ContaApp",
+                context.getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             )
-            channel.description = "Avisos de deuda, seguros y movimientos pendientes"
+            channel.description = context.getString(R.string.notification_channel_description)
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }

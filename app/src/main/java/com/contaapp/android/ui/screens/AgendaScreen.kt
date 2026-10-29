@@ -1,6 +1,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -109,7 +110,7 @@ fun AgendaScreen(
             )
         }
         selectedDay?.let { day ->
-            item { SectionHeader("Dia seleccionado", day.date.toReadableDate()) }
+            item { SectionHeader(stringResource(R.string.agenda_dia_seleccionado), day.date.toReadableDate()) }
             if (day.events.isEmpty()) {
                 item { EmptyHint(true, "No hay eventos previstos para este dia.") }
             } else {
@@ -118,7 +119,7 @@ fun AgendaScreen(
                 }
             }
         }
-        item { SectionHeader("Proximos eventos", "${allEvents.size} en el mes") }
+        item { SectionHeader(stringResource(R.string.agenda_proximos_eventos), "${allEvents.size} en el mes") }
         if (allEvents.isEmpty()) {
             item { EmptyHint(true, "No hay eventos financieros para este mes.") }
         } else {
@@ -156,7 +157,7 @@ fun AgendaHeader(
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Agenda financiera", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.agenda_agenda_financiera), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                     Text(month.monthLabel(), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                 }
                 if (isLoading) {
@@ -165,7 +166,7 @@ fun AgendaHeader(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = onPrevious, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text("<") }
-                OutlinedButton(onClick = onToday, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text("Hoy") }
+                OutlinedButton(onClick = onToday, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text(stringResource(R.string.agenda_hoy)) }
                 OutlinedButton(onClick = onNext, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text(">") }
             }
         }
@@ -185,11 +186,11 @@ fun AgendaSummary(calendar: CalendarMonth, hidden: Boolean) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            SectionHeader("Resumen mensual", "$events eventos")
+            SectionHeader(stringResource(R.string.agenda_resumen_mensual), "$events eventos")
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                ComparisonMetric("Ingresos", income, ContaTeal, hidden, Modifier.weight(1f))
-                ComparisonMetric("Gastos", expense, ContaCoral, hidden, Modifier.weight(1f))
-                ComparisonMetric("Previstos", pending.toDouble(), ContaAmber, false, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.agenda_ingresos), income, ContaTeal, hidden, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.agenda_gastos), expense, ContaCoral, hidden, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.agenda_previstos), pending.toDouble(), ContaAmber, false, Modifier.weight(1f))
             }
         }
     }
@@ -302,7 +303,7 @@ fun AgendaEventDialog(event: CalendarEvent, hidden: Boolean, onDismiss: () -> Un
     val accent = eventAccent(event)
     AlertDialog(
         onDismissRequest = onDismiss,
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Cerrar") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.agenda_cerrar)) } },
         title = { Text(event.label, fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -316,7 +317,7 @@ fun AgendaEventDialog(event: CalendarEvent, hidden: Boolean, onDismiss: () -> Un
                     }
                 }
                 StatusChip(if (event.confirmed) "Movimiento confirmado" else "Proyeccion pendiente", if (event.confirmed) ContaTeal else ContaAmber)
-                Text("Fecha: ${event.date.toReadableDate()}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.agenda_fecha, event.date.toReadableDate()), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
         shape = RoundedCornerShape(18.dp)
