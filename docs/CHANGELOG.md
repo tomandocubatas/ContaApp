@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Tema - Acento coherente claro/oscuro (v0.4.0)
+
+- El tema claro pasa a primario teal (`0F766E`) y secundario azul (`0D47A1`), como ya tenia el oscuro (menta `21D7A4` y azul `72B7FF`). Antes el primario era azul en claro y menta en oscuro.
+- Botones, chips de filtro y tonos de contenedor salen teal en ambos temas, en linea con el logo y el login; el azul queda para informacion.
+- Verificacion: `:app:assembleDebug` y tests correctos; Inicio y Movimientos revisados en el movil en claro y oscuro.
+
 ## 2026-10-29 - Fix/Sesion - Ajustes tras cerrar sesion (v0.3.2)
 
 - `MainViewModel.logout()` reiniciaba todo el estado y perdia la URL del servidor, el modo oscuro, la privacidad por defecto y el TTL de cache. Ahora el estado se reconstruye con los valores guardados.

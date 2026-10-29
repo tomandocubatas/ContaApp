@@ -10,8 +10,8 @@ fun apiBaseUrl(property: String, fallback: String): String =
 
 // Versión semántica: fix -> patch, mejora -> minor, cambio incompatible -> major.
 val appVersionMajor = 0
-val appVersionMinor = 3
-val appVersionPatch = 2
+val appVersionMinor = 4
+val appVersionPatch = 0
 val appVersionName = "$appVersionMajor.$appVersionMinor.$appVersionPatch"
 
 // El APK sale como ContaApp-<versión>-<tipo>.apk.
