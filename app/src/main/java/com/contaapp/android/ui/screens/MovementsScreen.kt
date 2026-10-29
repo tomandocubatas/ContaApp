@@ -157,6 +157,7 @@ fun MovementsScreen(
             item {
                 MovementsInsightCard(
                     movements = visibleMovements,
+                    categories = state.categories,
                     hidden = state.privacyMode
                 )
             }
@@ -738,10 +739,17 @@ enum class QuickRange {
 }
 
 @Composable
-fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
-    val income = movements.filter { it.amount > 0 }.sumOf { it.amount }
-    val expense = movements.filter { it.amount < 0 }.sumOf { kotlin.math.abs(it.amount) }
-    val net = income - expense
+fun MovementsInsightCard(movements: List<Movement>, categories: List<CategoryOption>, hidden: Boolean) {
+    // Mismas reglas que el dashboard de la API: sin movimientos padre y ingreso/gasto segun el tipo de su categoria.
+    val parentIds = movements.mapNotNull { it.parentMovementId }.toSet()
+    val computable = movements.filter { it.id !in parentIds && !it.hasSplits }
+    fun sumOfType(type: String) = computable
+        .filter { movementCategory(it, categories)?.type.equals(type, ignoreCase = true) }
+        .sumOf { it.amount }
+    val income = sumOfType("income")
+    val expenseSigned = sumOfType("expense")
+    val expense = kotlin.math.abs(expenseSigned)
+    val net = income + expenseSigned
     val total = (income + expense).takeIf { it > 0.0 } ?: 1.0
 
     Card(

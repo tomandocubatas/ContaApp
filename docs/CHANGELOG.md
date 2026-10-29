@@ -10,6 +10,11 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - Corrección/Datos - Resultado visible de Movimientos igual que Inicio (v0.24.2)
+- Movimientos sumaba los importes por signo (1.716,71 €) y Inicio usa las reglas de la API (1.849,21 €).
+- Ahora excluye los movimientos padre (con desglose) y clasifica ingreso/gasto por el tipo de su categoría, como el dashboard del backend.
+- Archivos: `MovementsScreen.kt`, `app/build.gradle.kts`.
+
 ## 2026-10-29 - UX/Carga - Cápsula de sincronización más evidente (v0.24.1)
 
 - La cápsula pasa a color sólido de acento (verde al terminar), texto `titleMedium` en negrita, icono de 28 dp, barra de 180 dp y sombra de 16 dp, para que se note a primera vista.
