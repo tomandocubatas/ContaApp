@@ -315,4 +315,5 @@
     <string name="vm_csv_exported">CSV exportado en %1$s</string>
     <string name="vm_csv_failed">No se pudo exportar CSV</string>
     <string name="vm_cache_local">Cache local</string>
+    <string name="vm_session_expired">La sesion ha caducado. Vuelve a iniciar sesion.</string>
 </resources>

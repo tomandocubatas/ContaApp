@@ -44,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -89,6 +90,7 @@ enum class Tab(val label: String, val shortLabel: String, @DrawableRes val iconR
 
 private data class DetailTarget(val tab: Tab, val id: String?)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
     state: ContaUiState,
@@ -151,65 +153,71 @@ fun MainScaffold(
                         .fillMaxSize()
                         .weight(1f)
                 ) {
-                    AdaptiveScreenFrame(isTablet = isTablet) {
-                        when (selectedTab) {
-                            Tab.Home -> HomeScreen(state, onHomeFiltersChanged)
-                            Tab.Agenda -> AgendaScreen(
-                                state = state,
-                                onMonthChanged = onCalendarMonthChanged
-                            )
-                            Tab.Movements -> MovementsScreen(
-                                state = state,
-                                onMovementFiltersChanged = onMovementFiltersChanged,
-                                focusMovementId = detailTarget.takeIf { it?.tab == Tab.Movements }?.id,
-                                onFocusConsumed = { detailTarget = null }
-                            )
-                            Tab.Accounts -> AccountsScreen(
-                                state = state,
-                                focusAccountId = detailTarget.takeIf { it?.tab == Tab.Accounts }?.id,
-                                onFocusConsumed = { detailTarget = null }
-                            )
-                            Tab.Charts -> ChartsScreen(state, onChartFiltersChanged)
-                            Tab.Debt -> DebtScreen(
-                                state = state,
-                                focusDebtId = detailTarget.takeIf { it?.tab == Tab.Debt }?.id,
-                                onFocusConsumed = { detailTarget = null }
-                            )
-                            Tab.Insurance -> InsuranceScreen(
-                                state = state,
-                                focusInsuranceId = detailTarget.takeIf { it?.tab == Tab.Insurance }?.id,
-                                onFocusConsumed = { detailTarget = null }
-                            )
-                            Tab.Rentals -> RentalsScreen(
-                                state = state,
-                                onRentalsFiltersChanged = onChartFiltersChanged,
-                                focusPropertyId = detailTarget.takeIf { it?.tab == Tab.Rentals }?.id,
-                                onFocusConsumed = { detailTarget = null }
-                            )
-                            Tab.Settings -> SettingsScreen(
-                                state = state,
-                                onRefresh = onRefresh,
-                                onToggleDarkMode = onToggleDarkMode,
-                                onTogglePrivacyDefault = onTogglePrivacyDefault,
-                                onCacheTtlChanged = onCacheTtlChanged,
-                                onRefreshCacheEntry = onRefreshCacheEntry,
-                                onClearCache = onClearCache,
-                                onExportMovements = onExportMovements,
-                                onShowAttentionNotification = onShowAttentionNotification,
-                                onLogout = onLogout
-                            )
-                            Tab.More -> MoreScreen(
-                                state = state,
-                                onOpen = { selectedTab = it },
-                                onOpenResult = { result ->
-                                    selectedTab = result.tab
-                                    detailTarget = DetailTarget(result.tab, result.targetId)
-                                }
-                            )
+                    PullToRefreshBox(
+                        isRefreshing = state.isLoading || state.isMovementsLoading || state.isCalendarLoading,
+                        onRefresh = onRefresh,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        AdaptiveScreenFrame(isTablet = isTablet) {
+                            when (selectedTab) {
+                                Tab.Home -> HomeScreen(state, onHomeFiltersChanged)
+                                Tab.Agenda -> AgendaScreen(
+                                    state = state,
+                                    onMonthChanged = onCalendarMonthChanged
+                                )
+                                Tab.Movements -> MovementsScreen(
+                                    state = state,
+                                    onMovementFiltersChanged = onMovementFiltersChanged,
+                                    focusMovementId = detailTarget.takeIf { it?.tab == Tab.Movements }?.id,
+                                    onFocusConsumed = { detailTarget = null }
+                                )
+                                Tab.Accounts -> AccountsScreen(
+                                    state = state,
+                                    focusAccountId = detailTarget.takeIf { it?.tab == Tab.Accounts }?.id,
+                                    onFocusConsumed = { detailTarget = null }
+                                )
+                                Tab.Charts -> ChartsScreen(state, onChartFiltersChanged)
+                                Tab.Debt -> DebtScreen(
+                                    state = state,
+                                    focusDebtId = detailTarget.takeIf { it?.tab == Tab.Debt }?.id,
+                                    onFocusConsumed = { detailTarget = null }
+                                )
+                                Tab.Insurance -> InsuranceScreen(
+                                    state = state,
+                                    focusInsuranceId = detailTarget.takeIf { it?.tab == Tab.Insurance }?.id,
+                                    onFocusConsumed = { detailTarget = null }
+                                )
+                                Tab.Rentals -> RentalsScreen(
+                                    state = state,
+                                    onRentalsFiltersChanged = onChartFiltersChanged,
+                                    focusPropertyId = detailTarget.takeIf { it?.tab == Tab.Rentals }?.id,
+                                    onFocusConsumed = { detailTarget = null }
+                                )
+                                Tab.Settings -> SettingsScreen(
+                                    state = state,
+                                    onRefresh = onRefresh,
+                                    onToggleDarkMode = onToggleDarkMode,
+                                    onTogglePrivacyDefault = onTogglePrivacyDefault,
+                                    onCacheTtlChanged = onCacheTtlChanged,
+                                    onRefreshCacheEntry = onRefreshCacheEntry,
+                                    onClearCache = onClearCache,
+                                    onExportMovements = onExportMovements,
+                                    onShowAttentionNotification = onShowAttentionNotification,
+                                    onLogout = onLogout
+                                )
+                                Tab.More -> MoreScreen(
+                                    state = state,
+                                    onOpen = { selectedTab = it },
+                                    onOpenResult = { result ->
+                                        selectedTab = result.tab
+                                        detailTarget = DetailTarget(result.tab, result.targetId)
+                                    }
+                                )
+                            }
                         }
                     }
 
-                    if (state.isLoading) {
+                    if (state.isLoading && state.dashboard == null) {
                         Box(
                             Modifier
                                 .fillMaxSize()

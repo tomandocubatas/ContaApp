@@ -9,6 +9,8 @@ import com.contaapp.android.core.cache.FinancialSnapshot
 import com.contaapp.android.core.cache.SnapshotStore
 import com.contaapp.android.core.network.ApiException
 import com.contaapp.android.core.notifications.AttentionNotifier
+import com.contaapp.android.core.session.SessionExpiredException
+import com.contaapp.android.core.session.SessionRefresher
 import com.contaapp.android.core.session.SessionStore
 import com.contaapp.android.core.settings.AppPreferencesStore
 import com.contaapp.android.core.settings.ServerConfigStore
@@ -386,7 +388,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadHome(filters: MovementFilters = MovementFilters(), force: Boolean = false) {
-        val session = sessionStore.get() ?: return
+        val session = sessionStore.get() ?: return expireSession()
         if (!force && applyCachedHome(filters)) return
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }
@@ -412,6 +414,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }.onFailure { throwable ->
+                if (throwable is SessionExpiredException) return@onFailure expireSession()
                 val snapshot = snapshotStore.load()
                 snapshot?.loadedAtMillis?.takeIf { it > 0L }?.let { lastHomeLoadedAt = Instant.ofEpochMilli(it) }
                 _uiState.update {
@@ -463,7 +466,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadMovements(filters: MovementFilters, force: Boolean = false) {
-        val session = sessionStore.get() ?: return
+        val session = sessionStore.get() ?: return expireSession()
         lastMovementFilters = filters
         val cached = movementsCache[filters]
         if (!force && cached != null && isFresh(cached.loadedAt)) {
@@ -485,6 +488,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     movementsCache = movementsCache + (filters to CachedMovements(movements, Instant.now(), label))
                     _uiState.update { it.copy(isMovementsLoading = false, movements = movements, lastUpdatedLabel = label, cacheStatus = buildCacheStatus()) }
                 }.onFailure { throwable ->
+                    if (throwable is SessionExpiredException) return@onFailure expireSession()
                     _uiState.update {
                         it.copy(isMovementsLoading = false, error = throwable.message ?: str(R.string.vm_movements_failed))
                     }
@@ -493,7 +497,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadCalendar(year: Int, month: Int) {
-        val session = sessionStore.get() ?: return
+        val session = sessionStore.get() ?: return expireSession()
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isCalendarLoading = true, error = null) }
             runCatching { withSession(session) { token -> repository.calendarMonth(token, year, month) } }
@@ -507,6 +511,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         )
                     }
                 }.onFailure { throwable ->
+                    if (throwable is SessionExpiredException) return@onFailure expireSession()
                     _uiState.update {
                         it.copy(isCalendarLoading = false, error = throwable.message ?: str(R.string.vm_agenda_failed))
                     }
@@ -591,20 +596,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    /** Ejecuta la llamada y, si el servidor responde 401, renueva la sesion una vez y repite. */
-    private fun <T> withSession(session: UserSession, call: (String) -> T): T {
-        return try {
-            call(session.accessToken)
-        } catch (error: ApiException) {
-            if (error.statusCode != 401) throw error
-            val refreshed = repository.refresh(session.refreshToken)
-            val merged = refreshed.copy(
-                name = refreshed.name.ifBlank { session.name },
-                email = refreshed.email.ifBlank { session.email }
-            )
-            sessionStore.save(merged)
-            call(merged.accessToken)
-        }
+    private val sessionRefresher = SessionRefresher(repository::refresh, sessionStore::save)
+
+    private fun <T> withSession(session: UserSession, call: (String) -> T): T = sessionRefresher.run(session, call)
+
+    /** La sesion ya no sirve: se limpia todo (tambien la cache y el widget) y se vuelve al login con aviso. */
+    private fun expireSession() {
+        logout()
+        _uiState.update { it.copy(error = str(R.string.vm_session_expired)) }
     }
 
     private fun applyCachedHome(filters: MovementFilters): Boolean {
