@@ -86,6 +86,7 @@ import com.contaapp.android.domain.InsurancePolicy
 import com.contaapp.android.domain.Movement
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MovementsScreen(
     state: ContaUiState,
@@ -280,13 +281,20 @@ fun MovementsScreen(
             }
             val groups = visibleMovements.groupBy {
                 when (groupMode) {
-                    MovementGroupMode.Date -> movementGroupLabel(it.date)
+                    MovementGroupMode.Date -> it.date.take(10)
                     MovementGroupMode.Category -> it.categoryName ?: "Sin categoria"
                     MovementGroupMode.Account -> it.accountName ?: "Sin cuenta"
                 }
             }
             groups.forEach { (label, movements) ->
-                item { MovementGroupHeader(label, movements, state.privacyMode) }
+                stickyHeader(key = "group-$label") {
+                    DayHeader(
+                        label = if (groupMode == MovementGroupMode.Date) dayHeaderLabel(label) else label,
+                        count = movements.size,
+                        total = movements.sumOf { it.amount },
+                        hidden = state.privacyMode
+                    )
+                }
                 items(movements, key = { it.id.ifBlank { "${it.date}-${it.description}-${it.amount}" } }) { movement ->
                     WalletMovementRow(
                         movement = movement,
@@ -416,22 +424,6 @@ fun MovementDateHeader(label: String, count: Int) {
     ) {
         Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
         StatusChip("$count", MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-fun MovementGroupHeader(label: String, movements: List<Movement>, hidden: Boolean) {
-    val total = movements.sumOf { it.amount }
-    Row(
-        Modifier.fillMaxWidth().padding(top = ContaSpacing.xs, bottom = 2.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column {
-            Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-            Text(stringResource(R.string.movements_movimientos, movements.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-        }
-        StatusChip(money(total, hidden), if (total >= 0.0) ContaIncome else ContaDanger)
     }
 }
 
@@ -700,18 +692,6 @@ fun decodeMovementSavedFilter(raw: String): MovementSavedFilter? {
 }
 
 private fun String.urlPart(): String = java.net.URLEncoder.encode(this, Charsets.UTF_8.name())
-
-fun movementGroupLabel(rawDate: String): String {
-    val date = runCatching { LocalDate.parse(rawDate.take(10)) }.getOrNull() ?: return "Sin fecha"
-    val today = LocalDate.now()
-    return when {
-        date == today -> "Hoy"
-        date == today.minusDays(1) -> "Ayer"
-        !date.isBefore(today.minusDays(7)) -> "Ultimos 7 dias"
-        date.year == today.year && date.month == today.month -> "Este mes"
-        else -> "${date.monthValue.toString().padStart(2, '0')}/${date.year}"
-    }
-}
 
 enum class QuickRange {
     All,

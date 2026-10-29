@@ -1271,3 +1271,34 @@ fun FitText(
         }
     )
 }
+
+/** Etiqueta de día para cabeceras de lista: «Hoy», «Ayer» o «lun 27 oct». */
+fun dayHeaderLabel(rawDate: String): String {
+    val date = runCatching { java.time.LocalDate.parse(rawDate.take(10)) }.getOrNull() ?: return "Sin fecha"
+    val today = java.time.LocalDate.now()
+    return when (date) {
+        today -> "Hoy"
+        today.minusDays(1) -> "Ayer"
+        today.plusDays(1) -> "Mañana"
+        else -> date.format(java.time.format.DateTimeFormatter.ofPattern("EEE d MMM", java.util.Locale("es", "ES")))
+    }
+}
+
+/** Cabecera de grupo con fondo opaco para usarla como `stickyHeader`: etiqueta, número de elementos y total con signo. */
+@Composable
+fun DayHeader(label: String, count: Int, total: Double, hidden: Boolean, modifier: Modifier = Modifier) {
+    Row(
+        modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(vertical = ContaSpacing.xs),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+            Text("$count ${if (count == 1) "elemento" else "elementos"}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+        }
+        StatusChip(signedMoney(total, hidden), if (total >= 0.0) ContaIncome else ContaDanger)
+    }
+}

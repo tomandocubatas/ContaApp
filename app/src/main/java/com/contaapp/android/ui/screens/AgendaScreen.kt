@@ -55,6 +55,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun AgendaScreen(
     state: ContaUiState,
@@ -130,8 +131,18 @@ fun AgendaScreen(
         if (allEvents.isEmpty()) {
             item { EmptyHint(true, "No hay eventos financieros para este mes.") }
         } else {
-            items(allEvents.take(12), key = { "month-${it.stableAgendaKey()}" }) { event ->
-                AgendaEventRow(event = event, hidden = state.privacyMode, onClick = { selectedEvent = event })
+            calendar.days.filter { it.events.isNotEmpty() }.sortedBy { it.date }.forEach { day ->
+                stickyHeader(key = "day-${day.date}") {
+                    DayHeader(
+                        label = dayHeaderLabel(day.date),
+                        count = day.events.size,
+                        total = day.totalIncome - day.totalExpense,
+                        hidden = state.privacyMode
+                    )
+                }
+                items(day.events, key = { "month-${it.stableAgendaKey()}" }) { event ->
+                    AgendaEventRow(event = event, hidden = state.privacyMode, onClick = { selectedEvent = event })
+                }
             }
         }
         item { ErrorText(state.error) }

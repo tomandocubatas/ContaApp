@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Listas - Agrupacion por dia con cabeceras pegajosas (v0.12.0)
+
+- Nuevo `DayHeader` (con `stickyHeader`, fondo opaco): etiqueta del dia ("Hoy", "Ayer", "lun 27 oct"), numero de elementos y total con signo y color.
+- Movimientos agrupa por dia (antes "Ultimos 7 dias", "Este mes"...); las agrupaciones por categoria y cuenta usan la misma cabecera. Se eliminan `MovementGroupHeader` y `movementGroupLabel`.
+- Agenda agrupa "Proximos eventos" por dia (total = ingresos - gastos) y ya no recorta a 12 eventos.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil las cabeceras quedan fijas al desplazar en Movimientos y Agenda.
+
 ## 2026-10-29 - UX/Filtros - Chips de filtros activos en Movimientos (v0.11.0)
 
 - `ActiveFilterBar` muestra un `InputChip` por filtro activo (texto, tipo, revision, periodo, categoria, cuenta, fechas, importe, agrupacion, vinculados, duplicados) con "x" para quitarlo sin abrir la hoja, el contador "N filtros activos" y "Limpiar todo".
