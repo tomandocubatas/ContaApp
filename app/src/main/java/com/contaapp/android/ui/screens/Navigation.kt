@@ -160,15 +160,17 @@ fun MainScaffold(
                         .weight(1f)
                 ) {
                     ErrorBanner(state.error, onRetry = onRefresh)
+                    val syncPhase = rememberSyncPhase(state.isLoading || state.isMovementsLoading || state.isCalendarLoading)
                     Box(Modifier.fillMaxWidth().weight(1f)) {
                     PullToRefreshBox(
                         isRefreshing = state.isLoading || state.isMovementsLoading || state.isCalendarLoading,
                         onRefresh = onRefresh,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        indicator = {}
                     ) {
                         AdaptiveScreenFrame(isTablet = isTablet) {
                             when (selectedTab) {
-                                Tab.Home -> HomeScreen(state, onHomeFiltersChanged, onNavigate = { selectedTab = it })
+                                Tab.Home -> HomeScreen(state, onHomeFiltersChanged, onNavigate = { selectedTab = it }, isSyncing = syncPhase == SyncPhase.Syncing)
                                 Tab.Agenda -> AgendaScreen(
                                     state = state,
                                     onMonthChanged = onCalendarMonthChanged
@@ -225,9 +227,7 @@ fun MainScaffold(
                             }
                         }
                     }
-                    if (state.isLoading || state.isMovementsLoading || state.isCalendarLoading) {
-                        ThinProgressBar(Modifier.align(Alignment.TopCenter))
-                    }
+                    SyncCapsule(syncPhase, Modifier.align(Alignment.TopCenter))
                 }
                 }
             }

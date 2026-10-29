@@ -8,6 +8,9 @@ import com.contaapp.android.ui.theme.ContaRadius
 import com.contaapp.android.ui.theme.ContaSpacing
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.alpha
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -1211,6 +1214,69 @@ fun InlineLoading(text: String) {
         }
     }
 }
+
+enum class SyncPhase { Idle, Syncing, Done }
+
+/** Atenúa el contenido y le pasa el brillo mientras se sincroniza. */
+@Composable
+fun Modifier.syncingDim(active: Boolean): Modifier =
+    if (active) this.alpha(0.55f).shimmer() else this
+
+/** Fase visible de la sincronización: aguanta al menos 1,2 s aunque la API conteste antes y muestra "Actualizado" 1,5 s. */
+@Composable
+fun rememberSyncPhase(loading: Boolean): SyncPhase {
+    var phase by remember { mutableStateOf(SyncPhase.Idle) }
+    var startedAt by remember { mutableStateOf(0L) }
+    LaunchedEffect(loading) {
+        if (loading) {
+            startedAt = System.currentTimeMillis()
+            phase = SyncPhase.Syncing
+        } else if (phase == SyncPhase.Syncing) {
+            kotlinx.coroutines.delay((1200L - (System.currentTimeMillis() - startedAt)).coerceAtLeast(0L))
+            phase = SyncPhase.Done
+            kotlinx.coroutines.delay(1500L)
+            phase = SyncPhase.Idle
+        }
+    }
+    return phase
+}
+
+/** Cápsula flotante que anuncia cuándo empieza y termina la sincronización. */
+@Composable
+fun SyncCapsule(phase: SyncPhase, modifier: Modifier = Modifier) {
+    androidx.compose.animation.AnimatedVisibility(
+        visible = phase != SyncPhase.Idle,
+        modifier = modifier,
+        enter = androidx.compose.animation.slideInVertically { -it } + androidx.compose.animation.fadeIn(),
+        exit = androidx.compose.animation.slideOutVertically { -it } + androidx.compose.animation.fadeOut()
+    ) {
+        val shape = RoundedCornerShape(50)
+        Row(
+            Modifier
+                .padding(top = ContaSpacing.sm)
+                .androidx_shadow(shape)
+                .background(MaterialTheme.colorScheme.surfaceVariant, shape)
+                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), shape)
+                .padding(horizontal = ContaSpacing.lg, vertical = ContaSpacing.sm)
+                .semantics(mergeDescendants = true) { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite },
+            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (phase == SyncPhase.Done) {
+                Icon(Icons.Filled.Check, contentDescription = null, tint = LocalContaPalette.current.income, modifier = Modifier.size(18.dp))
+                Text("Actualizado", color = LocalContaPalette.current.income, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Sincronizando…", color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                    ThinProgressBar(Modifier.width(120.dp))
+                }
+            }
+        }
+    }
+}
+
+private fun Modifier.androidx_shadow(shape: androidx.compose.ui.graphics.Shape): Modifier =
+    this.shadow(6.dp, shape)
 
 /** Barra de progreso indeterminada y fina, sustituye a la rueda circular. */
 @Composable

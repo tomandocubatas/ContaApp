@@ -10,6 +10,14 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Carga - Cápsula de sincronización (v0.24.0)
+
+- `SyncCapsule`: píldora flotante arriba ("Sincronizando…" con barra fina) que pasa a "Actualizado" en verde y se retira; `rememberSyncPhase` la mantiene visible al menos 1,2 s aunque la API responda antes.
+- Inicio (hero y métricas) se atenúa con brillo (`syncingDim`) mientras sincroniza.
+- Se oculta el indicador circular del gesto de refrescar; la cápsula lo sustituye. La barra fina superior se elimina (Agenda conserva la suya).
+- Verificado en móvil. Con animaciones del sistema desactivadas el brillo queda estático (solo por código).
+- Archivos: CommonComponents.kt, Navigation.kt, HomeScreen.kt.
+
 ## 2026-10-29 - Fix/Carga - Indicador visible en el gesto de refrescar (v0.23.1)
 
 - Se restaura el indicador circular del pull-to-refresh, que había ocultado en v0.23.0: sin él, arrastrar no daba señal visible. Se mantiene la barra fina superior.

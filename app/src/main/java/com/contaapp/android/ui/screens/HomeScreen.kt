@@ -90,7 +90,8 @@ import java.time.format.DateTimeFormatter
 fun HomeScreen(
     state: ContaUiState,
     onMovementFiltersChanged: (MovementFilters) -> Unit,
-    onNavigate: (Tab) -> Unit = {}
+    onNavigate: (Tab) -> Unit = {},
+    isSyncing: Boolean = false
 ) {
     var selectedMovement by remember { mutableStateOf<Movement?>(null) }
     val context = LocalContext.current
@@ -136,12 +137,14 @@ fun HomeScreen(
                         WelcomeEmptyState(state.error)
                     }
                 } else {
-                    HomeHeroDashboard(dashboard, state.privacyMode)
+                    Box(Modifier.syncingDim(isSyncing)) { HomeHeroDashboard(dashboard, state.privacyMode) }
                 }
             }
             item { HomeShortcuts(onNavigate) }
             item {
-                HomeQuickMetrics(dashboard, state.privacyMode, isTablet, state.debtDetails.visibleDebtDetails().sumOf { it.pendingAmount }, state.movements.count { !it.reviewed })
+                Box(Modifier.syncingDim(isSyncing)) {
+                    HomeQuickMetrics(dashboard, state.privacyMode, isTablet, state.debtDetails.visibleDebtDetails().sumOf { it.pendingAmount }, state.movements.count { !it.reviewed })
+                }
             }
             item {
                 HomePeriodComparisonCard(state)
