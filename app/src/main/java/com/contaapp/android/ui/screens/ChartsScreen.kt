@@ -538,7 +538,7 @@ fun InlineChartPanel(
             val safeIndex = selectedIndex.coerceIn(0, cleanValues.lastIndex)
             val selectedLabel = labels.getOrNull(safeIndex).orEmpty()
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(stringResource(R.string.charts_puntos, cleanValues.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(if (cleanValues.size == 1) R.string.charts_punto else R.string.charts_puntos, cleanValues.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                 Text(stringResource(R.string.charts_rango, money(min, hidden), money(max, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Row(

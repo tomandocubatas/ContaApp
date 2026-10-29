@@ -55,7 +55,8 @@ fun MoreScreen(
             MoreExecutiveCard(
                 balance = money(state.dashboard?.totalBalance ?: 0.0, state.privacyMode),
                 pending = pendingMovements,
-                alerts = debtWarnings + insuranceWarnings
+                alerts = debtWarnings + insuranceWarnings,
+                cacheTtlMinutes = state.cacheTtlMinutes
             )
         }
         item {
@@ -85,7 +86,7 @@ fun MoreScreen(
 }
 
 @Composable
-fun MoreExecutiveCard(balance: String, pending: Int, alerts: Int) {
+fun MoreExecutiveCard(balance: String, pending: Int, alerts: Int, cacheTtlMinutes: Int) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
@@ -119,7 +120,7 @@ fun MoreExecutiveCard(balance: String, pending: Int, alerts: Int) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                 MoreCompactMetric(stringResource(R.string.more_pendientes), pending.toString(), Modifier.weight(1f))
                 MoreCompactMetric(stringResource(R.string.more_avisos), alerts.toString(), Modifier.weight(1f))
-                MoreCompactMetric(stringResource(R.string.more_cache), "TTL", Modifier.weight(1f))
+                MoreCompactMetric(stringResource(R.string.more_cache), ttlLabel(cacheTtlMinutes), Modifier.weight(1f))
             }
         }
     }
@@ -269,3 +270,5 @@ fun MoreRow(tab: Tab, detail: String, onOpen: (Tab) -> Unit) {
     }
 }
 
+
+private fun ttlLabel(minutes: Int): String = if (minutes >= 60 && minutes % 60 == 0) "${minutes / 60}h" else "${minutes}m"

@@ -33,7 +33,7 @@ class AttentionNotifier(private val context: Context) {
             val raw = it.renewalDate ?: it.endDate
             val date = raw?.take(10)?.let { value -> runCatching { LocalDate.parse(value) }.getOrNull() }
             status !in setOf("expired", "cancelled", "canceled", "inactive") &&
-                date != null && !date.isBefore(LocalDate.now()) && !date.isAfter(LocalDate.now().plusDays(30))
+                date != null && !date.isAfter(LocalDate.now().plusDays(30))
         } ?: 0
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)

@@ -316,4 +316,25 @@
     <string name="vm_csv_failed">No se pudo exportar CSV</string>
     <string name="vm_cache_local">Cache local</string>
     <string name="vm_session_expired">La sesion ha caducado. Vuelve a iniciar sesion.</string>
+    <string name="home_pendientes">Pendientes</string>
+    <string name="home_movimientos_por_revisar">por revisar</string>
+    <string name="insurance_por_renovar">Por renovar</string>
+    <string name="charts_punto">%s punto</string>
+    <string name="commoncomponents_punto">%s punto</string>
+    <string name="insurance_status_active">Activa</string>
+    <string name="insurance_status_pending_renewal">Por renovar</string>
+    <string name="insurance_status_expired">Expirada</string>
+    <string name="insurance_status_cancelled">Cancelada</string>
+    <string name="insurance_status_inactive">Inactiva</string>
+    <string name="insurance_type_home">Hogar</string>
+    <string name="insurance_type_auto">Auto</string>
+    <string name="insurance_type_life">Vida</string>
+    <string name="insurance_type_health">Salud</string>
+    <string name="insurance_type_other">Otro</string>
+    <string name="insurance_poliza_generica">Poliza</string>
+    <string name="insurance_vencidas">Vencidas</string>
+    <string name="insurance_vencio">Vencio %s</string>
+    <string name="insurance_renueva">Renueva %s</string>
+    <string name="insurance_sin_fecha">sin fecha</string>
+    <string name="insurance_no_informado">No informado</string>
 </resources>

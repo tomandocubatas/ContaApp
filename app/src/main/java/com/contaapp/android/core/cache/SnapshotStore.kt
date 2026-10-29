@@ -237,14 +237,14 @@ private fun JSONObject.toMovement() = Movement(
 private fun DebtSummary.toJson() = JSONObject()
     .put("title", title)
     .put("pending", pending.jsonNumber())
-    .put("paid", paid.jsonNumber())
-    .put("interest", interest.jsonNumber())
+    .put("paid", paid?.jsonNumber())
+    .put("interest", interest?.jsonNumber())
 
 private fun JSONObject.toDebt() = DebtSummary(
     title = optString("title"),
     pending = optDouble("pending", 0.0),
-    paid = optDouble("paid", 0.0),
-    interest = optDouble("interest", 0.0)
+    paid = takeIf { has("paid") && !isNull("paid") }?.optDouble("paid", 0.0),
+    interest = takeIf { has("interest") && !isNull("interest") }?.optDouble("interest", 0.0)
 )
 
 private fun DebtDetail.toJson() = JSONObject()

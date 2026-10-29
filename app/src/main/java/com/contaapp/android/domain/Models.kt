@@ -66,8 +66,9 @@ data class Movement(
 data class DebtSummary(
     val title: String,
     val pending: Double,
-    val paid: Double,
-    val interest: Double
+    /** null cuando el backend no informa lo pagado (p. ej. el resumen global de prestamos). */
+    val paid: Double?,
+    val interest: Double?
 )
 
 data class DebtDetail(

@@ -132,7 +132,7 @@ fun HomeScreen(
                 }
             }
             item {
-                HomeQuickMetrics(dashboard, state.privacyMode, isTablet, state.debtDetails.visibleDebtDetails().sumOf { it.pendingAmount })
+                HomeQuickMetrics(dashboard, state.privacyMode, isTablet, state.debtDetails.visibleDebtDetails().sumOf { it.pendingAmount }, state.movements.count { !it.reviewed })
             }
             item {
                 HomePeriodComparisonCard(state)
@@ -350,13 +350,11 @@ fun ComparisonMetric(title: String, value: Double, color: Color, hidden: Boolean
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)
-        Text(
+        FitText(
             money(value, hidden),
             color = color,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Black,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            fontWeight = FontWeight.Black
         )
     }
 }
@@ -453,7 +451,7 @@ fun HeroMiniMetric(label: String, value: String, color: Color, modifier: Modifie
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(label, color = Color.White.copy(alpha = 0.72f), style = MaterialTheme.typography.labelMedium)
-        Text(value, color = color, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        FitText(value, color = color, fontWeight = FontWeight.Black)
     }
 }
 
@@ -464,18 +462,18 @@ fun LightHeroMiniMetric(label: String, value: String, color: Color, modifier: Mo
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(label, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f), style = MaterialTheme.typography.labelMedium)
-        Text(value, color = color, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        FitText(value, color = color, fontWeight = FontWeight.Black)
     }
 }
 
 @Composable
-fun HomeQuickMetrics(dashboard: DashboardSummary?, hidden: Boolean, isTablet: Boolean, activeDebt: Double? = null) {
+fun HomeQuickMetrics(dashboard: DashboardSummary?, hidden: Boolean, isTablet: Boolean, activeDebt: Double? = null, pendingReview: Int = 0) {
     val columns = if (isTablet) 4 else 2
     val metrics = listOf(
         ExecutiveMetricSpec("Ingresos", money(dashboard?.income ?: 0.0, hidden), "+ actividad", R.drawable.ic_bank, ContaTeal, listOf(2.0, 3.0, 3.4, 4.0, 4.8, 5.2)),
         ExecutiveMetricSpec("Gastos", money(dashboard?.expense ?: 0.0, hidden), "control mensual", R.drawable.ic_receipt, ContaCoral, listOf(3.0, 3.6, 3.1, 4.0, 3.8, 4.2)),
         ExecutiveMetricSpec("Deuda", money(activeDebt?.takeIf { it > 0.0 } ?: dashboard?.totalDebts ?: 0.0, hidden), "exposicion", R.drawable.ic_credit_card, ContaAmber, listOf(5.0, 4.8, 4.6, 4.4, 4.1, 3.9)),
-        ExecutiveMetricSpec("Revisado", percent(dashboard?.reviewedPct ?: 0.0), "calidad dato", R.drawable.ic_shield, ExecutiveBlue, listOf(1.0, 2.0, 2.8, 3.4, 4.2, 5.0))
+        ExecutiveMetricSpec(stringResource(R.string.home_pendientes), pendingReview.toString(), stringResource(R.string.home_movimientos_por_revisar), R.drawable.ic_shield, ExecutiveBlue, listOf(1.0, 2.0, 2.8, 3.4, 4.2, 5.0))
     )
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         metrics.chunked(columns).forEach { row ->
@@ -519,7 +517,7 @@ fun WalletMetricCard(title: String, value: String, color: Color, modifier: Modif
                 Box(Modifier.size(9.dp).background(color, RoundedCornerShape(50)))
             }
             Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-            Text(value, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            FitText(value, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
         }
     }
 }
@@ -553,7 +551,7 @@ fun FinancialPulseCard(dashboard: DashboardSummary, hidden: Boolean, modifier: M
 fun PulseLine(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-        Text(value, color = color, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        FitText(value, color = color, fontWeight = FontWeight.Bold)
     }
 }
 

@@ -245,12 +245,9 @@ class ContaWidgetProvider : AppWidgetProvider() {
     }
 
     private fun List<InsurancePolicy>.visibleInsurances(): List<InsurancePolicy> {
-        val today = LocalDate.now()
         return filter { policy ->
             val status = policy.status.orEmpty().lowercase()
-            val date = policy.policyDate()
-            status !in setOf("expired", "cancelled", "canceled", "inactive") &&
-                (date == null || !date.isBefore(today))
+            status !in setOf("expired", "cancelled", "canceled", "inactive")
         }
     }
 

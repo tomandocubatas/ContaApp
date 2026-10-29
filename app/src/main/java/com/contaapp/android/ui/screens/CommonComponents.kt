@@ -319,8 +319,8 @@ fun MetricCard(title: String, value: String, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelLarge)
-            Text(value, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            FitText(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelLarge)
+            FitText(value, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -575,12 +575,10 @@ fun DebtDetail.isDebtAlert(): Boolean {
 }
 
 fun List<InsurancePolicy>.visibleInsurancePolicies(): List<InsurancePolicy> {
-    val today = LocalDate.now()
     return filter { policy ->
         val status = policy.status.orEmpty().lowercase()
-        val date = (policy.renewalDate ?: policy.endDate)?.take(10)?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
-        status !in setOf("expired", "cancelled", "canceled", "inactive") &&
-            (date == null || !date.isBefore(today))
+        // Las de fecha pasada se muestran (como "Vencido"): son las que mas atencion necesitan.
+        status !in setOf("expired", "cancelled", "canceled", "inactive")
     }
 }
 
@@ -620,8 +618,7 @@ fun PremiumPeriodSelector(
                     dates?.let { "${selected.homeLabel()} · ${it.first} / ${it.second}" } ?: detail,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    maxLines = 2
                 )
             }
             StatusChip(stringResource(R.string.commoncomponents_cambiar), MaterialTheme.colorScheme.primary)
@@ -878,7 +875,7 @@ fun ExecutiveKpiCard(
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(title, color = onSurface.copy(alpha = 0.62f), style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(value, color = onSurface, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                FitText(value, color = onSurface, fontWeight = FontWeight.Black)
                 Text(detail, color = color, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             if (sparkValues.isNotEmpty()) {
@@ -970,7 +967,7 @@ fun FinancialLineChart(
                     Text(stringResource(R.string.commoncomponents_fin, money(cleanValues.last(), hidden)), color = color, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(stringResource(R.string.commoncomponents_puntos, cleanValues.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(if (cleanValues.size == 1) R.string.commoncomponents_punto else R.string.commoncomponents_puntos, cleanValues.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                     Text(stringResource(R.string.commoncomponents_rango, axisMoney(minValue, hidden), axisMoney(maxValue, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
@@ -1195,9 +1192,34 @@ fun DarkMiniMetric(label: String, value: String, color: Color, modifier: Modifie
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(label, color = Color.White.copy(alpha = 0.68f), style = MaterialTheme.typography.labelMedium)
-        Text(value, color = color, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+        FitText(value, color = color, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
     }
 }
 
 
 
+
+/** Texto de una linea que reduce su tamano hasta caber, en lugar de cortarse con "...". */
+@Composable
+fun FitText(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    style: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyLarge,
+    fontWeight: FontWeight? = null
+) {
+    var scale by remember(text) { androidx.compose.runtime.mutableFloatStateOf(1f) }
+    Text(
+        text = text,
+        modifier = modifier,
+        color = color,
+        style = style,
+        fontSize = style.fontSize * scale,
+        fontWeight = fontWeight,
+        maxLines = 1,
+        softWrap = false,
+        onTextLayout = { result ->
+            if (result.hasVisualOverflow && scale > 0.55f) scale *= 0.9f
+        }
+    )
+}

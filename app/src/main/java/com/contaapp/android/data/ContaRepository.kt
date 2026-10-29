@@ -244,7 +244,7 @@ class ContaRepository(
             DebtSummary(
                 title = "Prestamos",
                 pending = loans.optDouble("totalDebt", 0.0),
-                paid = 0.0,
+                paid = null,
                 interest = loans.optDouble("totalInterestToPay", 0.0)
             ),
             DebtSummary(

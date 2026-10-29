@@ -138,6 +138,7 @@ fun InsuranceScreen(
                     )
                     CompactFilterSection(R.drawable.ic_shield, "Vencimiento") {
                         FilterButton(stringResource(R.string.insurance_todos), range == InsuranceRange.All) { range = InsuranceRange.All }
+                        FilterButton(stringResource(R.string.insurance_vencidas), range == InsuranceRange.Overdue) { range = InsuranceRange.Overdue }
                         FilterButton(stringResource(R.string.insurance_30_dias), range == InsuranceRange.Days30) { range = InsuranceRange.Days30 }
                         FilterButton(stringResource(R.string.insurance_60_dias), range == InsuranceRange.Days60) { range = InsuranceRange.Days60 }
                     }
@@ -166,6 +167,7 @@ fun InsuranceScreen(
 
 enum class InsuranceRange(val days: Long?) {
     All(null),
+    Overdue(0),
     Days30(30),
     Days60(60);
 
@@ -173,8 +175,40 @@ enum class InsuranceRange(val days: Long?) {
         val limit = days ?: return true
         val date = rawDate?.take(10)?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return false
         val today = LocalDate.now()
-        return !date.isBefore(today) && !date.isAfter(today.plusDays(limit))
+        return when (this) {
+            Overdue -> date.isBefore(today)
+            else -> !date.isBefore(today) && !date.isAfter(today.plusDays(limit))
+        }
     }
+}
+
+@Composable
+private fun insuranceStatusLabel(status: String?): String? = when (status?.lowercase()) {
+    null, "" -> null
+    "active" -> stringResource(R.string.insurance_status_active)
+    "pending_renewal" -> stringResource(R.string.insurance_status_pending_renewal)
+    "expired" -> stringResource(R.string.insurance_status_expired)
+    "cancelled", "canceled" -> stringResource(R.string.insurance_status_cancelled)
+    "inactive" -> stringResource(R.string.insurance_status_inactive)
+    else -> status
+}
+
+@Composable
+private fun insuranceTypeLabel(type: String): String = when (type.lowercase()) {
+    "" -> stringResource(R.string.insurance_poliza_generica)
+    "home" -> stringResource(R.string.insurance_type_home)
+    "auto" -> stringResource(R.string.insurance_type_auto)
+    "life" -> stringResource(R.string.insurance_type_life)
+    "health" -> stringResource(R.string.insurance_type_health)
+    "other" -> stringResource(R.string.insurance_type_other)
+    else -> type
+}
+
+@Composable
+private fun renewalChipText(urgency: InsuranceUrgency, date: String?): String {
+    val shown = date?.take(10) ?: return stringResource(R.string.insurance_sin_fecha)
+    return if (urgency == InsuranceUrgency.Expired) stringResource(R.string.insurance_vencio, shown)
+    else stringResource(R.string.insurance_renueva, shown)
 }
 
 @Composable
@@ -255,6 +289,7 @@ fun InsuranceMonthlyCard(annualPremium: Double, hidden: Boolean) {
 
 @Composable
 fun InsuranceCalendarSummary(policies: List<InsurancePolicy>, annualPremium: Double, hidden: Boolean) {
+    val overdue = policies.count { InsuranceRange.Overdue.matches(it.renewalDate ?: it.endDate) }
     val next30 = policies.count { InsuranceRange.Days30.matches(it.renewalDate ?: it.endDate) }
     val next60 = policies.count { InsuranceRange.Days60.matches(it.renewalDate ?: it.endDate) }
     Card(
@@ -264,7 +299,8 @@ fun InsuranceCalendarSummary(policies: List<InsurancePolicy>, annualPremium: Dou
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            MetricCard(stringResource(R.string.insurance_mensual), money(annualPremium / 12.0, hidden), Modifier.weight(1f))
+            MetricCard(stringResource(R.string.insurance_mensual), money(annualPremium / 12.0, hidden), Modifier.weight(1.4f))
+            MetricCard(stringResource(R.string.insurance_vencidas), overdue.toString(), Modifier.weight(1f))
             MetricCard(stringResource(R.string.insurance_30_dias), next30.toString(), Modifier.weight(1f))
             MetricCard(stringResource(R.string.insurance_60_dias), next60.toString(), Modifier.weight(1f))
         }
@@ -293,7 +329,7 @@ fun InsuranceHeroCard(active: Int, expiring: Int, annualPremium: Double, hidden:
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 DarkMiniMetric(stringResource(R.string.insurance_activos), active.toString(), Color(0xFF2DD4BF), Modifier.weight(1f))
-                DarkMiniMetric(stringResource(R.string.insurance_vencen_pronto), expiring.toString(), Color(0xFFFBBF24), Modifier.weight(1f))
+                DarkMiniMetric(stringResource(R.string.insurance_por_renovar), expiring.toString(), Color(0xFFFBBF24), Modifier.weight(1f))
             }
         }
     }
@@ -336,12 +372,12 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(money(policy.annualPremium, hidden), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
-                    Text(policy.status ?: urgency.label, color = accent, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    Text(insuranceStatusLabel(policy.status) ?: urgency.label, color = accent, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StatusChip(policy.type.ifBlank { "Poliza" }, accent, Modifier.weight(1f))
-                StatusChip("Renueva ${(date ?: "sin fecha").take(10)}", accent, Modifier.weight(1f))
+                StatusChip(insuranceTypeLabel(policy.type), accent, Modifier.weight(1f))
+                StatusChip(renewalChipText(urgency, date), accent, Modifier.weight(1f))
             }
             policy.coverage?.let {
                 Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -391,15 +427,15 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
                             }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                            StatusChip(policy.status ?: urgency.label, accent)
-                            StatusChip("Renueva ${date?.take(10) ?: "sin fecha"}", accent)
+                            StatusChip(insuranceStatusLabel(policy.status) ?: urgency.label, accent)
+                            StatusChip(renewalChipText(urgency, date), accent)
                         }
                     }
                 }
                 DetailLine(stringResource(R.string.insurance_compania), policy.company ?: "No informada")
                 DetailLine(stringResource(R.string.insurance_tipo), policy.type.ifBlank { "No informado" })
                 DetailLine(stringResource(R.string.insurance_numero_de_poliza), policy.policyNumber ?: "No informado")
-                DetailLine(stringResource(R.string.insurance_estado_tecnico), policy.status ?: "No informado")
+                DetailLine(stringResource(R.string.insurance_estado_tecnico), insuranceStatusLabel(policy.status) ?: stringResource(R.string.insurance_no_informado))
                 DetailLine(stringResource(R.string.insurance_prima_anual), money(policy.annualPremium, hidden))
                 DetailLine(stringResource(R.string.insurance_prima_mensual), money(policy.annualPremium / 12.0, hidden))
                 DetailLine(stringResource(R.string.insurance_periodicidad), policy.periodicity ?: "No informada")

@@ -182,8 +182,8 @@ fun debtSummariesFromDetails(debts: List<DebtDetail>): List<DebtSummary> {
         DebtSummary(
             title = label,
             pending = rows.sumOf { it.pendingAmount },
-            paid = 0.0,
-            interest = 0.0
+            paid = null,
+            interest = null
         )
     }
 }
@@ -250,9 +250,9 @@ fun DebtNextPaymentCard(debts: List<DebtDetail>, hidden: Boolean) {
 @Composable
 fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
     val pending = debts.sumOf { it.pending }
-    val paid = debts.sumOf { it.paid }
-    val interest = debts.sumOf { it.interest }
-    val total = (pending + paid).takeIf { it > 0.0 } ?: 1.0
+    val paid = debts.knownSum { it.paid }
+    val interest = debts.knownSum { it.interest }
+    val pendingShare = paid?.let { pending / ((pending + it).takeIf { total -> total > 0.0 } ?: 1.0) }
 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -267,12 +267,12 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
                     Text(money(pending, hidden), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                     Text(stringResource(R.string.debt_pendiente_sobre_deuda_historica), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
-                StatusChip("${((pending / total) * 100).toInt()}%", ContaDanger)
+                pendingShare?.let { StatusChip("${(it * 100).toInt()}%", ContaDanger) }
             }
-            ProgressBar(progress = pending / total, color = Color(0xFFFF5A52))
+            pendingShare?.let { ProgressBar(progress = it, color = Color(0xFFFF5A52)) }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                LightHeroMiniMetric(stringResource(R.string.debt_pagado), money(paid, hidden), ContaTeal, Modifier.weight(1f))
-                LightHeroMiniMetric(stringResource(R.string.debt_intereses), money(interest, hidden), ContaAmber, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.debt_pagado), paid?.let { money(it, hidden) } ?: NO_DATA, ContaTeal, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.debt_intereses), interest?.let { money(it, hidden) } ?: NO_DATA, ContaAmber, Modifier.weight(1f))
             }
         }
     }
@@ -406,16 +406,26 @@ fun DebtRow(debt: DebtSummary, hidden: Boolean) {
             Text(debt.title, fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 MetricCard(stringResource(R.string.debt_pendiente), money(debt.pending, hidden), Modifier.weight(1f))
-                MetricCard(stringResource(R.string.debt_pagado), money(debt.paid, hidden), Modifier.weight(1f))
+                MetricCard(stringResource(R.string.debt_pagado), debt.paid?.let { money(it, hidden) } ?: NO_DATA, Modifier.weight(1f))
             }
-            ProgressBar(
-                progress = debt.pending / ((debt.pending + debt.paid).takeIf { it > 0 } ?: 1.0),
-                color = Color(0xFFFF5A52)
-            )
-            Text(stringResource(R.string.debt_intereses_2, money(debt.interest, hidden)), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            debt.paid?.let { paid ->
+                ProgressBar(
+                    progress = debt.pending / ((debt.pending + paid).takeIf { it > 0 } ?: 1.0),
+                    color = Color(0xFFFF5A52)
+                )
+            }
+            Text(stringResource(R.string.debt_intereses_2, debt.interest?.let { money(it, hidden) } ?: NO_DATA), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
 
 
 
+
+private const val NO_DATA = "—"
+
+/** Suma solo si todos los valores son conocidos; con alguno desconocido el total tampoco se conoce. */
+internal fun List<DebtSummary>.knownSum(selector: (DebtSummary) -> Double?): Double? {
+    val values = map(selector)
+    return if (values.isEmpty() || values.any { it == null }) null else values.filterNotNull().sum()
+}
