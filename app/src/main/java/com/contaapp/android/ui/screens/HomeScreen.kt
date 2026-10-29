@@ -411,17 +411,14 @@ fun HomePeriodCombo(period: QuickRange, onPeriod: (QuickRange) -> Unit) {
 @Composable
 fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
     val netColor = if (dashboard.net >= 0.0) ContaIncome else ContaDanger
-    val dark = MaterialTheme.colorScheme.background.red < 0.1f && MaterialTheme.colorScheme.background.green < 0.1f
-    val heroBrush = if (dark) {
-        Brush.horizontalGradient(listOf(Color(0xFF0B1120), Color(0xFF10233F), Color(0xFF0F2F2A)))
-    } else {
-        Brush.horizontalGradient(listOf(Color.White, Color(0xFFEAF2FF), Color(0xFFEFFDF8)))
-    }
-    val heroText = if (dark) Color.White else ContaInk
-    val heroMuted = if (dark) Color.White.copy(alpha = 0.68f) else ContaMuted
+    val colors = MaterialTheme.colorScheme
+    val heroBrush = Brush.horizontalGradient(listOf(colors.primaryContainer, colors.secondaryContainer))
+    val heroText = colors.onSurface
+    val heroMuted = colors.onSurfaceVariant
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(ContaRadius.xl),
+        border = ContaCardDefaults.border(),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(

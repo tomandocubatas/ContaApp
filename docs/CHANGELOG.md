@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Tema - Hero de saldo derivado del tema (v0.9.0)
+
+- `HomeHeroDashboard` (hero de Inicio) usa un degradado de `primaryContainer` a `secondaryContainer` y textos `onSurface`/`onSurfaceVariant`; desaparece la deteccion de modo oscuro por color de fondo y los degradados fijos. Gana el borde de tarjeta (pendiente de v0.7.0).
+- `HeroBalance` (sin usos hoy) deja el degradado coral fijo y usa los mismos colores del tema.
+- Verificacion: `:app:assembleDebug` y tests correctos; Inicio revisado en el movil en oscuro y en claro.
+
 ## 2026-10-29 - UX/Accesibilidad - Selector de periodo con botones accesibles (v0.8.0)
 
 - El selector de mes de Agenda sustituye los textos `<` y `>` por flechas con `contentDescription` ("Mes anterior", "Mes siguiente") y altura minima de 48 dp.

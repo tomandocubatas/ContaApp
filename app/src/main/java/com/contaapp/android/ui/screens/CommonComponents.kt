@@ -119,15 +119,15 @@ fun HeroBalance(title: String, value: String, subtitle: String) {
         Column(
             Modifier
                 .background(
-                    Brush.horizontalGradient(listOf(Color(0xFFFF5A52), Color(0xFFFF8A65))),
+                    Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.secondaryContainer)),
                     RoundedCornerShape(ContaRadius.md)
                 )
                 .padding(ContaSpacing.lg),
             verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)
         ) {
-            Text(title, color = Color(0xFFFFE4E0), style = MaterialTheme.typography.titleMedium)
-            Text(value, color = Color.White, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-            Text(subtitle, color = Color.White.copy(alpha = 0.86f))
+            Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.titleMedium)
+            Text(value, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+            Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
