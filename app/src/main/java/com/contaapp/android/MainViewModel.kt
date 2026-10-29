@@ -13,7 +13,9 @@ import com.contaapp.android.core.settings.ServerConfigStore
 import com.contaapp.android.core.network.ApiClient
 import com.contaapp.android.data.ContaRepository
 import com.contaapp.android.data.MovementFilters
+import com.contaapp.android.data.TwoFactorRequiredException
 import com.contaapp.android.domain.BankAccountBalance
+import com.contaapp.android.domain.CalendarMonth
 import com.contaapp.android.domain.CategoryOption
 import com.contaapp.android.domain.ChartsSnapshot
 import com.contaapp.android.domain.DashboardSummary
@@ -27,14 +29,18 @@ import com.contaapp.android.domain.Movement
 import com.contaapp.android.domain.RentalProperty
 import com.contaapp.android.domain.RentalMonth
 import com.contaapp.android.domain.RentalSummary
+import com.contaapp.android.domain.UserSession
 import com.contaapp.android.widget.ContaWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.json.JSONException
 import java.io.File
+import java.io.IOException
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -53,6 +59,7 @@ data class ContaUiState(
     val isUnlocked: Boolean = false,
     val isLoading: Boolean = false,
     val isMovementsLoading: Boolean = false,
+    val isCalendarLoading: Boolean = false,
     val privacyMode: Boolean = false,
     val privacyDefault: Boolean = false,
     val darkMode: Boolean = false,
@@ -63,6 +70,8 @@ data class ContaUiState(
     val refreshTick: Long = 0,
     val serverTestMessage: String? = null,
     val isTestingServer: Boolean = false,
+    val pendingTwoFactorToken: String? = null,
+    val pendingTwoFactorEmail: String = "",
     val lastExportPath: String? = null,
     val error: String? = null,
     val dashboard: DashboardSummary? = null,
@@ -79,6 +88,7 @@ data class ContaUiState(
     val rentalProperties: List<RentalProperty> = emptyList(),
     val rentalMonths: List<RentalMonth> = emptyList(),
     val charts: ChartsSnapshot = ChartsSnapshot(),
+    val calendarMonth: CalendarMonth? = null,
     val cacheStatus: List<CacheStatusUi> = emptyList()
 )
 
@@ -98,10 +108,12 @@ private fun initialCacheStatus(snapshot: FinancialSnapshot?, ttlMinutes: Int): L
             snapshot.rentalSummary != null ||
             snapshot.rentalProperties.isNotEmpty() ||
             snapshot.rentalMonths.isNotEmpty() ||
+            snapshot.calendarMonth != null ||
             snapshot.charts.financialSeries.isNotEmpty()
         )
     val screens = listOf(
         "Inicio" to "Dashboard, KPIs y resumen",
+        "Agenda" to "Eventos financieros del mes",
         "Graficas" to "Series y distribuciones",
         "Cuentas" to "Saldos por banco",
         "Deuda" to "Prestamos y financiaciones",
@@ -175,6 +187,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             rentalProperties = initialSnapshot?.rentalProperties.orEmpty(),
             rentalMonths = initialSnapshot?.rentalMonths.orEmpty(),
             charts = initialSnapshot?.charts ?: ChartsSnapshot(),
+            calendarMonth = initialSnapshot?.calendarMonth,
             cacheStatus = initialCacheStatus(initialSnapshot, preferencesStore.cacheTtlMinutes())
         )
     )
@@ -187,27 +200,72 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun login(email: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null, pendingTwoFactorToken = null, pendingTwoFactorEmail = "") }
             runCatching {
                 repository.login(email, password)
             }.onSuccess { session ->
-                sessionStore.save(session)
-                _uiState.update {
-                    it.copy(
-                        hasStoredSession = true,
-                        isUnlocked = true,
-                        isLoading = false,
-                        userName = session.name,
-                        error = null
-                    )
-                }
-                loadHome()
+                completeLogin(session)
             }.onFailure { throwable ->
-                _uiState.update {
-                    it.copy(isLoading = false, error = throwable.message ?: "No se pudo iniciar sesion")
+                if (throwable is TwoFactorRequiredException) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            pendingTwoFactorToken = throwable.pendingToken,
+                            pendingTwoFactorEmail = email,
+                            error = "Introduce el codigo de doble factor"
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(isLoading = false, error = throwable.message ?: "No se pudo iniciar sesion")
+                    }
                 }
             }
         }
+    }
+
+    fun verifyTwoFactor(code: String) {
+        val pendingToken = _uiState.value.pendingTwoFactorToken ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            runCatching {
+                repository.verifyTwoFactor(pendingToken, code)
+            }.onSuccess { session ->
+                val email = session.email.ifBlank { _uiState.value.pendingTwoFactorEmail }
+                completeLogin(session.copy(email = email))
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(isLoading = false, error = throwable.message ?: "No se pudo verificar el codigo")
+                }
+            }
+        }
+    }
+
+    fun cancelTwoFactor() {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                pendingTwoFactorToken = null,
+                pendingTwoFactorEmail = "",
+                error = null
+            )
+        }
+    }
+
+    private fun completeLogin(session: UserSession) {
+        sessionStore.save(session)
+        _uiState.update {
+            it.copy(
+                hasStoredSession = true,
+                isUnlocked = true,
+                isLoading = false,
+                userName = session.name,
+                pendingTwoFactorToken = null,
+                pendingTwoFactorEmail = "",
+                error = null
+            )
+        }
+        loadHome()
     }
 
     fun unlockAfterBiometric() {
@@ -222,7 +280,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun logout() {
         sessionStore.clear()
         snapshotStore.clear()
+        deleteExports()
+        ContaWidgetProvider.updateAll(getApplication())
+        homeCache = emptyMap()
+        movementsCache = emptyMap()
+        lastHomeFilters = null
+        lastHomeLoadedAt = null
+        lastMovementFilters = null
         _uiState.value = ContaUiState()
+    }
+
+    private fun exportsDir(): File = File(getApplication<Application>().getExternalFilesDir(null), "exports")
+
+    private fun deleteExports() {
+        runCatching { exportsDir().deleteRecursively() }
     }
 
     fun togglePrivacy() {
@@ -248,6 +319,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearCache() {
         snapshotStore.clear()
+        deleteExports()
+        ContaWidgetProvider.updateAll(getApplication())
         lastHomeLoadedAt = null
         lastHomeFilters = null
         homeCache = emptyMap()
@@ -269,6 +342,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 rentalProperties = emptyList(),
                 rentalMonths = emptyList(),
                 charts = ChartsSnapshot(),
+                calendarMonth = null,
                 lastUpdatedLabel = null,
                 error = "Cache local borrada"
             )
@@ -312,30 +386,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (!force && applyCachedHome(filters)) return
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            runCatching { loadHomePayload(session.accessToken, filters) }
-            .recoverCatching { throwable ->
-                if ((throwable as? ApiException)?.statusCode == 401) {
-                    val refreshed = repository.refresh(session.refreshToken)
-                    val merged = refreshed.copy(
-                        name = refreshed.name.ifBlank { session.name },
-                        email = refreshed.email.ifBlank { session.email }
-                    )
-                    sessionStore.save(merged)
-                    loadHomePayload(merged.accessToken, filters)
-                } else {
-                    throw throwable
-                }
-            }.onSuccess { payload ->
+            runCatching { withSession(session) { token -> loadHomePayload(token, filters) } }
+            .onSuccess { payload ->
                 val loadedAt = Instant.now()
                 val label = freshDataLabel()
-                val snapshot = payload.toSnapshot(loadedAt)
-                snapshotStore.save(snapshot)
-                snapshotStore.save(filters.snapshotKey(), snapshot)
-                ContaWidgetProvider.updateAll(getApplication())
-                homeCache = homeCache + (filters to CachedHomePayload(payload, loadedAt, label))
+                val complete = payload.failedSections.isEmpty()
+                if (complete) {
+                    // Una carga parcial no se guarda: sobrescribiria datos buenos con secciones vacias.
+                    val snapshot = payload.toSnapshot(loadedAt)
+                    snapshotStore.save(snapshot)
+                    snapshotStore.save(filters.snapshotKey(), snapshot)
+                    ContaWidgetProvider.updateAll(getApplication())
+                    homeCache = homeCache + (filters to CachedHomePayload(payload, loadedAt, label))
+                }
                 lastHomeFilters = filters
                 lastHomeLoadedAt = loadedAt
                 applyHomePayload(payload, label, isLoading = false)
+                if (!complete) {
+                    _uiState.update {
+                        it.copy(error = "No se pudieron cargar: ${payload.failedSections.joinToString(", ")}")
+                    }
+                }
             }.onFailure { throwable ->
                 val snapshot = snapshotStore.load()
                 snapshot?.loadedAtMillis?.takeIf { it > 0L }?.let { lastHomeLoadedAt = Instant.ofEpochMilli(it) }
@@ -357,6 +428,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             rentalProperties = snapshot.rentalProperties,
                             rentalMonths = snapshot.rentalMonths,
                             charts = snapshot.charts,
+                            calendarMonth = snapshot.calendarMonth,
                             lastUpdatedLabel = "Cache local",
                             cacheStatus = buildCacheStatus(),
                             error = "Mostrando ultimos datos guardados. ${throwable.message ?: "No se pudieron cargar los datos"}"
@@ -403,20 +475,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isMovementsLoading = true, error = null) }
-            runCatching { repository.movements(session.accessToken, filters) }
-                .recoverCatching { throwable ->
-                    if ((throwable as? ApiException)?.statusCode == 401) {
-                        val refreshed = repository.refresh(session.refreshToken)
-                        val merged = refreshed.copy(
-                            name = refreshed.name.ifBlank { session.name },
-                            email = refreshed.email.ifBlank { session.email }
-                        )
-                        sessionStore.save(merged)
-                        repository.movements(merged.accessToken, filters)
-                    } else {
-                        throw throwable
-                    }
-                }.onSuccess { movements ->
+            runCatching { withSession(session) { token -> repository.movements(token, filters) } }
+                .onSuccess { movements ->
                     val label = freshDataLabel()
                     movementsCache = movementsCache + (filters to CachedMovements(movements, Instant.now(), label))
                     _uiState.update { it.copy(isMovementsLoading = false, movements = movements, lastUpdatedLabel = label, cacheStatus = buildCacheStatus()) }
@@ -428,10 +488,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun loadCalendar(year: Int, month: Int) {
+        val session = sessionStore.get() ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isCalendarLoading = true, error = null) }
+            runCatching { withSession(session) { token -> repository.calendarMonth(token, year, month) } }
+                .onSuccess { calendar ->
+                    _uiState.update {
+                        it.copy(
+                            isCalendarLoading = false,
+                            calendarMonth = calendar,
+                            lastUpdatedLabel = freshDataLabel(),
+                            cacheStatus = buildCacheStatus()
+                        )
+                    }
+                }.onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(isCalendarLoading = false, error = throwable.message ?: "No se pudo cargar la agenda")
+                    }
+                }
+        }
+    }
+
     fun exportMovementsCsv() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val dir = File(getApplication<Application>().getExternalFilesDir(null), "exports")
+                val dir = exportsDir()
                 dir.mkdirs()
                 val file = File(dir, "movimientos-contaapp.csv")
                 val header = "fecha,descripcion,importe,tipo,categoria,cuenta,revisado,notas"
@@ -459,23 +541,66 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadHomePayload(token: String, filters: MovementFilters): HomePayload {
         val dashboardResponse = repository.dashboardResponse(token, filters)
+        val failed = mutableListOf<String>()
+        // Secciones secundarias: un fallo no tumba la carga, pero se avisa en lugar de mostrar ceros.
+        fun <T> optional(section: String, fallback: T, load: () -> T): T {
+            return try {
+                load()
+            } catch (error: ApiException) {
+                if (error.statusCode == 401) throw error
+                failed += section
+                fallback
+            } catch (error: IOException) {
+                failed += section
+                fallback
+            } catch (error: JSONException) {
+                failed += section
+                fallback
+            }
+        }
         return HomePayload(
             dashboard = repository.dashboardFrom(dashboardResponse),
-            categories = runCatching { repository.categories(token) }.getOrDefault(emptyList()),
+            categories = optional("categorias", emptyList()) { repository.categories(token) },
             accounts = repository.accountBalances(token),
             movements = repository.movements(token, filters),
             debts = repository.debt(token),
             debtDetails = repository.debtDetails(token),
             insurance = repository.insurances(token),
-            expiringInsurances = runCatching { repository.insurancePolicies(token) }
-                .getOrElse { repository.expiringInsurances(token) },
-            insuranceCoverages = runCatching { repository.insuranceCoverages(token) }.getOrDefault(emptyList()),
-            insuranceRenewals = runCatching { repository.insuranceRenewals(token) }.getOrDefault(emptyList()),
-            rentalSummary = runCatching { repository.rentalSummary(token, filters) }.getOrDefault(RentalSummary(0.0, 0.0, 0.0, 0.0, 0)),
-            rentalProperties = runCatching { repository.rentalProperties(token, filters) }.getOrDefault(emptyList()),
-            rentalMonths = runCatching { repository.rentalMonths(token, filters) }.getOrDefault(emptyList()),
-            charts = runCatching { repository.charts(token, dashboardResponse, filters) }.getOrDefault(ChartsSnapshot())
+            expiringInsurances = optional("seguros", emptyList()) {
+                try {
+                    repository.insurancePolicies(token)
+                } catch (error: IOException) {
+                    repository.expiringInsurances(token)
+                }
+            },
+            insuranceCoverages = optional("coberturas", emptyList()) { repository.insuranceCoverages(token) },
+            insuranceRenewals = optional("renovaciones", emptyList()) { repository.insuranceRenewals(token) },
+            rentalSummary = optional<RentalSummary?>("alquileres", null) { repository.rentalSummary(token, filters) },
+            rentalProperties = optional("propiedades", emptyList()) { repository.rentalProperties(token, filters) },
+            rentalMonths = optional("meses de alquiler", emptyList()) { repository.rentalMonths(token, filters) },
+            charts = optional("graficas", ChartsSnapshot()) { repository.charts(token, dashboardResponse, filters) },
+            calendarMonth = optional<CalendarMonth?>("agenda", null) {
+                val today = LocalDate.now()
+                repository.calendarMonth(token, today.year, today.monthValue)
+            },
+            failedSections = failed.toList()
         )
+    }
+
+    /** Ejecuta la llamada y, si el servidor responde 401, renueva la sesion una vez y repite. */
+    private fun <T> withSession(session: UserSession, call: (String) -> T): T {
+        return try {
+            call(session.accessToken)
+        } catch (error: ApiException) {
+            if (error.statusCode != 401) throw error
+            val refreshed = repository.refresh(session.refreshToken)
+            val merged = refreshed.copy(
+                name = refreshed.name.ifBlank { session.name },
+                email = refreshed.email.ifBlank { session.email }
+            )
+            sessionStore.save(merged)
+            call(merged.accessToken)
+        }
     }
 
     private fun applyCachedHome(filters: MovementFilters): Boolean {
@@ -516,6 +641,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 rentalProperties = payload.rentalProperties,
                 rentalMonths = payload.rentalMonths,
                 charts = payload.charts,
+                calendarMonth = payload.calendarMonth,
                 lastUpdatedLabel = label,
                 cacheStatus = buildCacheStatus()
             )
@@ -538,6 +664,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun buildCacheStatus(): List<CacheStatusUi> {
         val sharedScreens = listOf(
             "Inicio" to "Dashboard, KPIs y resumen",
+            "Agenda" to "Eventos financieros del mes",
             "Graficas" to "Series y distribuciones",
             "Cuentas" to "Saldos por banco",
             "Deuda" to "Prestamos y financiaciones",
@@ -580,6 +707,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             state.rentalProperties.isNotEmpty() ||
             state.rentalMonths.isNotEmpty() ||
             state.charts.financialSeries.isNotEmpty() ||
+            state.calendarMonth != null ||
             state.charts.incomeTrend.isNotEmpty() ||
             state.charts.expenseTrend.isNotEmpty()
     }
@@ -644,10 +772,12 @@ private data class HomePayload(
     val expiringInsurances: List<InsurancePolicy>,
     val insuranceCoverages: List<InsuranceCoverage>,
     val insuranceRenewals: List<InsuranceRenewal>,
-    val rentalSummary: RentalSummary,
+    val rentalSummary: RentalSummary?,
     val rentalProperties: List<RentalProperty>,
     val rentalMonths: List<RentalMonth>,
-    val charts: ChartsSnapshot
+    val charts: ChartsSnapshot,
+    val calendarMonth: CalendarMonth?,
+    val failedSections: List<String> = emptyList()
 )
 
 private fun HomePayload.toSnapshot(loadedAt: Instant): FinancialSnapshot {
@@ -666,7 +796,8 @@ private fun HomePayload.toSnapshot(loadedAt: Instant): FinancialSnapshot {
         rentalSummary = rentalSummary,
         rentalProperties = rentalProperties,
         rentalMonths = rentalMonths,
-        charts = charts
+        charts = charts,
+        calendarMonth = calendarMonth
     )
 }
 
@@ -682,10 +813,11 @@ private fun FinancialSnapshot.toHomePayloadOrNull(): HomePayload? {
         expiringInsurances = expiringInsurances,
         insuranceCoverages = insuranceCoverages,
         insuranceRenewals = insuranceRenewals,
-        rentalSummary = rentalSummary ?: RentalSummary(0.0, 0.0, 0.0, 0.0, 0),
+        rentalSummary = rentalSummary,
         rentalProperties = rentalProperties,
         rentalMonths = rentalMonths,
-        charts = charts
+        charts = charts,
+        calendarMonth = calendarMonth
     )
 }
 

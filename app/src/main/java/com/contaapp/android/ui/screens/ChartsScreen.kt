@@ -122,7 +122,8 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                         FinancialEvolutionDashboardCard(
                             financial = financial,
                             chartMode = chartMode,
-                            granularity = charts.granularity
+                            granularity = charts.granularity,
+                            hidden = state.privacyMode
                         )
                     }
                     item {
@@ -165,7 +166,8 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                             subtitle = "evolucion del patrimonio bancario",
                             values = charts.balanceTrend.map { it.value },
                             labels = charts.balanceTrend.map { it.label.toAxisLabel() },
-                            color = ExecutiveBlue
+                            color = ExecutiveBlue,
+                            hidden = state.privacyMode
                         )
                     }
                     item {
@@ -183,7 +185,8 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                             subtitle = "capital pendiente historico",
                             values = charts.debtTrend.map { it.value },
                             labels = charts.debtTrend.map { it.label.toAxisLabel() },
-                            color = ContaAmber
+                            color = ContaAmber,
+                            hidden = state.privacyMode
                         )
                     }
                     item { DebtSnapshotChartCard(state) }
@@ -195,7 +198,8 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                             subtitle = "rentabilidad por periodo",
                             values = charts.rentalCashflow.map { it.value },
                             labels = charts.rentalCashflow.map { it.label.toAxisLabel() },
-                            color = ContaTeal
+                            color = ContaTeal,
+                            hidden = state.privacyMode
                         )
                     }
                     item { RentalsSnapshotChartCard(state) }
@@ -277,7 +281,8 @@ fun RentalsSnapshotChartCard(state: ContaUiState) {
 fun FinancialEvolutionDashboardCard(
     financial: FinancialChartData,
     chartMode: FinancialChartMode,
-    granularity: String
+    granularity: String,
+    hidden: Boolean
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -292,9 +297,9 @@ fun FinancialEvolutionDashboardCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium
             )
-            InlineChartPanel("Neto", "Balance del periodo", financial.net, financial.labels, MaterialTheme.colorScheme.primary)
-            InlineChartPanel("Ingresos", "Serie ${chartMode.label.lowercase()}", financial.income, financial.labels, ContaTeal)
-            InlineChartPanel("Gastos", "Serie ${chartMode.label.lowercase()}", financial.expense, financial.labels, ContaCoral)
+            InlineChartPanel("Neto", "Balance del periodo", financial.net, financial.labels, MaterialTheme.colorScheme.primary, hidden = hidden)
+            InlineChartPanel("Ingresos", "Serie ${chartMode.label.lowercase()}", financial.income, financial.labels, ContaTeal, hidden = hidden)
+            InlineChartPanel("Gastos", "Serie ${chartMode.label.lowercase()}", financial.expense, financial.labels, ContaCoral, hidden = hidden)
         }
     }
 }
@@ -397,7 +402,8 @@ fun HistoricalCategoriesDashboardCard(
                 subtitle = "total mensual por categorias",
                 values = points.map { it.value },
                 labels = points.map { it.label.toAxisLabel() },
-                color = accent
+                color = accent,
+                hidden = hidden
             )
             points.takeLast(6).reversed().forEach { point ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -499,6 +505,7 @@ fun InlineChartPanel(
     values: List<Double>,
     labels: List<String>,
     color: androidx.compose.ui.graphics.Color,
+    hidden: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val cleanValues = values.map { if (it.isFinite()) it else 0.0 }
@@ -517,7 +524,7 @@ fun InlineChartPanel(
                 Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Text(
-                cleanValues.lastOrNull()?.let { money(it, false) } ?: "Sin datos",
+                cleanValues.lastOrNull()?.let { money(it, hidden) } ?: "Sin datos",
                 color = color,
                 fontWeight = FontWeight.Black,
                 maxLines = 1,
@@ -531,7 +538,7 @@ fun InlineChartPanel(
             val selectedLabel = labels.getOrNull(safeIndex).orEmpty()
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("${cleanValues.size} puntos", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                Text("Rango ${money(min, false)} / ${money(max, false)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text("Rango ${money(min, hidden)} / ${money(max, hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Row(
                 Modifier.fillMaxWidth().background(color.copy(alpha = 0.10f), RoundedCornerShape(14.dp)).padding(10.dp),
@@ -542,7 +549,7 @@ fun InlineChartPanel(
                     Text("Punto destacado", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                     Text(selectedLabel.ifBlank { "Indice ${safeIndex + 1}" }, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 }
-                Text(money(cleanValues[safeIndex], false), color = color, fontWeight = FontWeight.Black)
+                Text(money(cleanValues[safeIndex], hidden), color = color, fontWeight = FontWeight.Black)
             }
             ChartPointSelector(
                 size = cleanValues.size,
@@ -653,11 +660,11 @@ fun AxisLabels(labels: List<String>) {
 }
 
 @Composable
-fun ChartOrEmpty(title: String, subtitle: String, values: List<Double>, labels: List<String>, color: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier) {
+fun ChartOrEmpty(title: String, subtitle: String, values: List<Double>, labels: List<String>, color: androidx.compose.ui.graphics.Color, hidden: Boolean = false, modifier: Modifier = Modifier) {
     if (values.size >= 2) {
-        FinancialLineChart(title = title, subtitle = subtitle, values = values, color = color, labels = labels, modifier = modifier)
+        FinancialLineChart(title = title, subtitle = subtitle, values = values, color = color, labels = labels, hidden = hidden, modifier = modifier)
     } else if (values.size == 1) {
-        InlineChartPanel(title = title, subtitle = subtitle, values = values, labels = labels, color = color, modifier = modifier)
+        InlineChartPanel(title = title, subtitle = subtitle, values = values, labels = labels, color = color, hidden = hidden, modifier = modifier)
     } else {
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

@@ -55,20 +55,16 @@ class ApiClient(
     }
 
     private fun execute(request: Request): JSONObject {
-        client.newCall(request).execute().use { response ->
-            val raw = response.body?.string().orEmpty()
-            if (!response.isSuccessful) {
-                val parsed = runCatching { JSONObject(raw) }.getOrNull()
-                val message = parsed?.optString("message")?.takeIf { it.isNotBlank() }
-                    ?: parsed?.optString("error")?.takeIf { it.isNotBlank() }
-                    ?: "HTTP ${response.code}"
-                throw ApiException(response.code, message)
-            }
-            return if (raw.isBlank()) JSONObject() else JSONObject(raw)
-        }
+        val raw = executeRaw(request)
+        return if (raw.isBlank()) JSONObject() else JSONObject(raw)
     }
 
     private fun executeArray(request: Request): JSONArray {
+        val raw = executeRaw(request)
+        return if (raw.isBlank()) JSONArray() else JSONArray(raw)
+    }
+
+    private fun executeRaw(request: Request): String {
         client.newCall(request).execute().use { response ->
             val raw = response.body?.string().orEmpty()
             if (!response.isSuccessful) {
@@ -78,7 +74,7 @@ class ApiClient(
                     ?: "HTTP ${response.code}"
                 throw ApiException(response.code, message)
             }
-            return if (raw.isBlank()) JSONArray() else JSONArray(raw)
+            return raw
         }
     }
 }

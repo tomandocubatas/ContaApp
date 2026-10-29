@@ -106,7 +106,8 @@ fun RentalsScreen(
                         color = ContaTeal,
                         labels = cashflowLabels,
                         xAxisLabel = "Meses",
-                        yAxisLabel = "Cashflow"
+                        yAxisLabel = "Cashflow",
+                        hidden = state.privacyMode
                     )
                 }
             }

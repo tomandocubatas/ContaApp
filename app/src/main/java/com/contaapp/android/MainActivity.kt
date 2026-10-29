@@ -31,6 +31,8 @@ class MainActivity : ComponentActivity() {
                 AppRoot(
                     state = state,
                     onLogin = viewModel::login,
+                    onVerifyTwoFactor = viewModel::verifyTwoFactor,
+                    onCancelTwoFactor = viewModel::cancelTwoFactor,
                     onBaseUrlChanged = viewModel::updateBaseUrl,
                     onServerTest = viewModel::testServer,
                     onUnlock = {
@@ -43,6 +45,7 @@ class MainActivity : ComponentActivity() {
                     onRefresh = viewModel::refreshHome,
                     onHomeFiltersChanged = viewModel::loadHome,
                     onChartFiltersChanged = viewModel::loadHome,
+                    onCalendarMonthChanged = viewModel::loadCalendar,
                     onMovementFiltersChanged = viewModel::loadMovements,
                     onTogglePrivacy = viewModel::togglePrivacy,
                     onToggleDarkMode = viewModel::toggleDarkMode,

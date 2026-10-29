@@ -1,7 +1,12 @@
 package com.contaapp.android.core.cache
 
 import android.content.Context
+import com.contaapp.android.core.AppConfig
+import com.contaapp.android.core.session.SecureCipher
 import com.contaapp.android.domain.BankAccountBalance
+import com.contaapp.android.domain.CalendarDay
+import com.contaapp.android.domain.CalendarEvent
+import com.contaapp.android.domain.CalendarMonth
 import com.contaapp.android.domain.CategoryBreakdown
 import com.contaapp.android.domain.CategoryOption
 import com.contaapp.android.domain.ChartPoint
@@ -37,31 +42,40 @@ data class FinancialSnapshot(
     val rentalSummary: RentalSummary?,
     val rentalProperties: List<RentalProperty>,
     val rentalMonths: List<RentalMonth>,
-    val charts: ChartsSnapshot
+    val charts: ChartsSnapshot,
+    val calendarMonth: CalendarMonth? = null
 )
 
 class SnapshotStore(context: Context) {
-    private val prefs = context.getSharedPreferences("conta_snapshot", Context.MODE_PRIVATE)
+    // Cache cifrada en un fichero nuevo; la antigua (JSON en claro) se borra al crear el store.
+    private val prefs = context.getSharedPreferences("conta_snapshot_enc", Context.MODE_PRIVATE)
+    private val legacyPrefs = context.getSharedPreferences("conta_snapshot", Context.MODE_PRIVATE)
+    private val crypto = SecureCipher("contaapp_cache_key")
+
+    init {
+        legacyPrefs.edit().clear().apply()
+    }
 
     fun save(snapshot: FinancialSnapshot) {
-        runCatching {
-            prefs.edit().putString("home", snapshot.toJson().toString()).apply()
-        }
+        saveEncrypted("home", snapshot)
     }
 
     fun save(key: String, snapshot: FinancialSnapshot) {
+        saveEncrypted(key.safeSnapshotKey(), snapshot)
+    }
+
+    fun load(): FinancialSnapshot? = loadEncrypted("home")
+
+    fun load(key: String): FinancialSnapshot? = loadEncrypted(key.safeSnapshotKey())
+
+    private fun saveEncrypted(prefKey: String, snapshot: FinancialSnapshot) {
         runCatching {
-            prefs.edit().putString(key.safeSnapshotKey(), snapshot.toJson().toString()).apply()
+            prefs.edit().putString(prefKey, crypto.encrypt(snapshot.toJson().toString())).apply()
         }
     }
 
-    fun load(): FinancialSnapshot? {
-        val raw = prefs.getString("home", null) ?: return null
-        return runCatching { JSONObject(raw).toSnapshot() }.getOrNull()
-    }
-
-    fun load(key: String): FinancialSnapshot? {
-        val raw = prefs.getString(key.safeSnapshotKey(), null) ?: return null
+    private fun loadEncrypted(prefKey: String): FinancialSnapshot? {
+        val raw = prefs.getString(prefKey, null)?.let(crypto::decrypt) ?: return null
         return runCatching { JSONObject(raw).toSnapshot() }.getOrNull()
     }
 
@@ -89,6 +103,7 @@ private fun FinancialSnapshot.toJson(): JSONObject {
         .put("rentalProperties", rentalProperties.toJsonArray { it.toJson() })
         .put("rentalMonths", rentalMonths.toJsonArray { it.toJson() })
         .put("charts", charts.toJson())
+        .put("calendarMonth", calendarMonth?.toJson())
 }
 
 private fun JSONObject.toSnapshot(): FinancialSnapshot {
@@ -107,7 +122,8 @@ private fun JSONObject.toSnapshot(): FinancialSnapshot {
         rentalSummary = optJSONObject("rentalSummary")?.toRentalSummary(),
         rentalProperties = optJSONArray("rentalProperties").mapObjects { it.toRentalProperty() },
         rentalMonths = optJSONArray("rentalMonths").mapObjects { it.toRentalMonth() },
-        charts = optJSONObject("charts")?.toChartsSnapshot() ?: ChartsSnapshot()
+        charts = optJSONObject("charts")?.toChartsSnapshot() ?: ChartsSnapshot(),
+        calendarMonth = optJSONObject("calendarMonth")?.toCalendarMonth()
     )
 }
 
@@ -138,13 +154,13 @@ private fun DashboardSummary.toJson() = JSONObject()
     .put("incomeCategories", incomeCategories.toJsonArray { it.toJson() })
 
 private fun JSONObject.toDashboard() = DashboardSummary(
-    totalBalance = optDouble("totalBalance"),
-    totalDebts = optDouble("totalDebts"),
-    income = optDouble("income"),
-    expense = optDouble("expense"),
-    net = optDouble("net"),
-    reviewedPct = optDouble("reviewedPct"),
-    categorizedPct = optDouble("categorizedPct"),
+    totalBalance = optDouble("totalBalance", 0.0),
+    totalDebts = optDouble("totalDebts", 0.0),
+    income = optDouble("income", 0.0),
+    expense = optDouble("expense", 0.0),
+    net = optDouble("net", 0.0),
+    reviewedPct = optDouble("reviewedPct", 0.0),
+    categorizedPct = optDouble("categorizedPct", 0.0),
     expenseCategories = optJSONArray("expenseCategories").mapObjects { it.toCategory() },
     incomeCategories = optJSONArray("incomeCategories").mapObjects { it.toCategory() }
 )
@@ -157,9 +173,9 @@ private fun CategoryBreakdown.toJson() = JSONObject()
 
 private fun JSONObject.toCategory() = CategoryBreakdown(
     name = optString("name"),
-    total = optDouble("total"),
+    total = optDouble("total", 0.0),
     count = optInt("count"),
-    budgetPct = takeIf { has("budgetPct") && !isNull("budgetPct") }?.optDouble("budgetPct")
+    budgetPct = takeIf { has("budgetPct") && !isNull("budgetPct") }?.optDouble("budgetPct", 0.0)
 )
 
 private fun BankAccountBalance.toJson() = JSONObject()
@@ -173,8 +189,8 @@ private fun JSONObject.toAccount() = BankAccountBalance(
     id = optString("id"),
     bankName = optString("bankName"),
     accountName = optString("accountName"),
-    balance = optDouble("balance"),
-    currency = optString("currency", "EUR")
+    balance = optDouble("balance", 0.0),
+    currency = optString("currency", AppConfig.DEFAULT_CURRENCY)
 )
 
 private fun Movement.toJson() = JSONObject()
@@ -201,7 +217,7 @@ private fun JSONObject.toMovement() = Movement(
     id = optString("id"),
     date = optString("date"),
     description = optString("description"),
-    amount = optDouble("amount"),
+    amount = optDouble("amount", 0.0),
     type = optString("type"),
     accountId = optString("accountId").takeIf { it.isNotBlank() && it != "null" },
     categoryId = optString("categoryId").takeIf { it.isNotBlank() && it != "null" },
@@ -226,9 +242,9 @@ private fun DebtSummary.toJson() = JSONObject()
 
 private fun JSONObject.toDebt() = DebtSummary(
     title = optString("title"),
-    pending = optDouble("pending"),
-    paid = optDouble("paid"),
-    interest = optDouble("interest")
+    pending = optDouble("pending", 0.0),
+    paid = optDouble("paid", 0.0),
+    interest = optDouble("interest", 0.0)
 )
 
 private fun DebtDetail.toJson() = JSONObject()
@@ -249,8 +265,8 @@ private fun JSONObject.toDebtDetail() = DebtDetail(
     entity = optString("entity"),
     type = optString("type"),
     source = optString("source"),
-    pendingAmount = optDouble("pendingAmount"),
-    monthlyPayment = optDouble("monthlyPayment"),
+    pendingAmount = optDouble("pendingAmount", 0.0),
+    monthlyPayment = optDouble("monthlyPayment", 0.0),
     nextPaymentDate = optString("nextPaymentDate").takeIf { it.isNotBlank() && it != "null" },
     status = optString("status"),
     daysUntilPayment = takeIf { has("daysUntilPayment") && !isNull("daysUntilPayment") }?.optInt("daysUntilPayment")
@@ -263,7 +279,7 @@ private fun InsuranceSummary.toJson() = JSONObject()
 
 private fun JSONObject.toInsurance() = InsuranceSummary(
     activeCount = optInt("activeCount"),
-    annualPremium = optDouble("annualPremium"),
+    annualPremium = optDouble("annualPremium", 0.0),
     expiringSoon = optInt("expiringSoon")
 )
 
@@ -287,7 +303,7 @@ private fun JSONObject.toInsurancePolicy() = InsurancePolicy(
     type = optString("type"),
     renewalDate = optString("renewalDate").takeIf { it.isNotBlank() && it != "null" },
     endDate = optString("endDate").takeIf { it.isNotBlank() && it != "null" },
-    annualPremium = optDouble("annualPremium"),
+    annualPremium = optDouble("annualPremium", 0.0),
     policyNumber = optString("policyNumber").takeIf { it.isNotBlank() && it != "null" },
     coverage = optString("coverage").takeIf { it.isNotBlank() && it != "null" },
     status = optString("status").takeIf { it.isNotBlank() && it != "null" },
@@ -302,9 +318,9 @@ private fun InsuranceCoverage.toJson() = JSONObject()
 
 private fun JSONObject.toInsuranceCoverage() = InsuranceCoverage(
     type = optString("type"),
-    maxCoverage = optDouble("maxCoverage"),
-    totalPremium = optDouble("totalPremium"),
-    ratio = optDouble("ratio")
+    maxCoverage = optDouble("maxCoverage", 0.0),
+    totalPremium = optDouble("totalPremium", 0.0),
+    ratio = optDouble("ratio", 0.0)
 )
 
 private fun InsuranceRenewal.toJson() = JSONObject()
@@ -326,10 +342,10 @@ private fun RentalSummary.toJson() = JSONObject()
     .put("activeProperties", activeProperties)
 
 private fun JSONObject.toRentalSummary() = RentalSummary(
-    income = optDouble("income"),
-    expense = optDouble("expense"),
-    profit = optDouble("profit"),
-    profitability = optDouble("profitability"),
+    income = optDouble("income", 0.0),
+    expense = optDouble("expense", 0.0),
+    profit = optDouble("profit", 0.0),
+    profitability = optDouble("profitability", 0.0),
     activeProperties = optInt("activeProperties")
 )
 
@@ -344,10 +360,10 @@ private fun RentalProperty.toJson() = JSONObject()
 private fun JSONObject.toRentalProperty() = RentalProperty(
     id = optString("id"),
     name = optString("name"),
-    income = optDouble("income"),
-    expense = optDouble("expense"),
-    profit = optDouble("profit"),
-    profitability = optDouble("profitability")
+    income = optDouble("income", 0.0),
+    expense = optDouble("expense", 0.0),
+    profit = optDouble("profit", 0.0),
+    profitability = optDouble("profitability", 0.0)
 )
 
 private fun RentalMonth.toJson() = JSONObject()
@@ -362,10 +378,10 @@ private fun RentalMonth.toJson() = JSONObject()
 private fun JSONObject.toRentalMonth() = RentalMonth(
     month = optInt("month"),
     monthName = optString("monthName"),
-    income = optDouble("income"),
-    expense = optDouble("expense"),
-    profit = optDouble("profit"),
-    profitability = optDouble("profitability"),
+    income = optDouble("income", 0.0),
+    expense = optDouble("expense", 0.0),
+    profit = optDouble("profit", 0.0),
+    profitability = optDouble("profitability", 0.0),
     categories = optJSONArray("categories").mapObjects { it.toRentalCategoryMonth() }
 )
 
@@ -379,7 +395,7 @@ private fun JSONObject.toRentalCategoryMonth() = RentalCategoryMonth(
     period = optString("period"),
     categoryId = optString("categoryId").takeIf { it.isNotBlank() && it != "null" },
     categoryName = optString("categoryName"),
-    total = optDouble("total")
+    total = optDouble("total", 0.0)
 )
 
 private fun ChartsSnapshot.toJson() = JSONObject()
@@ -409,9 +425,9 @@ private fun FinancialSeriesPoint.toJson() = JSONObject()
 
 private fun JSONObject.toFinancialSeriesPoint() = FinancialSeriesPoint(
     label = optString("label"),
-    income = optDouble("income"),
-    expense = optDouble("expense"),
-    net = optDouble("net")
+    income = optDouble("income", 0.0),
+    expense = optDouble("expense", 0.0),
+    net = optDouble("net", 0.0)
 )
 
 private fun ChartPoint.toJson() = JSONObject()
@@ -422,7 +438,54 @@ private fun Double.jsonNumber(): Double = if (isFinite()) this else 0.0
 
 private fun JSONObject.toChartPoint() = ChartPoint(
     label = optString("label"),
-    value = optDouble("value")
+    value = optDouble("value", 0.0)
+)
+
+private fun CalendarMonth.toJson() = JSONObject()
+    .put("year", year)
+    .put("month", month)
+    .put("days", days.toJsonArray { it.toJson() })
+
+private fun JSONObject.toCalendarMonth() = CalendarMonth(
+    year = optInt("year"),
+    month = optInt("month"),
+    days = optJSONArray("days").mapObjects { it.toCalendarDay() }
+)
+
+private fun CalendarDay.toJson() = JSONObject()
+    .put("date", date)
+    .put("events", events.toJsonArray { it.toJson() })
+    .put("totalExpense", totalExpense.jsonNumber())
+    .put("totalIncome", totalIncome.jsonNumber())
+
+private fun JSONObject.toCalendarDay() = CalendarDay(
+    date = optString("date"),
+    events = optJSONArray("events").mapObjects { it.toCalendarEvent() },
+    totalExpense = optDouble("totalExpense", 0.0),
+    totalIncome = optDouble("totalIncome", 0.0)
+)
+
+private fun CalendarEvent.toJson() = JSONObject()
+    .put("id", id)
+    .put("type", type)
+    .put("date", date)
+    .put("label", label)
+    .put("amount", amount.jsonNumber())
+    .put("currency", currency)
+    .put("direction", direction)
+    .put("sourceId", sourceId)
+    .put("confirmed", confirmed)
+
+private fun JSONObject.toCalendarEvent() = CalendarEvent(
+    id = optString("id"),
+    type = optString("type"),
+    date = optString("date"),
+    label = optString("label"),
+    amount = optDouble("amount", 0.0),
+    currency = optString("currency", AppConfig.DEFAULT_CURRENCY),
+    direction = optString("direction"),
+    sourceId = optString("sourceId"),
+    confirmed = optBoolean("confirmed")
 )
 
 private fun <T> List<T>.toJsonArray(mapper: (T) -> JSONObject): JSONArray {

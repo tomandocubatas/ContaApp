@@ -72,6 +72,7 @@ fun MoreScreen(
         }
         item { SectionTitle("Analisis y operaciones") }
         item { MoreRow(Tab.Charts, "Graficas por resumen, categorias, deuda y alquileres", onOpen) }
+        item { MoreRow(Tab.Agenda, "Pagos previstos, recurrentes, seguros y confirmaciones", onOpen) }
         item { MoreRow(Tab.Accounts, "Detalle por banco, cuenta y saldo disponible", onOpen) }
         item { MoreRow(Tab.Movements, "Busqueda, filtros guardables y vinculaciones", onOpen) }
         item { MoreRow(Tab.Debt, "Prestamos, financiaciones y proximos pagos", onOpen) }
@@ -229,6 +230,13 @@ fun globalSearchResults(query: String, state: ContaUiState): List<MoreSearchResu
         }.take(4).forEach {
             add(MoreSearchResult(it.name, "Cashflow ${money(it.profit, state.privacyMode)} · ${percent(it.profitability)}", "Alquiler", Tab.Rentals, it.id))
         }
+        state.calendarMonth?.days.orEmpty()
+            .flatMap { it.events }
+            .filter { it.label.matchesTerm() || it.type.matchesTerm() }
+            .take(4)
+            .forEach {
+                add(MoreSearchResult(it.label, "${it.date.take(10)} · ${money(if (it.direction == "income") kotlin.math.abs(it.amount) else -kotlin.math.abs(it.amount), state.privacyMode)}", "Agenda", Tab.Agenda, it.id))
+            }
     }
 }
 

@@ -171,3 +171,28 @@ data class ChartsSnapshot(
     val rentalCashflow: List<ChartPoint> = emptyList(),
     val balanceTrend: List<ChartPoint> = emptyList()
 )
+
+data class CalendarMonth(
+    val year: Int,
+    val month: Int,
+    val days: List<CalendarDay> = emptyList()
+)
+
+data class CalendarDay(
+    val date: String,
+    val events: List<CalendarEvent>,
+    val totalExpense: Double,
+    val totalIncome: Double
+)
+
+data class CalendarEvent(
+    val id: String,
+    val type: String,
+    val date: String,
+    val label: String,
+    val amount: Double,
+    val currency: String,
+    val direction: String,
+    val sourceId: String,
+    val confirmed: Boolean
+)

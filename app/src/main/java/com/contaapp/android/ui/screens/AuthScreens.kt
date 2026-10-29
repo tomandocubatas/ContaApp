@@ -77,12 +77,16 @@ import java.time.format.DateTimeFormatter
 fun LoginScreen(
     state: ContaUiState,
     onLogin: (String, String) -> Unit,
+    onVerifyTwoFactor: (String) -> Unit,
+    onCancelTwoFactor: () -> Unit,
     onBaseUrlChanged: (String) -> Unit,
     onServerTest: (String) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var twoFactorCode by remember { mutableStateOf("") }
     var showServerDialog by remember { mutableStateOf(false) }
+    val waitingForTwoFactor = state.pendingTwoFactorToken != null
 
     Box(modifier = Modifier.fillMaxSize()) {
         AuthBackdrop()
@@ -132,15 +136,50 @@ fun LoginScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
                     )
+                    if (waitingForTwoFactor) {
+                        OutlinedTextField(
+                            value = twoFactorCode,
+                            onValueChange = { twoFactorCode = it.filter(Char::isDigit).take(6) },
+                            label = { Text("Codigo 2FA") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                     Button(
-                        onClick = { onLogin(email.trim(), password) },
-                        enabled = !state.isLoading && email.isNotBlank() && password.isNotBlank(),
+                        onClick = {
+                            if (waitingForTwoFactor) {
+                                onVerifyTwoFactor(twoFactorCode)
+                            } else {
+                                onLogin(email.trim(), password)
+                            }
+                        },
+                        enabled = !state.isLoading &&
+                            if (waitingForTwoFactor) twoFactorCode.length >= 6 else email.isNotBlank() && password.isNotBlank(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A884)),
                         contentPadding = PaddingValues(vertical = 15.dp)
                     ) {
-                        Text(if (state.isLoading) "Entrando..." else "Entrar", fontWeight = FontWeight.Bold)
+                        Text(
+                            when {
+                                state.isLoading && waitingForTwoFactor -> "Verificando..."
+                                state.isLoading -> "Entrando..."
+                                waitingForTwoFactor -> "Verificar codigo"
+                                else -> "Entrar"
+                            },
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    if (waitingForTwoFactor) {
+                        TextButton(
+                            onClick = {
+                                twoFactorCode = ""
+                                onCancelTwoFactor()
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Usar otras credenciales")
+                        }
                     }
                     ErrorText(state.error)
                 }

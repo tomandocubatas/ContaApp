@@ -75,6 +75,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 enum class Tab(val label: String, val shortLabel: String, @DrawableRes val iconRes: Int) {
     Home("Inicio", "Inicio", R.drawable.ic_home),
+    Agenda("Agenda", "Agenda", R.drawable.ic_calendar),
     Movements("Movimientos", "Movs", R.drawable.ic_receipt),
     Accounts("Cuentas", "Cuentas", R.drawable.ic_bank),
     Charts("Graficas", "Grafs", R.drawable.ic_chart),
@@ -94,6 +95,7 @@ fun MainScaffold(
     onRefresh: () -> Unit,
     onHomeFiltersChanged: (MovementFilters) -> Unit,
     onChartFiltersChanged: (MovementFilters) -> Unit,
+    onCalendarMonthChanged: (Int, Int) -> Unit,
     onMovementFiltersChanged: (MovementFilters) -> Unit,
     onTogglePrivacy: () -> Unit,
     onToggleDarkMode: () -> Unit,
@@ -151,6 +153,10 @@ fun MainScaffold(
                     AdaptiveScreenFrame(isTablet = isTablet) {
                         when (selectedTab) {
                             Tab.Home -> HomeScreen(state, onHomeFiltersChanged)
+                            Tab.Agenda -> AgendaScreen(
+                                state = state,
+                                onMonthChanged = onCalendarMonthChanged
+                            )
                             Tab.Movements -> MovementsScreen(
                                 state = state,
                                 onMovementFiltersChanged = onMovementFiltersChanged,
@@ -376,7 +382,7 @@ fun ContaBottomBar(selectedTab: Tab, onSelected: (Tab) -> Unit) {
 
 private fun bottomTabs(): List<Tab> = listOf(Tab.Home, Tab.Movements, Tab.Accounts, Tab.Charts, Tab.More)
 
-private fun tabletTabs(): List<Tab> = listOf(Tab.Home, Tab.Movements, Tab.Accounts, Tab.Charts, Tab.Debt, Tab.Insurance, Tab.Rentals, Tab.Settings)
+private fun tabletTabs(): List<Tab> = listOf(Tab.Home, Tab.Agenda, Tab.Movements, Tab.Accounts, Tab.Charts, Tab.Debt, Tab.Insurance, Tab.Rentals, Tab.Settings)
 
 
 

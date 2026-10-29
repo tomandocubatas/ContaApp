@@ -70,6 +70,7 @@ import com.contaapp.android.R
 import com.contaapp.android.core.settings.AppPreferencesStore
 import com.contaapp.android.data.MovementFilters
 import com.contaapp.android.domain.BankAccountBalance
+import com.contaapp.android.domain.CalendarEvent
 import com.contaapp.android.domain.CategoryBreakdown
 import com.contaapp.android.domain.DashboardSummary
 import com.contaapp.android.domain.DebtDetail
@@ -141,7 +142,8 @@ fun HomeScreen(
                         title = "Ingresos vs gastos",
                         subtitle = "tendencia estimada",
                         values = executiveTrend(dashboard.income, dashboard.expense, dashboard.net),
-                        color = ExecutiveBlue
+                        color = ExecutiveBlue,
+                        hidden = state.privacyMode
                     )
                 }
             }
@@ -222,44 +224,14 @@ fun HomeScreen(
 
 @Composable
 fun HomeAgendaCard(state: ContaUiState) {
-    val entries = buildList {
-        state.debtDetails
-            .visibleDebtDetails()
-            .filter { it.nextPaymentDate != null }
-            .sortedBy { it.nextPaymentDate }
-            .take(3)
-            .forEach { debt ->
-                add(
-                    AgendaEntry(
-                        title = debt.name,
-                        detail = "${debt.entity} · ${money(debt.monthlyPayment, state.privacyMode)}",
-                        date = debt.nextPaymentDate?.take(10).orEmpty(),
-                        iconRes = R.drawable.ic_credit_card,
-                        accent = if ((debt.daysUntilPayment ?: 99) < 0) ContaDanger else ContaAmber
-                    )
-                )
-            }
-        state.expiringInsurances
-            .visibleInsurancePolicies()
-            .sortedBy { it.renewalDate ?: it.endDate ?: "9999-12-31" }
-            .take(3)
-            .forEach { policy ->
-                add(
-                    AgendaEntry(
-                        title = policy.name.ifBlank { "Seguro" },
-                        detail = "${policy.company ?: policy.type} · ${money(policy.annualPremium, state.privacyMode)}",
-                        date = (policy.renewalDate ?: policy.endDate ?: "sin fecha").take(10),
-                        iconRes = R.drawable.ic_shield,
-                        accent = when (insuranceUrgency(policy.renewalDate ?: policy.endDate)) {
-                            InsuranceUrgency.Expired -> ContaDanger
-                            InsuranceUrgency.Soon -> ContaAmber
-                            InsuranceUrgency.Future -> ContaTeal
-                            InsuranceUrgency.Unknown -> MaterialTheme.colorScheme.primary
-                        }
-                    )
-                )
-            }
-    }.sortedBy { it.date }.take(5)
+    val today = LocalDate.now().toString()
+    val entries = state.calendarMonth?.days
+        .orEmpty()
+        .flatMap { it.events }
+        .filter { it.date >= today }
+        .sortedBy { it.date }
+        .take(5)
+        .map { it.toAgendaEntry() }
     if (entries.isEmpty()) return
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -270,7 +242,7 @@ fun HomeAgendaCard(state: ContaUiState) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionHeader("Agenda financiera", "${entries.size} proximos hitos")
             entries.forEach { entry ->
-                AgendaRow(entry)
+                AgendaRow(entry, state.privacyMode)
             }
         }
     }
@@ -278,14 +250,15 @@ fun HomeAgendaCard(state: ContaUiState) {
 
 data class AgendaEntry(
     val title: String,
-    val detail: String,
+    val typeLabel: String,
+    val amount: Double,
     val date: String,
     @DrawableRes val iconRes: Int,
     val accent: Color
 )
 
 @Composable
-fun AgendaRow(entry: AgendaEntry) {
+fun AgendaRow(entry: AgendaEntry, hidden: Boolean) {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -298,8 +271,8 @@ fun AgendaRow(entry: AgendaEntry) {
             Icon(painterResource(entry.iconRes), contentDescription = null, tint = entry.accent, modifier = Modifier.size(20.dp))
         }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(entry.title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(entry.detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(entry.title.privacySafeTitle(hidden), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("${entry.typeLabel} · ${money(entry.amount, hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         StatusChip(entry.date, entry.accent)
     }
@@ -307,13 +280,13 @@ fun AgendaRow(entry: AgendaEntry) {
 
 @Composable
 fun HomePeriodComparisonCard(state: ContaUiState) {
+    val dashboard = state.dashboard ?: return
     val series = state.charts.financialSeries
-    if (series.size < 2) return
-    val first = series.first()
-    val last = series.last()
-    val incomeDelta = last.income - first.income
-    val expenseDelta = last.expense - first.expense
-    val netDelta = last.net - first.net
+    val periodLabel = if (series.size >= 2) {
+        "${series.first().label.toAxisLabel()} -> ${series.last().label.toAxisLabel()}"
+    } else {
+        "Periodo actual"
+    }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
@@ -321,18 +294,54 @@ fun HomePeriodComparisonCard(state: ContaUiState) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionHeader("Comparativa del periodo", "${first.label.toAxisLabel()} -> ${last.label.toAxisLabel()}")
+            SectionHeader("Resumen del periodo", periodLabel)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                ComparisonMetric("Ingresos", incomeDelta, ContaTeal, state.privacyMode, Modifier.weight(1f))
-                ComparisonMetric("Gastos", expenseDelta, ContaCoral, state.privacyMode, Modifier.weight(1f))
-                ComparisonMetric("Neto", netDelta, if (netDelta >= 0.0) ContaTeal else ContaDanger, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric("Ingresos", dashboard.income, ContaTeal, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric("Gastos", dashboard.expense, ContaCoral, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric("Balance", dashboard.net, if (dashboard.net >= 0.0) ContaTeal else ContaDanger, state.privacyMode, Modifier.weight(1f))
             }
         }
     }
 }
 
+private fun CalendarEvent.toAgendaEntry(): AgendaEntry {
+    val accent = when {
+        direction == "income" -> ContaTeal
+        type == "loan" || type == "financing" -> ExecutiveBlue
+        type == "insurance" -> ContaAmber
+        else -> ContaCoral
+    }
+    val icon = when (type) {
+        "loan", "financing" -> R.drawable.ic_credit_card
+        "insurance" -> R.drawable.ic_shield
+        "recurring" -> R.drawable.ic_refresh
+        else -> R.drawable.ic_calendar
+    }
+    val typeLabel = when (type) {
+        "loan" -> "Prestamo"
+        "financing" -> "Financiacion"
+        "insurance" -> "Seguro"
+        "recurring" -> "Recurrente"
+        else -> "Evento"
+    }
+    val signed = if (direction == "income") kotlin.math.abs(amount) else -kotlin.math.abs(amount)
+    return AgendaEntry(
+        title = label,
+        typeLabel = typeLabel,
+        amount = signed,
+        date = date.take(10),
+        iconRes = icon,
+        accent = accent
+    )
+}
+
+private fun String.privacySafeTitle(hidden: Boolean): String {
+    if (!hidden) return this
+    return replace(Regex("""[-+]?\d{1,3}(?:[.\s]\d{3})*(?:,\d+)?\s*€|[-+]?\d+(?:[,.]\d+)?\s*€"""), "•••• €")
+}
+
 @Composable
-fun ComparisonMetric(title: String, delta: Double, color: Color, hidden: Boolean, modifier: Modifier = Modifier) {
+fun ComparisonMetric(title: String, value: Double, color: Color, hidden: Boolean, modifier: Modifier = Modifier) {
     Column(
         modifier
             .background(color.copy(alpha = 0.10f), RoundedCornerShape(14.dp))
@@ -341,7 +350,7 @@ fun ComparisonMetric(title: String, delta: Double, color: Color, hidden: Boolean
     ) {
         Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1)
         Text(
-            money(delta, hidden),
+            money(value, hidden),
             color = color,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Black,

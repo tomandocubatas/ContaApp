@@ -11,6 +11,8 @@ import com.contaapp.android.data.MovementFilters
 fun AppRoot(
     state: ContaUiState,
     onLogin: (String, String) -> Unit,
+    onVerifyTwoFactor: (String) -> Unit,
+    onCancelTwoFactor: () -> Unit,
     onBaseUrlChanged: (String) -> Unit,
     onServerTest: (String) -> Unit,
     onUnlock: () -> Unit,
@@ -18,6 +20,7 @@ fun AppRoot(
     onRefresh: () -> Unit,
     onHomeFiltersChanged: (MovementFilters) -> Unit,
     onChartFiltersChanged: (MovementFilters) -> Unit,
+    onCalendarMonthChanged: (Int, Int) -> Unit,
     onMovementFiltersChanged: (MovementFilters) -> Unit,
     onTogglePrivacy: () -> Unit,
     onToggleDarkMode: () -> Unit,
@@ -37,7 +40,7 @@ fun AppRoot(
         label = "root"
     ) { target ->
         when (target) {
-            "login" -> LoginScreen(state, onLogin, onBaseUrlChanged, onServerTest)
+            "login" -> LoginScreen(state, onLogin, onVerifyTwoFactor, onCancelTwoFactor, onBaseUrlChanged, onServerTest)
             "locked" -> LockedScreen(state, onUnlock, onLogout)
             else -> MainScaffold(
                 state = state,
@@ -45,6 +48,7 @@ fun AppRoot(
                 onRefresh = onRefresh,
                 onHomeFiltersChanged = onHomeFiltersChanged,
                 onChartFiltersChanged = onChartFiltersChanged,
+                onCalendarMonthChanged = onCalendarMonthChanged,
                 onMovementFiltersChanged = onMovementFiltersChanged,
                 onTogglePrivacy = onTogglePrivacy,
                 onToggleDarkMode = onToggleDarkMode,

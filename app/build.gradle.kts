@@ -4,6 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+// URL base por defecto; se puede sobreescribir con -P<nombre>=... o en gradle.properties.
+fun apiBaseUrl(property: String, fallback: String): String =
+    "\"${providers.gradleProperty(property).getOrElse(fallback)}\""
+
 android {
     namespace = "com.contaapp.android"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -19,16 +23,17 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:4000/api/\"")
     }
 
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            buildConfigField("String", "API_BASE_URL", apiBaseUrl("contaApiBaseUrlDebug", "http://10.0.2.2:4000/api/"))
         }
         release {
-            isMinifyEnabled = false
+            buildConfigField("String", "API_BASE_URL", apiBaseUrl("contaApiBaseUrl", "https://10.0.2.2:4000/api/"))
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

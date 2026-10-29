@@ -946,6 +946,7 @@ fun FinancialLineChart(
     labels: List<String> = emptyList(),
     xAxisLabel: String = "Periodo",
     yAxisLabel: String = "Importe",
+    hidden: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val surface = MaterialTheme.colorScheme.surface
@@ -964,12 +965,12 @@ fun FinancialLineChart(
             SectionHeader(title, subtitle)
             if (cleanValues.isNotEmpty()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Inicio ${money(cleanValues.first(), false)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                    Text("Fin ${money(cleanValues.last(), false)}", color = color, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    Text("Inicio ${money(cleanValues.first(), hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text("Fin ${money(cleanValues.last(), hidden)}", color = color, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("${cleanValues.size} puntos", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                    Text("Rango ${axisMoney(minValue)} / ${axisMoney(maxValue)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("Rango ${axisMoney(minValue, hidden)} / ${axisMoney(maxValue, hidden)}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -978,9 +979,9 @@ fun FinancialLineChart(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.End
                 ) {
-                    Text(axisMoney(maxValue), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                    Text(axisMoney(midValue), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
-                    Text(axisMoney(minValue), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(axisMoney(maxValue, hidden), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(axisMoney(midValue, hidden), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text(axisMoney(minValue, hidden), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                 }
                 Canvas(Modifier.weight(1f).height(150.dp)) {
                     repeat(4) { line ->
@@ -1026,7 +1027,8 @@ fun FinancialLineChart(
     }
 }
 
-private fun axisMoney(value: Double): String {
+private fun axisMoney(value: Double, hidden: Boolean): String {
+    if (hidden) return "•••• €"
     val abs = kotlin.math.abs(value)
     val scaled = when {
         abs >= 1_000_000.0 -> value / 1_000_000.0

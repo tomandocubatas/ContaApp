@@ -1,7 +1,12 @@
 package com.contaapp.android.data
 
+import com.contaapp.android.core.AppConfig
 import com.contaapp.android.core.network.ApiClient
+import com.contaapp.android.core.network.ApiException
 import com.contaapp.android.domain.BankAccountBalance
+import com.contaapp.android.domain.CalendarDay
+import com.contaapp.android.domain.CalendarEvent
+import com.contaapp.android.domain.CalendarMonth
 import com.contaapp.android.domain.CategoryBreakdown
 import com.contaapp.android.domain.CategoryOption
 import com.contaapp.android.domain.ChartPoint
@@ -24,6 +29,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
 
+class TwoFactorRequiredException(val pendingToken: String) : Exception("Introduce el codigo de doble factor")
+
 class ContaRepository(
     private val api: ApiClient
 ) {
@@ -35,12 +42,44 @@ class ContaRepository(
                 .put("password", password)
         )
 
+        if (response.optBoolean("requiresTwoFactor")) {
+            val pendingToken = response.optString("pendingToken")
+            if (pendingToken.isBlank()) throw IllegalStateException("El servidor solicito doble factor sin token pendiente")
+            throw TwoFactorRequiredException(pendingToken)
+        }
+
         val user = response.optJSONObject("user") ?: JSONObject()
+        val accessToken = response.optString("accessToken")
+        val refreshToken = response.optString("refreshToken")
+        if (accessToken.isBlank() || refreshToken.isBlank()) {
+            throw IllegalStateException("El servidor no devolvio una sesion valida")
+        }
         return UserSession(
             name = user.optString("name"),
             email = user.optString("email", email),
-            accessToken = response.optString("accessToken"),
-            refreshToken = response.optString("refreshToken")
+            accessToken = accessToken,
+            refreshToken = refreshToken
+        )
+    }
+
+    fun verifyTwoFactor(pendingToken: String, code: String): UserSession {
+        val response = api.post(
+            path = "auth/2fa/verify",
+            body = JSONObject()
+                .put("pendingToken", pendingToken)
+                .put("code", code)
+        )
+        val user = response.optJSONObject("user") ?: JSONObject()
+        val accessToken = response.optString("accessToken")
+        val refreshToken = response.optString("refreshToken")
+        if (accessToken.isBlank() || refreshToken.isBlank()) {
+            throw IllegalStateException("El servidor no devolvio una sesion valida")
+        }
+        return UserSession(
+            name = user.optString("name"),
+            email = user.optString("email"),
+            accessToken = accessToken,
+            refreshToken = refreshToken
         )
     }
 
@@ -54,10 +93,12 @@ class ContaRepository(
             body = JSONObject().put("refreshToken", refreshToken)
         )
         val user = response.optJSONObject("user") ?: JSONObject()
+        val accessToken = response.optString("accessToken")
+        if (accessToken.isBlank()) throw ApiException(401, "La sesion ha caducado, vuelve a iniciar sesion")
         return UserSession(
             name = user.optString("name"),
             email = user.optString("email"),
-            accessToken = response.optString("accessToken"),
+            accessToken = accessToken,
             refreshToken = response.optString("refreshToken", refreshToken)
         )
     }
@@ -83,13 +124,13 @@ class ContaRepository(
         val kpis = optJSONObject("kpis") ?: JSONObject()
         val categories = optJSONObject("categories") ?: JSONObject()
         return DashboardSummary(
-            totalBalance = kpis.optDouble("totalBalance"),
-            totalDebts = kpis.optDouble("totalDebts"),
-            income = kpis.optDouble("income"),
-            expense = kpis.optDouble("expense"),
-            net = kpis.optDouble("net"),
-            reviewedPct = kpis.optDouble("reviewedPct"),
-            categorizedPct = kpis.optDouble("categorizedPct"),
+            totalBalance = kpis.optDouble("totalBalance", 0.0),
+            totalDebts = kpis.optDouble("totalDebts", 0.0),
+            income = kpis.optDouble("income", 0.0),
+            expense = kpis.optDouble("expense", 0.0),
+            net = kpis.optDouble("net", 0.0),
+            reviewedPct = kpis.optDouble("reviewedPct", 0.0),
+            categorizedPct = kpis.optDouble("categorizedPct", 0.0),
             expenseCategories = categories.optJSONArray("expense").toCategoryBreakdowns(),
             incomeCategories = categories.optJSONArray("income").toCategoryBreakdowns()
         )
@@ -103,8 +144,8 @@ class ContaRepository(
                 id = item.optString("_id", item.optString("id")),
                 bankName = item.optString("bankName", item.optString("bank")),
                 accountName = item.optString("name", item.optString("accountName")),
-                balance = item.optDouble("computedBalance", item.optDouble("balance")),
-                currency = item.optString("currency", "EUR")
+                balance = item.optDouble("computedBalance", item.optDouble("balance", 0.0)),
+                currency = item.optString("currency", AppConfig.DEFAULT_CURRENCY)
             )
         }
     }
@@ -127,18 +168,28 @@ class ContaRepository(
                 .flatMap { type -> movements(token, filters.copy(type = type)) }
                 .distinctBy { it.id }
                 .sortedByDescending { it.date }
-                .take(200)
+                .take(AppConfig.MOVEMENTS_PAGE_SIZE * AppConfig.MOVEMENTS_MAX_PAGES)
         }
         if (filters.type == MovementTypeGroups.Expense) {
             return movementTypeValues(filters.type)
                 .flatMap { type -> movements(token, filters.copy(type = type)) }
                 .distinctBy { it.id }
                 .sortedByDescending { it.date }
-                .take(200)
+                .take(AppConfig.MOVEMENTS_PAGE_SIZE * AppConfig.MOVEMENTS_MAX_PAGES)
         }
+        val items = mutableListOf<JSONObject>()
+        for (page in 1..AppConfig.MOVEMENTS_MAX_PAGES) {
+            val pageItems = movementsPage(token, filters, page)
+            items += pageItems
+            if (pageItems.size < AppConfig.MOVEMENTS_PAGE_SIZE) break
+        }
+        return items.map { it.toMovement() }
+    }
+
+    private fun movementsPage(token: String, filters: MovementFilters, page: Int): List<JSONObject> {
         val query = buildList {
-            add("page=1")
-            add("limit=200")
+            add("page=$page")
+            add("limit=${AppConfig.MOVEMENTS_PAGE_SIZE}")
             add("sortBy=date")
             add("sortDir=desc")
             if (filters.text.isNotBlank()) add("text=${filters.text.urlEncode()}")
@@ -148,17 +199,21 @@ class ContaRepository(
             if (filters.dateTo != null) add("dateTo=${filters.dateTo.exclusiveDateTo().urlEncode()}")
             if (filters.accountId != null) add("accountId=${filters.accountId.urlEncode()}")
             if (filters.categoryId != null) add("categoryId=${filters.categoryId.urlEncode()}")
-            if (filters.minAmount != null) add("minAmount=${filters.minAmount}")
-            if (filters.maxAmount != null) add("maxAmount=${filters.maxAmount}")
+            if (filters.minAmount != null) add("amountMin=${filters.minAmount}")
+            if (filters.maxAmount != null) add("amountMax=${filters.maxAmount}")
         }.joinToString("&")
         val response = api.get("movements-global?$query", token)
-        val items = response.firstArray("data", "movements")
-        return items.mapObjects { item ->
+        return response.firstArray("data", "movements").mapObjects { it }
+    }
+
+    private fun JSONObject.toMovement(): Movement {
+        val item = this
+        return run {
             Movement(
                 id = item.optString("_id", item.optString("id")),
                 date = item.optString("date"),
                 description = item.optString("description"),
-                amount = item.optDouble("amount"),
+                amount = item.optDouble("amount", 0.0),
                 type = item.optString("type"),
                 accountId = item.optString("accountId").takeIf { it.isNotBlank() && it != "null" },
                 categoryId = item.optString("categoryId").takeIf { it.isNotBlank() && it != "null" },
@@ -183,15 +238,15 @@ class ContaRepository(
         return listOf(
             DebtSummary(
                 title = "Prestamos",
-                pending = loans.optDouble("totalDebt"),
+                pending = loans.optDouble("totalDebt", 0.0),
                 paid = 0.0,
-                interest = loans.optDouble("totalInterestToPay")
+                interest = loans.optDouble("totalInterestToPay", 0.0)
             ),
             DebtSummary(
                 title = "Financiaciones",
-                pending = financings.optDouble("pendingCapital", financings.optDouble("totalPending")),
-                paid = financings.optDouble("paidCapital"),
-                interest = financings.optDouble("paidInterest") + financings.optDouble("pendingInterest")
+                pending = financings.optDouble("pendingCapital", financings.optDouble("totalPending", 0.0)),
+                paid = financings.optDouble("paidCapital", 0.0),
+                interest = financings.optDouble("paidInterest", 0.0) + financings.optDouble("pendingInterest", 0.0)
             )
         )
     }
@@ -211,13 +266,13 @@ class ContaRepository(
         val data = response.optJSONObject("data") ?: response
         return InsuranceSummary(
             activeCount = data.optInt("activeInsurances"),
-            annualPremium = data.optDouble("totalAnnualPremium"),
+            annualPremium = data.optDouble("totalAnnualPremium", 0.0),
             expiringSoon = data.optInt("expiringSoon")
         )
     }
 
     fun expiringInsurances(token: String): List<InsurancePolicy> {
-        val response = api.get("insurances/expiring-soon?days=60", token)
+        val response = api.get("insurances/expiring-soon?days=${AppConfig.EXPIRING_INSURANCE_DAYS}", token)
         val items = response.firstArray("data")
         return items.mapObjects { item -> item.toInsurancePolicy() }
     }
@@ -244,9 +299,9 @@ class ContaRepository(
         return response.firstArray("data", "items").mapObjects { item ->
             InsuranceCoverage(
                 type = item.optString("type", "Seguro"),
-                maxCoverage = item.optDouble("maxCoverage"),
-                totalPremium = item.optDouble("totalPremium"),
-                ratio = item.optDouble("ratio")
+                maxCoverage = item.optDouble("maxCoverage", 0.0),
+                totalPremium = item.optDouble("totalPremium", 0.0),
+                ratio = item.optDouble("ratio", 0.0)
             )
         }
     }
@@ -267,10 +322,10 @@ class ContaRepository(
         val query = inclusiveDateQuery(filters)
         val response = api.get("rentals/summary${query.querySuffix()}", token)
         return RentalSummary(
-            income = response.optDouble("income"),
-            expense = response.optDouble("expense"),
-            profit = response.optDouble("profit"),
-            profitability = response.optDouble("profitability"),
+            income = response.optDouble("income", 0.0),
+            expense = response.optDouble("expense", 0.0),
+            profit = response.optDouble("profit", 0.0),
+            profitability = response.optDouble("profitability", 0.0),
             activeProperties = response.optInt("activeProperties")
         )
     }
@@ -283,10 +338,10 @@ class ContaRepository(
             RentalProperty(
                 id = item.optString("propertyId", item.optString("_id", item.optString("id"))),
                 name = item.optString("propertyName", item.optString("name", "Propiedad")),
-                income = item.optDouble("income"),
-                expense = item.optDouble("expense"),
-                profit = item.optDouble("profit"),
-                profitability = item.optDouble("profitability")
+                income = item.optDouble("income", 0.0),
+                expense = item.optDouble("expense", 0.0),
+                profit = item.optDouble("profit", 0.0),
+                profitability = item.optDouble("profitability", 0.0)
             )
         }
             .groupBy { it.id.ifBlank { it.name } }
@@ -314,7 +369,7 @@ class ContaRepository(
                         period = item.optString("period", item.optString("month")),
                         categoryId = item.optString("categoryId").takeIf { it.isNotBlank() && it != "null" },
                         categoryName = item.optString("categoryName", item.optString("name", "Sin categoria")),
-                        total = item.optDouble("total")
+                        total = item.optDouble("total", 0.0)
                     )
                 }
                 .groupBy { it.period }
@@ -325,10 +380,10 @@ class ContaRepository(
             RentalMonth(
                 month = month,
                 monthName = monthName(month).ifBlank { period },
-                income = item.optDouble("income"),
-                expense = item.optDouble("expense"),
-                profit = item.optDouble("cashflow", item.optDouble("profit")),
-                profitability = item.optDouble("profitability"),
+                income = item.optDouble("income", 0.0),
+                expense = item.optDouble("expense", 0.0),
+                profit = item.optDouble("cashflow", item.optDouble("profit", 0.0)),
+                profitability = item.optDouble("profitability", 0.0),
                 categories = categoriesByPeriod[period].orEmpty().sortedByDescending { it.total }
             )
         }
@@ -339,12 +394,12 @@ class ContaRepository(
         val dashboardQuery = inclusiveDateQuery(filters)
         val range = dashboard.optJSONObject("range") ?: JSONObject()
         val series = (dashboard.optJSONObject("series")?.firstArray("current") ?: JSONArray()).mapObjects { item ->
-            val expense = kotlin.math.abs(item.optDouble("expense"))
+            val expense = kotlin.math.abs(item.optDouble("expense", 0.0))
             FinancialSeriesPoint(
                 label = item.optString("date", item.optString("month", item.optString("label"))),
-                income = item.optDouble("income"),
+                income = item.optDouble("income", 0.0),
                 expense = expense,
-                net = item.optDouble("net", item.optDouble("income") - expense)
+                net = item.optDouble("net", item.optDouble("income", 0.0) - expense)
             )
         }
         val income = runCatching {
@@ -357,16 +412,16 @@ class ContaRepository(
         }.getOrDefault(emptyList())
         val debt = runCatching {
             flexibleArray("dashboard/debt-evolution", token)
-                .mapObjects { ChartPoint(it.optString("month", it.optString("label")), it.optDouble("totalDebt")) }
+                .mapObjects { ChartPoint(it.optString("month", it.optString("label")), it.optDouble("totalDebt", 0.0)) }
         }.getOrDefault(emptyList())
         val rentals = runCatching {
             flexibleArray("rentals/cashflow${query.querySuffix()}", token)
-                .mapObjects { ChartPoint(it.optString("period", it.optString("month", it.optString("label"))), it.optDouble("cashflow", it.optDouble("profit"))) }
+                .mapObjects { ChartPoint(it.optString("period", it.optString("month", it.optString("label"))), it.optDouble("cashflow", it.optDouble("profit", 0.0))) }
         }.getOrDefault(emptyList())
         val balances = runCatching {
             val response = api.get("accounts/balance-evolution${query.querySuffix()}", token)
             response.firstArray("evolution", "data").mapObjects {
-                ChartPoint(it.optString("month", it.optString("date", it.optString("label"))), it.optDouble("totalBalance"))
+                ChartPoint(it.optString("month", it.optString("date", it.optString("label"))), it.optDouble("totalBalance", 0.0))
             }
         }.getOrDefault(emptyList())
         return ChartsSnapshot(
@@ -387,12 +442,41 @@ class ContaRepository(
             RentalMonth(
                 month = item.optInt("month"),
                 monthName = item.optString("monthName", item.optString("month")),
-                income = item.optDouble("income"),
-                expense = item.optDouble("expense"),
-                profit = item.optDouble("profit"),
-                profitability = item.optDouble("profitability")
+                income = item.optDouble("income", 0.0),
+                expense = item.optDouble("expense", 0.0),
+                profit = item.optDouble("profit", 0.0),
+                profitability = item.optDouble("profitability", 0.0)
             )
         }
+    }
+
+    fun calendarMonth(token: String, year: Int, month: Int): CalendarMonth {
+        val response = api.get("calendar/events?year=$year&month=$month", token)
+        val data = response.optJSONObject("data") ?: response
+        return CalendarMonth(
+            year = data.optInt("year", year),
+            month = data.optInt("month", month),
+            days = data.firstArray("days").mapObjects { day ->
+                CalendarDay(
+                    date = day.optString("date"),
+                    events = day.firstArray("events").mapObjects { event ->
+                        CalendarEvent(
+                            id = event.optString("id"),
+                            type = event.optString("type"),
+                            date = event.optString("date"),
+                            label = event.optString("label", "Evento"),
+                            amount = event.optDouble("amount", 0.0),
+                            currency = event.optString("currency", AppConfig.DEFAULT_CURRENCY),
+                            direction = event.optString("direction"),
+                            sourceId = event.optString("sourceId"),
+                            confirmed = event.optBoolean("confirmed")
+                        )
+                    },
+                    totalExpense = day.optDouble("totalExpense", 0.0),
+                    totalIncome = day.optDouble("totalIncome", 0.0)
+                )
+            }
+        )
     }
 
     private fun flexibleArray(path: String, token: String): JSONArray {
@@ -479,7 +563,7 @@ private fun JSONObject.toInsurancePolicy(): InsurancePolicy {
             ?: optString("expirationDate").takeIf { it.isNotBlank() && it != "null" },
         annualPremium = premium.optDouble(
             "annualizedAmount",
-            optDouble("annualPremium", optDouble("premiumAmount", premium.optDouble("amount")))
+            optDouble("annualPremium", optDouble("premiumAmount", premium.optDouble("amount", 0.0)))
         ),
         policyNumber = optString("policyNumber").takeIf { it.isNotBlank() && it != "null" },
         coverage = optString("coverage").takeIf { it.isNotBlank() && it != "null" },
@@ -496,8 +580,8 @@ private fun JSONArray.toDebtDetails(source: String): List<DebtDetail> {
             entity = item.optString("entity", "Entidad no informada"),
             type = item.optString("type", source),
             source = source,
-            pendingAmount = item.optDouble("pendingAmount"),
-            monthlyPayment = item.optDouble("monthlyPayment"),
+            pendingAmount = item.optDouble("pendingAmount", 0.0),
+            monthlyPayment = item.optDouble("monthlyPayment", 0.0),
             nextPaymentDate = item.optString("nextPaymentDate").takeIf { it.isNotBlank() && it != "null" },
             status = item.optString("status", "ok"),
             daysUntilPayment = item.takeIf { it.has("daysUntilPayment") && !it.isNull("daysUntilPayment") }?.optInt("daysUntilPayment")
@@ -518,9 +602,9 @@ private fun JSONArray?.toCategoryBreakdowns(): List<CategoryBreakdown> {
     return mapObjects { item ->
         CategoryBreakdown(
             name = item.optString("name", "Sin categoria"),
-            total = item.optDouble("total"),
+            total = item.optDouble("total", 0.0),
             count = item.optInt("count"),
-            budgetPct = item.takeIf { it.has("budgetPct") && !it.isNull("budgetPct") }?.optDouble("budgetPct")
+            budgetPct = item.takeIf { it.has("budgetPct") && !it.isNull("budgetPct") }?.optDouble("budgetPct", 0.0)
         )
     }
 }
@@ -528,9 +612,9 @@ private fun JSONArray?.toCategoryBreakdowns(): List<CategoryBreakdown> {
 private fun JSONObject.toMonthlyTotal(): ChartPoint {
     val categories = optJSONArray("categories")
     val total = if (categories != null) {
-        (0 until categories.length()).sumOf { index -> categories.optJSONObject(index)?.optDouble("total") ?: 0.0 }
+        (0 until categories.length()).sumOf { index -> categories.optJSONObject(index)?.optDouble("total", 0.0) ?: 0.0 }
     } else {
-        optDouble("total", optDouble("value"))
+        optDouble("total", optDouble("value", 0.0))
     }
     return ChartPoint(optString("month", optString("period", optString("label"))), total)
 }

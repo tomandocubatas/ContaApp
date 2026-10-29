@@ -22,7 +22,7 @@ class ServerConfigStore(context: Context) {
         val withProtocol = if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
             trimmed
         } else {
-            "http://$trimmed"
+            "https://$trimmed"
         }
         val withoutSlash = withProtocol.trimEnd('/')
         return if (withoutSlash.endsWith("/api")) withoutSlash else "$withoutSlash/api"
