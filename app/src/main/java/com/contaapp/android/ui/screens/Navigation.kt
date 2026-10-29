@@ -164,8 +164,7 @@ fun MainScaffold(
                     PullToRefreshBox(
                         isRefreshing = state.isLoading || state.isMovementsLoading || state.isCalendarLoading,
                         onRefresh = onRefresh,
-                        modifier = Modifier.fillMaxSize(),
-                        indicator = {}
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         AdaptiveScreenFrame(isTablet = isTablet) {
                             when (selectedTab) {

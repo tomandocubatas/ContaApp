@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - Fix/Carga - Indicador visible en el gesto de refrescar (v0.23.1)
+
+- Se restaura el indicador circular del pull-to-refresh, que había ocultado en v0.23.0: sin él, arrastrar no daba señal visible. Se mantiene la barra fina superior.
+- Verificado en móvil con un arrastre lento: el indicador aparece sobre el contenido.
+- Archivos: Navigation.kt.
+
 ## 2026-10-29 - UX/Carga - Carga elegante sin spinners (v0.23.0)
 
 - Nuevo modificador `shimmer()` (brillo que recorre el elemento; estático si las animaciones del sistema están desactivadas) aplicado a `SkeletonCard`.
