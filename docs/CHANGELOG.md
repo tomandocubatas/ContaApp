@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Navegacion - NavigationBar de Material en movil (v0.16.0)
+
+- `ContaBottomBar` sustituye la barra hecha a mano por `NavigationBar`/`NavigationBarItem` de Material: Inicio, Movs, Cuentas, Grafs y Mas, etiqueta siempre visible, indicador de seleccion y estado accesible. "Mas" queda activo cuando el destino actual cuelga de el (Agenda, Deuda, Seguros...).
+- `NavigationRail` (>= 720 dp) usa los mismos colores de seleccion; los iconos pierden la descripcion duplicada porque la etiqueta ya los nombra.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil Inicio queda activo en Inicio y Mas en Agenda. El rail de tablet solo se comprobo por codigo y compilacion.
+
 ## 2026-10-29 - UX/Graficos - Graficos interactivos y accesibles (v0.15.0)
 
 - Las graficas de linea se pueden arrastrar (ademas de tocar) para leer el valor de cada punto, y el lienzo lleva `contentDescription` con punto, valor y rango.

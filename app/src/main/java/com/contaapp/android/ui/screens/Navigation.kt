@@ -37,6 +37,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -323,58 +327,39 @@ fun ContaNavigationRail(selectedTab: Tab, onSelected: (Tab) -> Unit) {
             NavigationRailItem(
                 selected = selectedTab == tab,
                 onClick = { onSelected(tab) },
-                icon = { Icon(painterResource(tab.iconRes), contentDescription = tab.label) },
-                label = { Text(tab.label, maxLines = 1) }
+                icon = { Icon(painterResource(tab.iconRes), contentDescription = null) },
+                label = { Text(tab.label, maxLines = 1) },
+                colors = NavigationRailItemDefaults.colors(
+                    selectedIconColor = ContaCoral,
+                    selectedTextColor = ContaCoral,
+                    indicatorColor = ContaCoral.copy(alpha = 0.16f)
+                )
             )
         }
     }
 }
 
+/** Barra inferior de Material: 4 destinos principales y «Mas»; «Mas» queda marcado cuando el destino actual está dentro de él. */
 @Composable
 fun ContaBottomBar(selectedTab: Tab, onSelected: (Tab) -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-        shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = ContaSpacing.sm, vertical = ContaSpacing.sm),
-            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val visibleTabs = bottomTabs()
-            visibleTabs.forEach { tab ->
-                val selected = selectedTab == tab || (tab == Tab.More && selectedTab !in visibleTabs)
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(
-                            if (selected) ContaCoral.copy(alpha = 0.16f) else Color.Transparent,
-                            RoundedCornerShape(ContaRadius.xl)
-                        )
-                        .clickable { onSelected(tab) }
-                        .padding(horizontal = 3.dp, vertical = ContaSpacing.sm),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                        Icon(
-                            painter = painterResource(tab.iconRes),
-                            contentDescription = tab.label,
-                            tint = if (selected) ContaCoral else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Text(
-                            tab.shortLabel,
-                            color = if (selected) ContaCoral else MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-            }
+    val visibleTabs = bottomTabs()
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 3.dp) {
+        visibleTabs.forEach { tab ->
+            val selected = selectedTab == tab || (tab == Tab.More && selectedTab !in visibleTabs)
+            NavigationBarItem(
+                selected = selected,
+                onClick = { onSelected(tab) },
+                icon = { Icon(painterResource(tab.iconRes), contentDescription = null, modifier = Modifier.size(22.dp)) },
+                label = { Text(tab.shortLabel, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                alwaysShowLabel = true,
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = ContaCoral,
+                    selectedTextColor = ContaCoral,
+                    indicatorColor = ContaCoral.copy(alpha = 0.16f),
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
         }
     }
 }
