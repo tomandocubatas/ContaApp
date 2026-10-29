@@ -12,6 +12,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -1197,6 +1199,29 @@ fun SkeletonCard(lines: Int = 3, modifier: Modifier = Modifier) {
                         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), RoundedCornerShape(50))
                 )
             }
+        }
+    }
+}
+
+/** Aviso de fallo (red, sesión, servidor) con acción de reintentar; no aparece si no hay error. */
+@Composable
+fun ErrorBanner(error: String?, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    if (error.isNullOrBlank()) return
+    Row(
+        modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.errorContainer)
+            .padding(horizontal = ContaSpacing.lg, vertical = ContaSpacing.sm)
+            .semantics(mergeDescendants = true) { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite },
+        horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text("No se pudo actualizar", color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+            Text(error, color = MaterialTheme.colorScheme.onErrorContainer, style = MaterialTheme.typography.bodySmall, maxLines = 3, overflow = TextOverflow.Ellipsis)
+        }
+        TextButton(onClick = onRetry, modifier = Modifier.heightIn(min = 48.dp)) {
+            Text("Reintentar", color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Bold)
         }
     }
 }

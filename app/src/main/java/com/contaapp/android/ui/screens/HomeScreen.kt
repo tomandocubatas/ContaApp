@@ -189,7 +189,6 @@ fun HomeScreen(
             item {
                 HomeAgendaCard(state)
             }
-            item { ErrorText(state.error) }
             item { SectionHeader(stringResource(R.string.home_actividad_reciente), "${state.movements.size} mov.") }
             items(
                 state.movements.take(if (isTablet) 8 else 5),
@@ -684,7 +683,6 @@ fun WelcomeEmptyState(error: String?) {
                 "Cuando la API responda, aqui veras el balance, ingresos, gastos y movimientos recientes.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            ErrorText(error)
         }
     }
 }

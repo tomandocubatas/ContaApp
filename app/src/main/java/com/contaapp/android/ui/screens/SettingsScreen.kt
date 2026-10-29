@@ -124,7 +124,6 @@ fun SettingsScreen(
                     StatusNote(stringResource(R.string.settings_ultima_exportacion), it)
                 }
             }
-            item { ErrorText(state.error) }
         }
     }
 }

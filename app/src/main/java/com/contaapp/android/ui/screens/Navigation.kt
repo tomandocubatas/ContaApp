@@ -153,11 +153,13 @@ fun MainScaffold(
                     ContaNavigationRail(selectedTab = selectedTab, onSelected = { selectedTab = it })
                 }
 
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f)
                 ) {
+                    ErrorBanner(state.error, onRetry = onRefresh)
+                    Box(Modifier.fillMaxWidth().weight(1f)) {
                     PullToRefreshBox(
                         isRefreshing = state.isLoading || state.isMovementsLoading || state.isCalendarLoading,
                         onRefresh = onRefresh,
@@ -221,6 +223,7 @@ fun MainScaffold(
                             }
                         }
                     }
+                }
                 }
             }
         }

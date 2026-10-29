@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Estados - Banner de error con Reintentar (v0.18.0)
+
+- Nuevo `ErrorBanner` bajo la barra superior de `MainScaffold`: titulo "No se pudo actualizar", mensaje, boton "Reintentar" de 48 dp que relanza la carga y region viva para lectores de pantalla. Sustituye a los `ErrorText` sueltos de Inicio, Agenda y Ajustes (el de las pantallas de acceso se mantiene).
+- Los esqueletos de carga y los estados vacios ya existentes se conservan.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil, con wifi y datos apagados por adb (no modo avion), aparece el banner con "Mostrando ultimos datos guardados" y "Reintentar"; al restaurar la red y pulsar Reintentar desaparece y la cabecera pasa a "Act. 13:52".
+- Pendiente: el detalle de la excepcion llega en ingles tecnico ("Unable to resolve host...") desde la capa de red; conviene traducirlo a un mensaje de usuario.
+
 ## 2026-10-29 - UX/Seguros y Deuda - Progreso y proxima fecha (v0.17.0)
 
 - `InsuranceHeroCard` deriva su degradado del tema (antes colores fijos oscuros), anade barra "X de Y al dia" (activos menos por renovar, del resumen de la API) y un bloque "Proxima renovacion" con poliza, fecha y dias restantes (`List<InsurancePolicy>.nextRenewal()`).

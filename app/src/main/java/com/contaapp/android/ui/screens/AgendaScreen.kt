@@ -145,7 +145,6 @@ fun AgendaScreen(
                 }
             }
         }
-        item { ErrorText(state.error) }
         item { Spacer(Modifier.height(8.dp)) }
     }
 

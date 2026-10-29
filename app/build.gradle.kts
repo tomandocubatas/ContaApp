@@ -10,7 +10,7 @@ fun apiBaseUrl(property: String, fallback: String): String =
 
 // Versión semántica: fix -> patch, mejora -> minor, cambio incompatible -> major.
 val appVersionMajor = 0
-val appVersionMinor = 17
+val appVersionMinor = 18
 val appVersionPatch = 0
 val appVersionName = "$appVersionMajor.$appVersionMinor.$appVersionPatch"
 
