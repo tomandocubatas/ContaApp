@@ -12,6 +12,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -807,13 +808,18 @@ fun QualityBadges(
 }
 
 @Composable
-fun AttentionCard(title: String, value: String, detail: String, color: Color, modifier: Modifier = Modifier) {
+fun AttentionCard(title: String, value: String, detail: String, color: Color, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     val compactValue = value.length <= 3 && !value.contains(" ")
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .let { base ->
+                if (onClick == null) base
+                else base.clip(RoundedCornerShape(ContaRadius.md)).clickable(onClickLabel = "Abrir $title", onClick = onClick)
+            }
     ) {
         Row(
             Modifier.fillMaxWidth().padding(ContaSpacing.md),

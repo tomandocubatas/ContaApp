@@ -161,7 +161,7 @@ fun MainScaffold(
                     ) {
                         AdaptiveScreenFrame(isTablet = isTablet) {
                             when (selectedTab) {
-                                Tab.Home -> HomeScreen(state, onHomeFiltersChanged)
+                                Tab.Home -> HomeScreen(state, onHomeFiltersChanged, onNavigate = { selectedTab = it })
                                 Tab.Agenda -> AgendaScreen(
                                     state = state,
                                     onMonthChanged = onCalendarMonthChanged

@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Inicio - Panel de prioridades (v0.14.0)
+
+- Inicio se ordena como: periodo, "Requiere atencion", saldo (hero), atajos y despues el detalle (metricas, comparativa, grafico, salud financiera, agenda, actividad reciente).
+- "Requiere atencion" solo lista los avisos con algo que revisar (movimientos pendientes, deudas con aviso, seguros proximos) y cada uno abre su pantalla; sin avisos muestra "Sin avisos".
+- Nuevo `HomeShortcuts` (Movimientos, Cuentas, Agenda, Graficas) con botones de 48 dp; `HomeScreen` recibe `onNavigate` desde `Navigation.kt` y `AttentionCard` admite clic.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil se ven 2 avisos, "Deudas con aviso" abre Deuda y el atajo Agenda abre Agenda.
+
 ## 2026-10-29 - UX/Iconos - Iconos por categoria (v0.13.0)
 
 - Nuevos vectores `ic_cat_restaurant`, `ic_cat_cart`, `ic_cat_car`, `ic_cat_fuel`, `ic_cat_health`, `ic_cat_leisure`, `ic_cat_transfer`, `ic_cat_repeat` y `ic_cat_work`.

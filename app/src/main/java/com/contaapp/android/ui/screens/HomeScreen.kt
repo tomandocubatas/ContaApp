@@ -11,6 +11,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -88,7 +89,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun HomeScreen(
     state: ContaUiState,
-    onMovementFiltersChanged: (MovementFilters) -> Unit
+    onMovementFiltersChanged: (MovementFilters) -> Unit,
+    onNavigate: (Tab) -> Unit = {}
 ) {
     var selectedMovement by remember { mutableStateOf<Movement?>(null) }
     val context = LocalContext.current
@@ -125,6 +127,7 @@ fun HomeScreen(
                     detail = "Cambia periodo sin salir del dashboard"
                 )
             }
+            item { HomeAttentionSection(state = state, isTablet = isTablet, onNavigate = onNavigate) }
             item {
                 if (dashboard == null) {
                     if (state.isLoading) {
@@ -136,6 +139,7 @@ fun HomeScreen(
                     HomeHeroDashboard(dashboard, state.privacyMode)
                 }
             }
+            item { HomeShortcuts(onNavigate) }
             item {
                 HomeQuickMetrics(dashboard, state.privacyMode, isTablet, state.debtDetails.visibleDebtDetails().sumOf { it.pendingAmount }, state.movements.count { !it.reviewed })
             }
@@ -181,18 +185,7 @@ fun HomeScreen(
                     )
                 }
             }
-            item {
-                if (isTablet) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
-                        HomeAttentionSection(state = state, isTablet = true, modifier = Modifier.weight(1f))
-                        HomeHealthCard(dashboard, state, Modifier.weight(1f))
-                    }
-                } else {
-                    HomeHealthCard(dashboard, state)
-                    Spacer(Modifier.height(12.dp))
-                    HomeAttentionSection(state = state, isTablet = false)
-                }
-            }
+            item { HomeHealthCard(dashboard, state) }
             item {
                 HomeAgendaCard(state)
             }
@@ -631,7 +624,7 @@ fun HomeHealthCard(dashboard: DashboardSummary?, state: ContaUiState, modifier: 
 }
 
 @Composable
-fun HomeAttentionSection(state: ContaUiState, isTablet: Boolean, modifier: Modifier = Modifier) {
+fun HomeAttentionSection(state: ContaUiState, isTablet: Boolean, modifier: Modifier = Modifier, onNavigate: (Tab) -> Unit = {}) {
     val pendingMovements = state.movements.count { !it.reviewed }
     val urgentDebt = state.debtDetails.visibleDebtDetails().count { it.isDebtAlert() }
     val upcomingInsurance = state.expiringInsurances.visibleInsurancePolicies().count {
@@ -640,18 +633,39 @@ fun HomeAttentionSection(state: ContaUiState, isTablet: Boolean, modifier: Modif
         date != null && !date.isBefore(LocalDate.now()) && !date.isAfter(LocalDate.now().plusDays(30))
     }
 
+    val alerts = buildList<@Composable (Modifier) -> Unit> {
+        if (pendingMovements > 0) add { m -> AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaWarning, m, onClick = { onNavigate(Tab.Movements) }) }
+        if (urgentDebt > 0) add { m -> AttentionCard(stringResource(R.string.home_deudas_con_aviso), urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger, m, onClick = { onNavigate(Tab.Debt) }) }
+        if (upcomingInsurance > 0) add { m -> AttentionCard(stringResource(R.string.home_seguros_proximos), upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal, m, onClick = { onNavigate(Tab.Insurance) }) }
+    }
+
     Column(modifier, verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
-        SectionHeader(stringResource(R.string.home_requiere_atencion), "lectura rapida")
-        if (isTablet) {
+        SectionHeader(stringResource(R.string.home_requiere_atencion), if (alerts.isEmpty()) "todo al dia" else "${alerts.size} avisos")
+        if (alerts.isEmpty()) {
+            AttentionCard("Sin avisos", "OK", "No hay movimientos pendientes, deudas con aviso ni seguros proximos", ContaTeal)
+        } else if (isTablet) {
             Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md), modifier = Modifier.fillMaxWidth()) {
-                AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaWarning, Modifier.weight(1f))
-                AttentionCard(stringResource(R.string.home_deudas_con_aviso), urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger, Modifier.weight(1f))
-                AttentionCard(stringResource(R.string.home_seguros_proximos), upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal, Modifier.weight(1f))
+                alerts.forEach { alert -> alert(Modifier.weight(1f)) }
             }
         } else {
-            AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaWarning)
-            AttentionCard(stringResource(R.string.home_deudas_con_aviso), urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger)
-            AttentionCard(stringResource(R.string.home_seguros_proximos), upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal)
+            alerts.forEach { alert -> alert(Modifier) }
+        }
+    }
+}
+
+/** Atajos a las pantallas de uso más frecuente, bajo el resumen. */
+@Composable
+fun HomeShortcuts(onNavigate: (Tab) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
+        listOf(Tab.Movements to "Movimientos", Tab.Accounts to "Cuentas", Tab.Agenda to "Agenda", Tab.Charts to "Graficas").forEach { (tab, label) ->
+            OutlinedButton(
+                onClick = { onNavigate(tab) },
+                modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                shape = RoundedCornerShape(50),
+                contentPadding = PaddingValues(horizontal = ContaSpacing.xs)
+            ) {
+                Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelMedium)
+            }
         }
     }
 }
