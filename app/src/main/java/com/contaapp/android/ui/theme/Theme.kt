@@ -10,7 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 private val LightColors: ColorScheme = lightColorScheme(
     primary = Color(0xFF0F766E),
@@ -48,25 +51,42 @@ private val DarkColors: ColorScheme = darkColorScheme(
     error = Color(0xFFFF7B7B)
 )
 
+/** Cifras de ancho fijo: los importes de una lista quedan alineados dígito a dígito. */
+private const val TABULAR_FIGURES = "tnum"
+
+private fun TextStyle.contaStyle(weight: FontWeight, spacing: Float): TextStyle = copy(
+    fontFamily = FontFamily.SansSerif,
+    fontWeight = weight,
+    letterSpacing = spacing.sp,
+    fontFeatureSettings = TABULAR_FIGURES
+)
+
+// Jerarquía: titulares y títulos con más peso y tracking cerrado; cuerpo y etiquetas con tracking contenido.
 private val AppTypography = Typography().let { base ->
     base.copy(
-        displayLarge = base.displayLarge.copy(fontFamily = FontFamily.SansSerif),
-        displayMedium = base.displayMedium.copy(fontFamily = FontFamily.SansSerif),
-        displaySmall = base.displaySmall.copy(fontFamily = FontFamily.SansSerif),
-        headlineLarge = base.headlineLarge.copy(fontFamily = FontFamily.SansSerif),
-        headlineMedium = base.headlineMedium.copy(fontFamily = FontFamily.SansSerif),
-        headlineSmall = base.headlineSmall.copy(fontFamily = FontFamily.SansSerif),
-        titleLarge = base.titleLarge.copy(fontFamily = FontFamily.SansSerif),
-        titleMedium = base.titleMedium.copy(fontFamily = FontFamily.SansSerif),
-        titleSmall = base.titleSmall.copy(fontFamily = FontFamily.SansSerif),
-        bodyLarge = base.bodyLarge.copy(fontFamily = FontFamily.SansSerif),
-        bodyMedium = base.bodyMedium.copy(fontFamily = FontFamily.SansSerif),
-        bodySmall = base.bodySmall.copy(fontFamily = FontFamily.SansSerif),
-        labelLarge = base.labelLarge.copy(fontFamily = FontFamily.SansSerif),
-        labelMedium = base.labelMedium.copy(fontFamily = FontFamily.SansSerif),
-        labelSmall = base.labelSmall.copy(fontFamily = FontFamily.SansSerif)
+        displayLarge = base.displayLarge.contaStyle(FontWeight.Bold, -0.5f),
+        displayMedium = base.displayMedium.contaStyle(FontWeight.Bold, -0.4f),
+        displaySmall = base.displaySmall.contaStyle(FontWeight.Bold, -0.3f),
+        headlineLarge = base.headlineLarge.contaStyle(FontWeight.Bold, -0.3f),
+        headlineMedium = base.headlineMedium.contaStyle(FontWeight.Bold, -0.2f),
+        headlineSmall = base.headlineSmall.contaStyle(FontWeight.SemiBold, -0.1f),
+        titleLarge = base.titleLarge.contaStyle(FontWeight.SemiBold, 0f),
+        titleMedium = base.titleMedium.contaStyle(FontWeight.SemiBold, 0.1f),
+        titleSmall = base.titleSmall.contaStyle(FontWeight.SemiBold, 0.1f),
+        bodyLarge = base.bodyLarge.contaStyle(FontWeight.Normal, 0.1f),
+        bodyMedium = base.bodyMedium.contaStyle(FontWeight.Normal, 0.1f),
+        bodySmall = base.bodySmall.contaStyle(FontWeight.Normal, 0.2f),
+        labelLarge = base.labelLarge.contaStyle(FontWeight.Medium, 0.1f),
+        labelMedium = base.labelMedium.contaStyle(FontWeight.Medium, 0.3f),
+        labelSmall = base.labelSmall.contaStyle(FontWeight.Medium, 0.3f)
     )
 }
+
+/** Estilos de importe: siempre cifras tabulares, de mayor a menor protagonismo. */
+val Typography.amountHero: TextStyle get() = headlineLarge.copy(fontWeight = FontWeight.Black, letterSpacing = (-0.5).sp)
+val Typography.amountLarge: TextStyle get() = headlineSmall.copy(fontWeight = FontWeight.Black)
+val Typography.amountMedium: TextStyle get() = titleMedium.copy(fontWeight = FontWeight.Bold)
+val Typography.amountSmall: TextStyle get() = bodyMedium.copy(fontWeight = FontWeight.SemiBold)
 
 /** Colores de marca y de estado que no existen en [ColorScheme]; cada tema aporta su variante. */
 data class ContaPalette(

@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Tipografia - Jerarquia y cifras tabulares (v0.5.0)
+
+- `AppTypography` define pesos y espaciado por nivel (titulares Bold con tracking cerrado, titulos SemiBold, cuerpo y etiquetas mas contenidos) y activa cifras tabulares (`tnum`) en todos los estilos.
+- Nuevos estilos de importe en `Theme.kt`: `amountHero`, `amountLarge`, `amountMedium` y `amountSmall`; se aplican al saldo de Inicio, a las metricas comparativas, a las filas de Movimientos y al detalle del movimiento.
+- Verificacion: `:app:assembleDebug` y tests correctos; Inicio y lista de Movimientos revisados en el movil.
+
 ## 2026-10-29 - UX/Tema - Acento coherente claro/oscuro (v0.4.0)
 
 - El tema claro pasa a primario teal (`0F766E`) y secundario azul (`0D47A1`), como ya tenia el oscuro (menta `21D7A4` y azul `72B7FF`). Antes el primario era azul en claro y menta en oscuro.

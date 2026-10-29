@@ -72,6 +72,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.contaapp.android.ContaUiState
 import com.contaapp.android.R
+import com.contaapp.android.ui.theme.amountLarge
+import com.contaapp.android.ui.theme.amountSmall
 import com.contaapp.android.data.MovementFilters
 import com.contaapp.android.domain.BankAccountBalance
 import com.contaapp.android.domain.CategoryBreakdown
@@ -365,7 +367,7 @@ fun MovementRow(movement: Movement, hidden: Boolean, onClick: () -> Unit) {
                 Text(movement.description, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("${movement.date.take(10)} - ${movement.categoryName ?: movement.type}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
-            Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Bold)
+            Text(money(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountSmall)
         }
     }
 }
@@ -412,7 +414,7 @@ fun MovementDetailDialog(
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 Text(if (movement.amount >= 0.0) "Ingreso" else "Gasto", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-                                Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall)
+                                Text(money(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountLarge)
                             }
                             StatusChip(if (movement.reviewed) "Revisado" else "Pendiente", if (movement.reviewed) ContaIncome else ContaWarning)
                         }

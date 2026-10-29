@@ -70,6 +70,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.contaapp.android.ContaUiState
 import com.contaapp.android.R
+import com.contaapp.android.ui.theme.amountSmall
 import com.contaapp.android.core.settings.AppPreferencesStore
 import com.contaapp.android.data.MovementFilters
 import com.contaapp.android.data.MovementTypeGroups
@@ -458,7 +459,7 @@ fun WalletMovementRow(
                 }
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black)
+                Text(money(movement.amount, hidden), color = accent, style = MaterialTheme.typography.amountSmall, fontWeight = FontWeight.Black)
                 if (!movement.reviewed) {
                     StatusChip(stringResource(R.string.movements_pend), ContaWarning)
                 }

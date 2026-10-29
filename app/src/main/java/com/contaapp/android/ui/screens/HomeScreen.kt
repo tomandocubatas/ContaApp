@@ -68,6 +68,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.contaapp.android.ContaUiState
 import com.contaapp.android.R
+import com.contaapp.android.ui.theme.amountHero
+import com.contaapp.android.ui.theme.amountMedium
 import com.contaapp.android.core.settings.AppPreferencesStore
 import com.contaapp.android.data.MovementFilters
 import com.contaapp.android.domain.BankAccountBalance
@@ -354,7 +356,7 @@ fun ComparisonMetric(title: String, value: Double, color: Color, hidden: Boolean
         FitText(
             money(value, hidden),
             color = color,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.amountMedium,
             fontWeight = FontWeight.Black
         )
     }
@@ -431,7 +433,7 @@ fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(stringResource(R.string.home_balance_disponible), color = heroMuted, style = MaterialTheme.typography.labelLarge)
-                    Text(money(dashboard.totalBalance, hidden), color = heroText, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(money(dashboard.totalBalance, hidden), color = heroText, style = MaterialTheme.typography.amountHero, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(stringResource(R.string.home_resumen_ejecutivo_del_periodo_actual), color = heroMuted, style = MaterialTheme.typography.bodySmall)
                 }
                 StatusChip(if (dashboard.net >= 0.0) "positivo" else "atencion", if (dashboard.net >= 0.0) ContaIncome else ContaWarning)
