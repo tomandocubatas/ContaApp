@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
@@ -109,7 +110,7 @@ fun LoginScreen(
             AuthBrandMark()
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+                elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
                 shape = RoundedCornerShape(ContaRadius.xxl),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -399,7 +400,7 @@ fun LockedScreen(
             AuthBrandMark()
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+                elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
                 shape = RoundedCornerShape(ContaRadius.xxl),
                 modifier = Modifier.fillMaxWidth()
             ) {

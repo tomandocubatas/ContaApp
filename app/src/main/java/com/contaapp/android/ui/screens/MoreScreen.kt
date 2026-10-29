@@ -1,6 +1,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
@@ -91,7 +92,7 @@ fun MoreScreen(
 fun MoreExecutiveCard(balance: String, pending: Int, alerts: Int, cacheTtlMinutes: Int) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -146,7 +147,7 @@ fun MoreCompactMetric(title: String, value: String, modifier: Modifier = Modifie
 fun GlobalSearchCard(query: String, onQuery: (String) -> Unit, resultCount: Int) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -172,7 +173,7 @@ fun GlobalSearchCard(query: String, onQuery: (String) -> Unit, resultCount: Int)
 fun MoreSearchResultRow(result: MoreSearchResult, onOpen: (MoreSearchResult) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth().clickable { onOpen(result) }
     ) {
@@ -248,7 +249,7 @@ fun globalSearchResults(query: String, state: ContaUiState): List<MoreSearchResu
 fun MoreRow(tab: Tab, detail: String, onOpen: (Tab) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth().clickable { onOpen(tab) }
     ) {

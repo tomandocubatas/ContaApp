@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
@@ -240,7 +241,7 @@ fun HomeAgendaCard(state: ContaUiState) {
     if (entries.isEmpty()) return
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -294,7 +295,7 @@ fun HomePeriodComparisonCard(state: ContaUiState) {
     }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -369,7 +370,7 @@ fun HomePeriodCombo(period: QuickRange, onPeriod: (QuickRange) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -513,7 +514,7 @@ data class ExecutiveMetricSpec(
 fun WalletMetricCard(title: String, value: String, color: Color, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier
     ) {
@@ -533,7 +534,7 @@ fun FinancialPulseCard(dashboard: DashboardSummary, hidden: Boolean, modifier: M
     val incomeProgress = dashboard.income / activityTotal
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier.fillMaxWidth()
     ) {
@@ -615,7 +616,7 @@ fun HomeHealthCard(dashboard: DashboardSummary?, state: ContaUiState, modifier: 
     }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = modifier.fillMaxWidth()
     ) {
@@ -663,7 +664,7 @@ fun WelcomeEmptyState(error: String?) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(ContaRadius.md),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {

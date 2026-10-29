@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
@@ -220,7 +221,7 @@ fun InsuranceCoverageCard(coverages: List<com.contaapp.android.domain.InsuranceC
     val max = sorted.maxOfOrNull { it.maxCoverage }?.takeIf { it > 0.0 } ?: 1.0
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -254,7 +255,7 @@ fun InsuranceRenewalCalendarCard(renewals: List<com.contaapp.android.domain.Insu
     if (upcoming.isEmpty()) return
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -296,7 +297,7 @@ fun InsuranceCalendarSummary(policies: List<InsurancePolicy>, annualPremium: Dou
     val next60 = policies.count { InsuranceRange.Days60.matches(it.renewalDate ?: it.endDate) }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -349,7 +350,7 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
     }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {

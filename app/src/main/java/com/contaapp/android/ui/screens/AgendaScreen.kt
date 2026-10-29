@@ -1,6 +1,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
@@ -152,7 +153,7 @@ fun AgendaHeader(
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -183,7 +184,7 @@ fun AgendaSummary(calendar: CalendarMonth, hidden: Boolean) {
     val pending = calendar.days.sumOf { day -> day.events.count { !it.confirmed } }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -209,7 +210,7 @@ fun AgendaMonthGrid(
     val cells = remember(month, calendar.days) { buildAgendaCells(month, dayMap) }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -276,7 +277,7 @@ fun AgendaEventRow(event: CalendarEvent, hidden: Boolean, onClick: () -> Unit) {
     val accent = eventAccent(event)
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {

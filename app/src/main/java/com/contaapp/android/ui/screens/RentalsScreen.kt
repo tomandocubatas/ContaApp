@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.background
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
@@ -166,7 +167,7 @@ fun RentalHeroCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -201,7 +202,7 @@ fun RentalPropertyRow(property: RentalProperty, hidden: Boolean, onClick: () -> 
     val accent = if (property.profit >= 0.0) ContaIncome else ContaDanger
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
@@ -281,7 +282,7 @@ fun RentalPropertyDetailDialog(
                 if (bestMonth != null || worstMonth != null) {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
                         shape = RoundedCornerShape(ContaRadius.lg)
                     ) {
                         Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
@@ -327,7 +328,7 @@ fun RentalPropertyDetailDialog(
 fun RentalMonthsCard(months: List<com.contaapp.android.domain.RentalMonth>, hidden: Boolean) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {

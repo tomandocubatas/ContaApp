@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaRadius
 import com.contaapp.android.ui.theme.ContaSpacing
 import androidx.compose.ui.res.stringResource
@@ -137,7 +138,7 @@ fun PeriodHeader(
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(ContaRadius.md),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -270,7 +271,7 @@ fun CategoryRankingCard(
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
         shape = RoundedCornerShape(ContaRadius.md),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
@@ -324,7 +325,7 @@ fun CategoryBarRow(
 fun MetricCard(title: String, value: String, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = modifier
     ) {
@@ -345,7 +346,7 @@ fun MovementRow(movement: Movement, hidden: Boolean, onClick: () -> Unit) {
     val icon = movementIcon(movement)
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md)
     ) {
         Row(
@@ -447,7 +448,7 @@ fun MovementDetailDialog(
 fun MovementContextCard(type: String, account: String, category: String, link: String, accent: Color) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.lg)
     ) {
         Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
@@ -604,7 +605,7 @@ fun PremiumPeriodSelector(
     val dates = selected.toDates()
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier
             .fillMaxWidth()
@@ -791,7 +792,7 @@ fun AttentionCard(title: String, value: String, detail: String, color: Color, mo
     val compactValue = value.length <= 3 && !value.contains(" ")
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = modifier.fillMaxWidth()
     ) {
@@ -868,7 +869,7 @@ fun ExecutiveKpiCard(
     val onSurface = MaterialTheme.colorScheme.onSurface
     Card(
         colors = CardDefaults.cardColors(containerColor = surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier
     ) {
@@ -928,7 +929,7 @@ fun ExecutiveProgressCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier.fillMaxWidth()
     ) {
@@ -965,7 +966,7 @@ fun FinancialLineChart(
     val midValue = (minValue + maxValue) / 2.0
     Card(
         colors = CardDefaults.cardColors(containerColor = surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier.fillMaxWidth()
     ) {
@@ -1101,7 +1102,7 @@ fun ActiveFilterBar(filters: List<String>, onOpenFilters: () -> Unit, modifier: 
 fun FilterPanel(content: @Composable () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {

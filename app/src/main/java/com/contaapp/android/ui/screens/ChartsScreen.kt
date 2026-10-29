@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.compose.foundation.Canvas
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
@@ -236,7 +237,7 @@ fun DebtSnapshotChartCard(state: ContaUiState) {
     val visibleDebt = state.debtDetails.visibleDebtDetails()
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -260,7 +261,7 @@ fun DebtSnapshotChartCard(state: ContaUiState) {
 fun RentalsSnapshotChartCard(state: ContaUiState) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -289,7 +290,7 @@ fun FinancialEvolutionDashboardCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -315,7 +316,7 @@ fun QuickDistributionDashboardCard(dashboard: com.contaapp.android.domain.Dashbo
     val total = (income + expense).takeIf { it > 0.0 } ?: 1.0
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -345,7 +346,7 @@ fun CategoryPeriodDashboardCard(expenses: List<CategoryBreakdown>, income: List<
     val accent = if (type == "expense") ContaExpense else ContaIncome
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -390,7 +391,7 @@ fun HistoricalCategoriesDashboardCard(
     val accent = if (type == "expense") ContaExpense else ContaIncome
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -453,7 +454,7 @@ fun ChartsSummaryCard(state: ContaUiState) {
     val dashboard = state.dashboard
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -671,7 +672,7 @@ fun ChartOrEmpty(title: String, subtitle: String, values: List<Double>, labels: 
     } else {
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+            elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
             shape = RoundedCornerShape(ContaRadius.xl),
             modifier = modifier.fillMaxWidth()
         ) {

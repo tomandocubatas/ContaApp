@@ -3,6 +3,7 @@
 package com.contaapp.android.ui.screens
 
 import androidx.annotation.DrawableRes
+import com.contaapp.android.ui.theme.ContaCardDefaults
 import com.contaapp.android.ui.theme.ContaSpacing
 import com.contaapp.android.ui.theme.ContaRadius
 import androidx.compose.ui.res.stringResource
@@ -219,7 +220,7 @@ fun BankAccountsCard(
     val total = accounts.sumOf { it.balance }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.lg),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -274,7 +275,7 @@ fun AccountsTotalCard(accounts: List<BankAccountBalance>, hidden: Boolean) {
     val negative = accounts.count { it.balance < 0.0 }
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -302,7 +303,7 @@ fun AccountsTotalCard(accounts: List<BankAccountBalance>, hidden: Boolean) {
 fun AccountRow(account: BankAccountBalance, hidden: Boolean, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
         shape = RoundedCornerShape(ContaRadius.md)
     ) {
         Row(

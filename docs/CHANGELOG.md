@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Tarjetas - Elevacion y borde unicos (v0.7.0)
+
+- Nuevo `ContaCardDefaults` en `Dimens.kt`: elevacion de 1 dp y borde de 1 dp (`outline` al 70 %) para todas las tarjetas de contenido. En tema oscuro la sombra apenas se ve y las tarjetas se fundian con el fondo; el borde las separa.
+- 58 elevaciones de 1, 2 y 16 dp de 12 pantallas pasan al criterio unico. Se dejan las tarjetas planas (elevacion 0) y la barra de navegacion inferior.
+- Pendiente: la tarjeta hero de Inicio (degradado) no lleva borde.
+- Verificacion: `:app:assembleDebug` y tests correctos; pantalla de huella, Inicio y Cuentas revisados en el movil en claro y oscuro.
+
 ## 2026-10-29 - UX/Tokens - Espaciado en todas las pantallas (v0.6.1)
 
 - Los 257 `spacedBy` y `padding` de 4 a 28 dp de las 12 pantallas restantes pasan a `ContaSpacing`, con el mismo criterio que en `CommonComponents.kt` (escalon mas cercano, empates al menor).
