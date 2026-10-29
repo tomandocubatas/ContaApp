@@ -1,6 +1,10 @@
 package com.contaapp.android.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -122,7 +126,7 @@ private val LightPalette = ContaPalette(
     orange = Color(0xFFF59E0B),
     background = Color(0xFFF1F5F9),
     income = Color(0xFF0F766E),
-    expense = Color(0xFFE0463F),
+    expense = Color(0xFFC62F2A),
     warning = Color(0xFFB45309),
     debt = Color(0xFFC2410C)
 )
@@ -149,11 +153,17 @@ private val DarkPalette = ContaPalette(
 val LocalContaPalette = staticCompositionLocalOf { LightPalette }
 
 @Composable
-fun ContaTheme(darkMode: Boolean? = null, content: @Composable () -> Unit) {
+fun ContaTheme(darkMode: Boolean? = null, dynamicColor: Boolean = false, content: @Composable () -> Unit) {
     val dark = darkMode ?: isSystemInDarkTheme()
+    val context = LocalContext.current
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= 31 -> if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        dark -> DarkColors
+        else -> LightColors
+    }
     CompositionLocalProvider(LocalContaPalette provides if (dark) DarkPalette else LightPalette) {
         MaterialTheme(
-            colorScheme = if (dark) DarkColors else LightColors,
+            colorScheme = colorScheme,
             typography = AppTypography,
             content = content
         )

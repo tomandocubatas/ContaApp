@@ -40,6 +40,7 @@ fun SettingsScreen(
     state: ContaUiState,
     onRefresh: () -> Unit,
     onToggleDarkMode: () -> Unit,
+    onToggleDynamicColor: () -> Unit,
     onTogglePrivacyDefault: () -> Unit,
     onCacheTtlChanged: (Int) -> Unit,
     onRefreshCacheEntry: (String) -> Unit,
@@ -67,6 +68,17 @@ fun SettingsScreen(
                     iconRes = R.drawable.ic_visibility,
                     onChange = onToggleDarkMode
                 )
+            }
+            if (android.os.Build.VERSION.SDK_INT >= 31) {
+                item {
+                    SettingsToggleRow(
+                        title = "Color dinamico",
+                        detail = "Toma el acento del fondo de pantalla del sistema; los colores de ingreso y gasto no cambian",
+                        checked = state.dynamicColor,
+                        iconRes = R.drawable.ic_settings,
+                        onChange = onToggleDynamicColor
+                    )
+                }
             }
             item {
                 SettingsToggleRow(

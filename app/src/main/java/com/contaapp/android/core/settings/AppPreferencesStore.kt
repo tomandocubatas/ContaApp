@@ -11,6 +11,12 @@ class AppPreferencesStore(context: Context) {
         prefs.edit().putBoolean("darkMode", enabled).apply()
     }
 
+    fun isDynamicColor(): Boolean = prefs.getBoolean("dynamicColor", false)
+
+    fun setDynamicColor(enabled: Boolean) {
+        prefs.edit().putBoolean("dynamicColor", enabled).apply()
+    }
+
     fun isPrivacyDefault(): Boolean = prefs.getBoolean("privacyDefault", false)
 
     fun setPrivacyDefault(enabled: Boolean) {

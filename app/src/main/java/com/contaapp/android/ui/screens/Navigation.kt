@@ -107,6 +107,7 @@ fun MainScaffold(
     onMovementFiltersChanged: (MovementFilters) -> Unit,
     onTogglePrivacy: () -> Unit,
     onToggleDarkMode: () -> Unit,
+    onToggleDynamicColor: () -> Unit,
     onTogglePrivacyDefault: () -> Unit,
     onCacheTtlChanged: (Int) -> Unit,
     onRefreshCacheEntry: (String) -> Unit,
@@ -204,6 +205,7 @@ fun MainScaffold(
                                     state = state,
                                     onRefresh = onRefresh,
                                     onToggleDarkMode = onToggleDarkMode,
+                                    onToggleDynamicColor = onToggleDynamicColor,
                                     onTogglePrivacyDefault = onTogglePrivacyDefault,
                                     onCacheTtlChanged = onCacheTtlChanged,
                                     onRefreshCacheEntry = onRefreshCacheEntry,
@@ -242,6 +244,7 @@ fun AppTopBar(
 ) {
     TopAppBar(
         title = {
+            WithCappedFontScale {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md)) {
                 Box(
                     Modifier
@@ -264,6 +267,7 @@ fun AppTopBar(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+            }
             }
         },
         actions = {
@@ -346,6 +350,7 @@ fun ContaNavigationRail(selectedTab: Tab, onSelected: (Tab) -> Unit) {
 @Composable
 fun ContaBottomBar(selectedTab: Tab, onSelected: (Tab) -> Unit) {
     val visibleTabs = bottomTabs()
+    WithCappedFontScale {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 3.dp) {
         visibleTabs.forEach { tab ->
             val selected = selectedTab == tab || (tab == Tab.More && selectedTab !in visibleTabs)
@@ -364,6 +369,7 @@ fun ContaBottomBar(selectedTab: Tab, onSelected: (Tab) -> Unit) {
                 )
             )
         }
+    }
     }
 }
 

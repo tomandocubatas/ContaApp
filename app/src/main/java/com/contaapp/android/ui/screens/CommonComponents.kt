@@ -646,12 +646,13 @@ fun PremiumPeriodSelector(
                 Icon(painterResource(R.drawable.ic_chart), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(21.dp))
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text(title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, maxLines = 1)
+                Text(title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(
                     dates?.let { "${selected.homeLabel()} · ${it.first} / ${it.second}" } ?: detail,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelMedium,
-                    maxLines = 2
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             StatusChip(stringResource(R.string.commoncomponents_cambiar), MaterialTheme.colorScheme.primary)
@@ -846,21 +847,37 @@ fun AttentionCard(title: String, value: String, detail: String, color: Color, mo
                 )
             }
             Column(Modifier.weight(1f)) {
-                Text(title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
         }
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun SectionHeader(title: String, detail: String? = null) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+    // FlowRow: con la fuente muy grande el detalle pasa a la línea siguiente en vez de pisar el título.
+    FlowRow(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)
+    ) {
         Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         if (!detail.isNullOrBlank()) {
             Text(detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
         }
     }
+}
+
+/** Limita la escala de fuente en barras de altura fija (superior e inferior), como recomienda Material; el contenido de las pantallas sigue la escala completa. */
+@Composable
+fun WithCappedFontScale(maxScale: Float = 1.3f, content: @Composable () -> Unit) {
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    androidx.compose.runtime.CompositionLocalProvider(
+        androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density, density.fontScale.coerceAtMost(maxScale)),
+        content = content
+    )
 }
 
 @Composable

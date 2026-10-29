@@ -67,6 +67,7 @@ data class ContaUiState(
     val privacyMode: Boolean = false,
     val privacyDefault: Boolean = false,
     val darkMode: Boolean = false,
+    val dynamicColor: Boolean = false,
     val userName: String = "",
     val lastUpdatedLabel: String? = null,
     val baseUrl: String = "",
@@ -176,6 +177,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             privacyMode = preferencesStore.isPrivacyDefault(),
             privacyDefault = preferencesStore.isPrivacyDefault(),
             darkMode = preferencesStore.isDarkMode(),
+            dynamicColor = preferencesStore.isDynamicColor(),
             dashboard = initialSnapshot?.dashboard,
             lastUpdatedLabel = initialSnapshot?.let { "Cache local" },
             categories = initialSnapshot?.categories.orEmpty(),
@@ -297,7 +299,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             cacheTtlMinutes = preferencesStore.cacheTtlMinutes(),
             privacyMode = preferencesStore.isPrivacyDefault(),
             privacyDefault = preferencesStore.isPrivacyDefault(),
-            darkMode = preferencesStore.isDarkMode()
+            darkMode = preferencesStore.isDarkMode(),
+            dynamicColor = preferencesStore.isDynamicColor()
         )
     }
 
@@ -317,6 +320,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val next = !_uiState.value.darkMode
         preferencesStore.setDarkMode(next)
         _uiState.update { it.copy(darkMode = next) }
+    }
+
+    fun toggleDynamicColor() {
+        val next = !_uiState.value.dynamicColor
+        preferencesStore.setDynamicColor(next)
+        _uiState.update { it.copy(dynamicColor = next) }
     }
 
     fun togglePrivacyDefault() {

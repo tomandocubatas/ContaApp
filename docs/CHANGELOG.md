@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Accesibilidad - Contraste, fuente grande y color dinamico (v0.21.0)
+
+- Contraste AA: el unico texto bajo 4,5:1 era el rojo de gasto del tema claro (`#E0463F`, 4,10); pasa a `#C62F2A` (5,47 sobre blanco).
+- Color dinamico: nuevo interruptor en Ajustes (solo API 31+, desactivado por defecto) que usa `dynamicLightColorScheme`/`dynamicDarkColorScheme`; los colores de ingreso y gasto no cambian.
+- Fuente grande (escala 2,0): `WithCappedFontScale` limita a 1,3 la escala en las barras superior e inferior (altura fija); `SectionHeader` usa `FlowRow` para que el detalle pase a la linea siguiente; el selector de periodo y las tarjetas de aviso admiten dos lineas; los filtros de Cuentas pasan a `FlowRow`.
+- Verificacion: `:app:assembleDebug` y tests correctos; Inicio, Movimientos y Cuentas revisados en el movil con la fuente al maximo. Sin verificar en pantalla: el chip "Negativas" tras pasar a `FlowRow`, Graficas, Ajustes y el color dinamico.
+
 ## 2026-10-29 - UX/Widget - Paleta alineada y aviso de datos desactualizados (v0.20.0)
 
 - El layout del widget usa los tokens oscuros de la app (coral `#FF8A80`, ambar `#FBBF24`, azul `#72B7FF`, verde de la barra `#21D7A4`) en lugar de tonos propios.

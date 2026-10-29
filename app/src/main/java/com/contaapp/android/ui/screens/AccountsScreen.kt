@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -79,6 +80,7 @@ import com.contaapp.android.domain.InsurancePolicy
 import com.contaapp.android.domain.Movement
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun AccountsScreen(
     state: ContaUiState,
@@ -134,7 +136,7 @@ fun AccountsScreen(
                         selected = bankFilter,
                         onSelected = { bankFilter = it }
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs), modifier = Modifier.fillMaxWidth()) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(ContaSpacing.xs), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs), modifier = Modifier.fillMaxWidth()) {
                         FilterButton(stringResource(R.string.accounts_todas), balanceFilter == AccountBalanceFilter.All) { balanceFilter = AccountBalanceFilter.All }
                         FilterButton(stringResource(R.string.accounts_positivas), balanceFilter == AccountBalanceFilter.Positive) { balanceFilter = AccountBalanceFilter.Positive }
                         FilterButton(stringResource(R.string.accounts_negativas), balanceFilter == AccountBalanceFilter.Negative) { balanceFilter = AccountBalanceFilter.Negative }

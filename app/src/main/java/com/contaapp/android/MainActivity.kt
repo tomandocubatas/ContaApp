@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val state by viewModel.uiState.collectAsState()
             SideEffect { applyRecentsPrivacy(state.privacyMode) }
-            ContaTheme(darkMode = state.darkMode) {
+            ContaTheme(darkMode = state.darkMode, dynamicColor = state.dynamicColor) {
                 AppRoot(
                     state = state,
                     onLogin = viewModel::login,
@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
                     onMovementFiltersChanged = viewModel::loadMovements,
                     onTogglePrivacy = viewModel::togglePrivacy,
                     onToggleDarkMode = viewModel::toggleDarkMode,
+                    onToggleDynamicColor = viewModel::toggleDynamicColor,
                     onTogglePrivacyDefault = viewModel::togglePrivacyDefault,
                     onCacheTtlChanged = viewModel::setCacheTtlMinutes,
                     onRefreshCacheEntry = viewModel::refreshCacheEntry,
