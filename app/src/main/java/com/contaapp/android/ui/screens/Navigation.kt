@@ -164,7 +164,8 @@ fun MainScaffold(
                     PullToRefreshBox(
                         isRefreshing = state.isLoading || state.isMovementsLoading || state.isCalendarLoading,
                         onRefresh = onRefresh,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        indicator = {}
                     ) {
                         AdaptiveScreenFrame(isTablet = isTablet) {
                             when (selectedTab) {
@@ -224,6 +225,9 @@ fun MainScaffold(
                                 )
                             }
                         }
+                    }
+                    if (state.isLoading || state.isMovementsLoading || state.isCalendarLoading) {
+                        ThinProgressBar(Modifier.align(Alignment.TopCenter))
                     }
                 }
                 }

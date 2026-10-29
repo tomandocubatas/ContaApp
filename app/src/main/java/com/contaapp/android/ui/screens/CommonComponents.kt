@@ -8,6 +8,14 @@ import com.contaapp.android.ui.theme.ContaRadius
 import com.contaapp.android.ui.theme.ContaSpacing
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -1197,8 +1205,47 @@ fun InlineLoading(text: String) {
         horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-        Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+        Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm), modifier = Modifier.fillMaxWidth()) {
+            Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+            ThinProgressBar()
+        }
+    }
+}
+
+/** Barra de progreso indeterminada y fina, sustituye a la rueda circular. */
+@Composable
+fun ThinProgressBar(modifier: Modifier = Modifier) {
+    LinearProgressIndicator(
+        modifier = modifier.fillMaxWidth().height(3.dp).clip(RoundedCornerShape(50)),
+        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+    )
+}
+
+/** Brillo que recorre el elemento; queda estático si el usuario desactivó las animaciones del sistema. */
+@Composable
+fun Modifier.shimmer(): Modifier {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val animationsOff = remember {
+        android.provider.Settings.Global.getFloat(context.contentResolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
+    }
+    if (animationsOff) return this
+    val progress by rememberInfiniteTransition(label = "shimmer").animateFloat(
+        initialValue = -1f, targetValue = 2f,
+        animationSpec = infiniteRepeatable(tween(1400, easing = LinearEasing), RepeatMode.Restart),
+        label = "shimmerProgress"
+    )
+    val highlight = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f)
+    return drawWithContent {
+        drawContent()
+        val width = size.width
+        val x = progress * width
+        drawRect(
+            brush = Brush.linearGradient(
+                colors = listOf(Color.Transparent, highlight, Color.Transparent),
+                start = androidx.compose.ui.geometry.Offset(x - width * 0.4f, 0f),
+                end = androidx.compose.ui.geometry.Offset(x + width * 0.4f, size.height)
+            )
+        )
     }
 }
 
@@ -1208,7 +1255,7 @@ fun SkeletonCard(lines: Int = 3, modifier: Modifier = Modifier) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.70f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(ContaRadius.xl),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(ContaRadius.xl)).shimmer()
     ) {
         Column(Modifier.padding(ContaSpacing.lg), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
             repeat(lines) { index ->

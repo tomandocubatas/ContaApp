@@ -10,6 +10,14 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Carga - Carga elegante sin spinners (v0.23.0)
+
+- Nuevo modificador `shimmer()` (brillo que recorre el elemento; estático si las animaciones del sistema están desactivadas) aplicado a `SkeletonCard`.
+- `ThinProgressBar`: barra indeterminada de 3 dp que sustituye a la rueda en `InlineLoading` y en el encabezado de Agenda.
+- Barra fina superpuesta arriba del contenido mientras carga Inicio/Movimientos/Agenda; se oculta el indicador circular del pull-to-refresh (el gesto sigue activo).
+- Verificado en móvil: Inicio y Agenda renderizan bien y el cambio de mes funciona. No se pudo capturar el estado de carga (la API responde en menos de un fotograma): shimmer y barra verificados solo por compilación y revisión de código.
+- Archivos: CommonComponents.kt, AgendaScreen.kt, Navigation.kt.
+
 ## 2026-10-29 - UX/Detalle - Detalle del movimiento en panel inferior (v0.22.0)
 
 - `MovementDetailDialog` (cuadro de dialogo) pasa a `MovementDetailSheet`, un `ModalBottomSheet` que sube desde abajo: contenido desplazable, boton "Cerrar" de 48 dp y cierre por gesto o tocando fuera. Se usa desde Inicio y Movimientos.
