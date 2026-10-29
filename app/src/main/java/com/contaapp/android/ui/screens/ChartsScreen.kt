@@ -38,6 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.foundation.gestures.detectTapGestures
+import kotlin.math.roundToInt
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -365,16 +370,35 @@ fun CategoryPeriodDashboardCard(expenses: List<CategoryBreakdown>, income: List<
 fun CategoryDistributionBars(categories: List<CategoryBreakdown>, hidden: Boolean, accent: androidx.compose.ui.graphics.Color) {
     val sorted = categories.sortedByDescending { kotlin.math.abs(it.total) }.take(8)
     val max = sorted.maxOfOrNull { kotlin.math.abs(it.total) }?.takeIf { it > 0.0 } ?: 1.0
+    val grandTotal = categories.sumOf { kotlin.math.abs(it.total) }.takeIf { it > 0.0 } ?: 1.0
+    var selectedName by remember(categories) { mutableStateOf<String?>(null) }
     if (sorted.isEmpty()) {
         EmptyHint(true, "Sin categorias en este periodo.")
     } else {
-        sorted.forEach { category ->
-            Column(verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
+        sorted.forEachIndexed { index, category ->
+            val share = kotlin.math.abs(category.total) / grandTotal * 100.0
+            val selected = selectedName == category.name
+            val detail = "${category.count} mov. · ${"%.1f".format(java.util.Locale("es", "ES"), share)}% del total"
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(ContaRadius.sm))
+                    .background(if (selected) accent.copy(alpha = 0.10f) else androidx.compose.ui.graphics.Color.Transparent)
+                    .clickable(onClickLabel = "Ver detalle de ${category.name}") { selectedName = if (selected) null else category.name }
+                    .semantics(mergeDescendants = true) {
+                        contentDescription = "${index + 1}. ${category.name}, ${money(kotlin.math.abs(category.total), hidden)}, $detail"
+                    }
+                    .padding(vertical = ContaSpacing.xs, horizontal = ContaSpacing.xs),
+                verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)
+            ) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text(category.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f), maxLines = 1)
+                    Text("${index + 1}. ${category.name}", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(money(kotlin.math.abs(category.total), hidden), color = accent, fontWeight = FontWeight.Bold)
                 }
                 ProgressBar(kotlin.math.abs(category.total) / max, accent)
+                if (selected) {
+                    Text(detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                }
             }
         }
     }
@@ -564,10 +588,19 @@ fun InlineChartPanel(
                 Modifier
                     .fillMaxWidth()
                     .height(96.dp)
+                    .semantics {
+                        contentDescription = "Grafica $title. Punto ${selectedLabel.ifBlank { "${safeIndex + 1}" }}: ${money(cleanValues[safeIndex], hidden)}. Rango de ${money(min, hidden)} a ${money(max, hidden)}. Usa Inicio, Centro y Fin para cambiar de punto."
+                    }
                     .pointerInput(cleanValues) {
                         detectTapGestures { offset ->
                             val step = if (cleanValues.size > 1) size.width / (cleanValues.size - 1) else size.width
                             selectedIndex = (offset.x / step).toInt().coerceIn(0, cleanValues.lastIndex)
+                        }
+                    }
+                    .pointerInput(cleanValues) {
+                        detectHorizontalDragGestures { change, _ ->
+                            val step = if (cleanValues.size > 1) size.width / (cleanValues.size - 1) else size.width
+                            selectedIndex = (change.position.x / step).roundToInt().coerceIn(0, cleanValues.lastIndex)
                         }
                     }
             ) {

@@ -10,6 +10,14 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Graficos - Graficos interactivos y accesibles (v0.15.0)
+
+- Las graficas de linea se pueden arrastrar (ademas de tocar) para leer el valor de cada punto, y el lienzo lleva `contentDescription` con punto, valor y rango.
+- `CategoryDistributionBars`: cada categoria es tocable y muestra "N mov. · X% del total"; lleva numero de orden y descripcion accesible.
+- Paleta: sin cambios; la lectura no depende del color (numeros de orden, porcentajes, signos de v0.10.0 y etiquetas de punto).
+- Hallazgo pendiente: en "Neto" un valor negativo se pinta con el color de la serie (verde), no por signo.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil se ve el detalle de "Impuestos" (11,2 %) y el arrastre sobre Neto lleva el punto a 10-12 (754,37 €).
+
 ## 2026-10-29 - UX/Inicio - Panel de prioridades (v0.14.0)
 
 - Inicio se ordena como: periodo, "Requiere atencion", saldo (hero), atajos y despues el detalle (metricas, comparativa, grafico, salud financiera, agenda, actividad reciente).
