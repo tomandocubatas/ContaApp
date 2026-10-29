@@ -322,6 +322,11 @@ fun MovementsScreen(
     selectedMovement?.let { movement ->
         MovementDetailSheet(
             movement = movement,
+            parts = state.movements.filter { other ->
+                other.id != movement.id && (other.parentMovementId == movement.id ||
+                    (movement.parentMovementId != null && other.parentMovementId == movement.parentMovementId))
+            },
+            onOpenMovement = { selectedMovement = it },
             hidden = state.privacyMode,
             categories = state.categories,
             accounts = state.accounts,

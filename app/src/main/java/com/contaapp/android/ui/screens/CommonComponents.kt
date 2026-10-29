@@ -410,6 +410,8 @@ fun MovementDetailSheet(
     accounts: List<BankAccountBalance> = emptyList(),
     debts: List<DebtDetail> = emptyList(),
     insurances: List<InsurancePolicy> = emptyList(),
+    parts: List<Movement> = emptyList(),
+    onOpenMovement: (Movement) -> Unit = {},
     onDismiss: () -> Unit
 ) {
     val category = movementCategory(movement, categories)
@@ -460,7 +462,35 @@ fun MovementDetailSheet(
                 link = link ?: "Sin vinculacion detectada",
                 accent = accent
             )
-            if (movement.hasSplits) DetailLine(stringResource(R.string.commoncomponents_desglose), "Movimiento con splits")
+            if (movement.hasSplits && parts.isEmpty()) DetailLine(stringResource(R.string.commoncomponents_desglose), "Movimiento con splits")
+            if (parts.isNotEmpty()) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = ContaCardDefaults.elevation(), border = ContaCardDefaults.border(),
+                    shape = RoundedCornerShape(ContaRadius.lg)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(if (movement.parentMovementId != null) "Otras partes del desglose · ${parts.size}" else "Desglose · ${parts.size} partes", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
+                            Text(signedMoney(parts.sumOf { it.amount }, hidden), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
+                        }
+                        parts.forEach { part ->
+                            val partCategory = movementCategory(part, categories)
+                            Row(
+                                Modifier.fillMaxWidth().clickable { onOpenMovement(part) }.padding(vertical = ContaSpacing.xs),
+                                horizontalArrangement = Arrangement.spacedBy(ContaSpacing.md),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(part.description, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    Text(partCategory?.name ?: part.categoryName ?: part.type, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                                }
+                                Text(signedMoney(part.amount, hidden), color = if (part.amount >= 0.0) ContaIncome else ContaExpense, fontWeight = FontWeight.Black)
+                            }
+                        }
+                    }
+                }
+            }
             if (movement.isDuplicate) DetailLine(stringResource(R.string.commoncomponents_duplicado), "Marcado como posible duplicado")
             movement.notes?.let { DetailLine(stringResource(R.string.commoncomponents_notas), it) }
             OutlinedButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = RoundedCornerShape(50)) {
@@ -595,7 +625,7 @@ fun movementLinkLabel(
         movement.financingId != null -> "Financiacion · ${debt?.let { "${it.name} (${it.entity})" } ?: movement.financingId}"
         movement.propertyId != null -> "Propiedad · ${movement.propertyId}"
         movement.insuranceId != null -> "Seguro · ${insurance?.name ?: movement.insuranceId}"
-        movement.parentMovementId != null || movement.hasSplits -> "Split · ${movement.parentMovementId ?: "movimiento desglosado"}"
+        movement.parentMovementId != null || movement.hasSplits -> if (movement.parentMovementId != null) "Desglose · parte de un movimiento dividido" else "Desglose · movimiento dividido"
         movement.isDuplicate -> "Duplicado · posible movimiento repetido"
         else -> null
     }

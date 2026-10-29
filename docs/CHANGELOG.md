@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Movimientos - Partes de un desglose visibles (v0.25.0)
+- La API no devuelve el movimiento padre en las listas, solo sus partes: no se puede agrupar bajo el padre.
+- El detalle de una parte lista las otras partes del mismo desglose (tocar una la abre) y su suma.
+- La etiqueta de la lista ya no enseña un id: dice «Desglose · parte de un movimiento dividido».
+- Archivos: `CommonComponents.kt`, `MovementsScreen.kt`, `app/build.gradle.kts`.
+
 ## 2026-10-29 - Corrección/Datos - Resultado visible de Movimientos igual que Inicio (v0.24.2)
 - Movimientos sumaba los importes por signo (1.716,71 €) y Inicio usa las reglas de la API (1.849,21 €).
 - Ahora excluye los movimientos padre (con desglose) y clasifica ingreso/gasto por el tipo de su categoría, como el dashboard del backend.
