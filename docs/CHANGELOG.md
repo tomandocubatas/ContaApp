@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Filtros - Chips de filtros activos en Movimientos (v0.11.0)
+
+- `ActiveFilterBar` muestra un `InputChip` por filtro activo (texto, tipo, revision, periodo, categoria, cuenta, fechas, importe, agrupacion, vinculados, duplicados) con "x" para quitarlo sin abrir la hoja, el contador "N filtros activos" y "Limpiar todo".
+- Nuevo `ActiveFilter(label, onRemove)`; `movementFilterLabels` (sin uso) se elimina y `QuickRange.activeLabel()` aporta la etiqueta del periodo.
+- Verificacion: `:app:assembleDebug` y tests correctos; en el movil el chip Mes, anadir Gastos (29 mov.), quitar Gastos (37) y Limpiar todo ("Todos los datos"). El texto singular "1 filtro activo" no se vio en pantalla.
+
 ## 2026-10-29 - UX/Importes - Signo explicito y color por signo (v0.10.0)
 
 - Nuevo `signedMoney` en `Formatters.kt`: antepone `+` a los importes positivos (el `-` ya lo pone el formato); con privacidad activa sigue `•••• €`. Se usa en las filas de movimientos, el detalle y la mini fila de Cuentas.

@@ -42,6 +42,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Icon
+import androidx.compose.material3.InputChip
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -1058,47 +1061,75 @@ private fun axisMoney(value: Double, hidden: Boolean): String {
     return String.format(java.util.Locale("es", "ES"), "%.1f%s €", scaled, suffix)
 }
 
+/** Filtro activo mostrado como chip; `onRemove` lo quita sin abrir la hoja de filtros. */
+data class ActiveFilter(val label: String, val onRemove: () -> Unit)
+
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class, androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
-fun ActiveFilterBar(filters: List<String>, onOpenFilters: () -> Unit, modifier: Modifier = Modifier) {
+fun ActiveFilterBar(
+    filters: List<ActiveFilter>,
+    onOpenFilters: () -> Unit,
+    onClearAll: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(ContaRadius.xl),
         modifier = modifier.fillMaxWidth()
     ) {
-        Row(
-            Modifier.fillMaxWidth().padding(ContaSpacing.md),
-            horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                Modifier.size(40.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.md)),
-                contentAlignment = Alignment.Center
+        Column(Modifier.fillMaxWidth().padding(ContaSpacing.md), verticalArrangement = Arrangement.spacedBy(ContaSpacing.sm)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(painterResource(R.drawable.ic_settings), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Box(
+                    Modifier.size(40.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape(ContaRadius.md)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(painterResource(R.drawable.ic_settings), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
+                    Text(stringResource(R.string.commoncomponents_vista_filtrada), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Black)
+                    Text(
+                        if (filters.isEmpty()) "Todos los datos" else if (filters.size == 1) "1 filtro activo" else "${filters.size} filtros activos",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Button(
+                    onClick = onOpenFilters,
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    contentPadding = PaddingValues(horizontal = ContaSpacing.lg, vertical = ContaSpacing.sm)
+                ) {
+                    Text(
+                        if (filters.isEmpty()) "Filtrar" else "Filtrar · ${filters.size}",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs)) {
-                Text(stringResource(R.string.commoncomponents_vista_filtrada), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Black)
-                Text(
-                    if (filters.isEmpty()) "Todos los datos" else filters.joinToString(" · "),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Button(
-                onClick = onOpenFilters,
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                contentPadding = PaddingValues(horizontal = ContaSpacing.lg, vertical = ContaSpacing.sm)
-            ) {
-                Text(
-                    if (filters.isEmpty()) "Filtrar" else "Filtrar · ${filters.size}",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold
-                )
+            if (filters.isNotEmpty()) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(ContaSpacing.sm),
+                    verticalArrangement = Arrangement.spacedBy(ContaSpacing.xs),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    filters.forEach { filter ->
+                        InputChip(
+                            selected = true,
+                            onClick = filter.onRemove,
+                            label = { Text(filter.label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                            trailingIcon = {
+                                Icon(Icons.Default.Close, contentDescription = "Quitar filtro ${filter.label}", modifier = Modifier.size(18.dp))
+                            }
+                        )
+                    }
+                    TextButton(onClick = onClearAll) { Text("Limpiar todo") }
+                }
             }
         }
     }

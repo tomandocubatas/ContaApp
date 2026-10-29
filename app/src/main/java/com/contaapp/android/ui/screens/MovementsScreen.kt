@@ -240,12 +240,35 @@ fun MovementsScreen(
             }
             item {
                 ActiveFilterBar(
-                    filters = movementFilterLabels(text, type, reviewed, range, selectedCategoryName, selectedAccountName, dateFrom, dateTo, minAmount, maxAmount, groupMode) +
-                        buildList {
-                            if (onlyLinked) add("Vinculados")
-                            if (onlyDuplicates) add("Duplicados")
-                        },
-                    onOpenFilters = { showFilters = true }
+                    filters = buildList {
+                        if (text.isNotBlank()) add(ActiveFilter("Texto: ${text.trim()}") { text = "" })
+                        type?.let { add(ActiveFilter(if (it == MovementTypeGroups.Income || it == "ingreso") "Ingresos" else "Gastos") { type = null }) }
+                        reviewed?.let { add(ActiveFilter(if (it) "Revisadas" else "Pendientes") { reviewed = null }) }
+                        if (range != QuickRange.All) add(ActiveFilter(range.activeLabel()) { range = QuickRange.All })
+                        selectedCategoryName?.let { add(ActiveFilter("Categoria: $it") { categoryId = null }) }
+                        selectedAccountName?.let { add(ActiveFilter("Cuenta: $it") { accountId = null }) }
+                        if (dateFrom.isNotBlank() || dateTo.isNotBlank()) add(ActiveFilter("Fechas") { dateFrom = ""; dateTo = "" })
+                        if (minAmount.isNotBlank() || maxAmount.isNotBlank()) add(ActiveFilter("Importe") { minAmount = ""; maxAmount = "" })
+                        if (groupMode != MovementGroupMode.Date) add(ActiveFilter("Agr. ${if (groupMode == MovementGroupMode.Category) "categoria" else "cuenta"}") { groupMode = MovementGroupMode.Date })
+                        if (onlyLinked) add(ActiveFilter("Vinculados") { onlyLinked = false })
+                        if (onlyDuplicates) add(ActiveFilter("Duplicados") { onlyDuplicates = false })
+                    },
+                    onOpenFilters = { showFilters = true },
+                    onClearAll = {
+                        text = ""
+                        type = null
+                        reviewed = null
+                        range = QuickRange.All
+                        groupMode = MovementGroupMode.Date
+                        categoryId = null
+                        accountId = null
+                        dateFrom = ""
+                        dateTo = ""
+                        minAmount = ""
+                        maxAmount = ""
+                        onlyLinked = false
+                        onlyDuplicates = false
+                    }
                 )
             }
             if (state.isMovementsLoading) {
@@ -620,40 +643,6 @@ fun CompactFilterSection(@DrawableRes iconRes: Int, title: String, content: @Com
     }
 }
 
-fun movementFilterLabels(
-    text: String,
-    type: String?,
-    reviewed: Boolean?,
-    range: QuickRange,
-    categoryName: String?,
-    accountName: String?,
-    dateFrom: String,
-    dateTo: String,
-    minAmount: String,
-    maxAmount: String,
-    groupMode: MovementGroupMode
-): List<String> = buildList {
-    if (text.isNotBlank()) add("Texto")
-    type?.let { add(if (it == MovementTypeGroups.Income || it == "ingreso") "Ingresos" else "Gastos") }
-    if (reviewed != null) add(if (reviewed) "Revisadas" else "Pendientes")
-    if (range != QuickRange.All) add(
-        when (range) {
-            QuickRange.Last30Days -> "30 dias"
-            QuickRange.LastMonth -> "Mes pasado"
-            QuickRange.ThisQuarter -> "Trimestre"
-            QuickRange.ThisYear -> "Anio"
-            QuickRange.LastYear -> "Anio pasado"
-            QuickRange.ThisMonth -> "Mes"
-            QuickRange.All -> "Todo"
-        }
-    )
-    categoryName?.let { add("Categoria: $it") }
-    accountName?.let { add("Cuenta: $it") }
-    if (dateFrom.isNotBlank() || dateTo.isNotBlank()) add("Fechas")
-    if (minAmount.isNotBlank() || maxAmount.isNotBlank()) add("Importe")
-    if (groupMode != MovementGroupMode.Date) add("Agr. ${if (groupMode == MovementGroupMode.Category) "categoria" else "cuenta"}")
-}
-
 data class MovementSavedFilter(
     val text: String,
     val type: String?,
@@ -732,6 +721,16 @@ enum class QuickRange {
     ThisYear,
     LastYear,
     ThisMonth;
+
+    fun activeLabel(): String = when (this) {
+        Last30Days -> "30 dias"
+        LastMonth -> "Mes pasado"
+        ThisQuarter -> "Trimestre"
+        ThisYear -> "Anio"
+        LastYear -> "Anio pasado"
+        ThisMonth -> "Mes"
+        All -> "Todo"
+    }
 
     fun toDates(): Pair<String, String>? {
         val today = LocalDate.now()
