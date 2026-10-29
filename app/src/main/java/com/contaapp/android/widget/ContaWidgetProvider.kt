@@ -35,9 +35,12 @@ class ContaWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        private val ContaTeal = Color.rgb(45, 212, 191)
-        private val ContaCoral = Color.rgb(255, 107, 102)
-        private val ContaAmber = Color.rgb(245, 158, 11)
+        // Tokens oscuros de la app (ContaPalette.Dark): el widget siempre es oscuro.
+        private val ContaTeal = Color.rgb(0x2D, 0xD4, 0xBF)
+        private val ContaCoral = Color.rgb(0xFF, 0x8A, 0x80)
+        private val ContaAmber = Color.rgb(0xFB, 0xBF, 0x24)
+        private val ContaMuted = Color.rgb(0x91, 0xA4, 0xB8)
+        private const val STALE_HOURS = 24L
 
         fun updateAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
@@ -68,6 +71,7 @@ class ContaWidgetProvider : AppWidgetProvider() {
         val openApp = openAppIntent(context)
 
         views.setTextViewText(R.id.widget_updated, snapshot.freshnessLabel(preferences.cacheTtlMinutes()))
+        views.setTextColor(R.id.widget_updated, snapshot.freshnessColor(preferences.cacheTtlMinutes()))
         views.setTextViewText(R.id.widget_balance, money(balance, hidden))
         views.setTextViewText(R.id.widget_income, ctx.getString(R.string.widget_income_short, money(income, hidden)))
         views.setTextViewText(R.id.widget_expense, ctx.getString(R.string.widget_expense_short, money(expense, hidden)))
@@ -148,6 +152,17 @@ class ContaWidgetProvider : AppWidgetProvider() {
             minimumFractionDigits = if (abs >= 10_000) 0 else 2
         }
         return format.format(suffixValue) + suffix
+    }
+
+    /** Gris si los datos están en vigor, ámbar si la caché caducó y coral si no hay datos o tienen más de un día. */
+    private fun FinancialSnapshot?.freshnessColor(ttlMinutes: Int): Int {
+        val loadedAt = this?.loadedAtMillis?.takeIf { it > 0L } ?: return ContaCoral
+        val elapsedMinutes = ((System.currentTimeMillis() - loadedAt) / 60_000L).coerceAtLeast(0)
+        return when {
+            elapsedMinutes >= STALE_HOURS * 60 -> ContaCoral
+            elapsedMinutes >= ttlMinutes -> ContaAmber
+            else -> ContaMuted
+        }
     }
 
     private fun FinancialSnapshot?.freshnessLabel(ttlMinutes: Int): String {

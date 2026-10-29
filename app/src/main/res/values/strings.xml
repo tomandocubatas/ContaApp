@@ -283,7 +283,7 @@
     <string name="widget_no_cache">Sin cache</string>
     <string name="widget_valid_hours">%1$dh vig.</string>
     <string name="widget_valid_minutes">%1$dm vig.</string>
-    <string name="widget_expired">vencida</string>
+    <string name="widget_expired">desactualizado</string>
     <string name="widget_no_activity">Sin actividad</string>
     <string name="widget_mix">Mix %1$d%% ing. · %2$d%% gas.</string>
     <string name="widget_top_none">Top: sin datos</string>

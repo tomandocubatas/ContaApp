@@ -117,7 +117,7 @@
         android:max="100"
         android:progress="0"
         android:progressBackgroundTint="#1A3147"
-        android:progressTint="#00DDB4" />
+        android:progressTint="#21D7A4" />
 
     <LinearLayout
         android:id="@+id/widget_result_row"
@@ -183,7 +183,7 @@
                 android:contentDescription="Gastos"
                 android:padding="4dp"
                 android:src="@drawable/ic_receipt"
-                android:tint="#FF6B66" />
+                android:tint="#FF8A80" />
 
             <TextView
                 android:id="@+id/widget_expense"
@@ -194,7 +194,7 @@
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:text="Gas. 0 €"
-                android:textColor="#FF6B66"
+                android:textColor="#FF8A80"
                 android:textSize="9sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -219,7 +219,7 @@
                 android:contentDescription="Neto"
                 android:padding="4dp"
                 android:src="@drawable/ic_chart"
-                android:tint="#78A8FF" />
+                android:tint="#72B7FF" />
 
             <TextView
                 android:id="@+id/widget_net"
@@ -255,7 +255,7 @@
             android:contentDescription="Top gasto"
             android:padding="4dp"
             android:src="@drawable/ic_receipt"
-            android:tint="#FF6B66" />
+            android:tint="#FF8A80" />
 
         <TextView
             android:id="@+id/widget_top_expense"
@@ -289,7 +289,7 @@
             android:contentDescription="Proximo vencimiento"
             android:padding="4dp"
             android:src="@drawable/ic_credit_card"
-            android:tint="#F59E0B" />
+            android:tint="#FBBF24" />
 
         <TextView
             android:id="@+id/widget_next"
@@ -323,7 +323,7 @@
             android:contentDescription="Avisos"
             android:padding="4dp"
             android:src="@drawable/ic_shield"
-            android:tint="#78A8FF" />
+            android:tint="#72B7FF" />
 
         <TextView
             android:id="@+id/widget_attention"

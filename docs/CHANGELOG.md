@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Widget - Paleta alineada y aviso de datos desactualizados (v0.20.0)
+
+- El layout del widget usa los tokens oscuros de la app (coral `#FF8A80`, ambar `#FBBF24`, azul `#72B7FF`, verde de la barra `#21D7A4`) en lugar de tonos propios.
+- La linea de sincronizacion (`HH:mm · Nh vig.`) cambia de color segun la frescura: gris en vigor, ambar con la cache caducada y coral sin datos o con mas de 24 h; el texto de caducada pasa de "vencida" a "desactualizado".
+- Verificacion: `:app:assembleDebug` y tests correctos; widget revisado en la pantalla de inicio del movil con datos en vigor (`13:54 · 5h vig.`). Los estados ambar y coral no se vieron en pantalla porque la cache estaba vigente.
+
 ## 2026-10-29 - Seguridad/Privacidad - Vista de recientes protegida (v0.19.0)
 
 - Con la privacidad activa la ventana lleva `FLAG_SECURE` (y `setRecentsScreenshotEnabled(false)` en API 33+): la tarjeta de la app en la vista de recientes queda en blanco y se bloquean las capturas. Al desactivarla se retira. `setRecentsScreenshotEnabled` por si solo no bastaba en un movil con Android 15 (One UI).
