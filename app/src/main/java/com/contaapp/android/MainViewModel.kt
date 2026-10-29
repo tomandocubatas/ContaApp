@@ -291,7 +291,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         lastHomeFilters = null
         lastHomeLoadedAt = null
         lastMovementFilters = null
-        _uiState.value = ContaUiState()
+        // Los ajustes del dispositivo (servidor, tema, privacidad, caché) sobreviven al cierre de sesión.
+        _uiState.value = ContaUiState(
+            baseUrl = serverConfigStore.getBaseUrl(),
+            cacheTtlMinutes = preferencesStore.cacheTtlMinutes(),
+            privacyMode = preferencesStore.isPrivacyDefault(),
+            privacyDefault = preferencesStore.isPrivacyDefault(),
+            darkMode = preferencesStore.isDarkMode()
+        )
     }
 
     private fun str(@StringRes id: Int, vararg args: Any): String = getApplication<Application>().getString(id, *args)

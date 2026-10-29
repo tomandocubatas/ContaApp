@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - Fix/Sesion - Ajustes tras cerrar sesion (v0.3.2)
+
+- `MainViewModel.logout()` reiniciaba todo el estado y perdia la URL del servidor, el modo oscuro, la privacidad por defecto y el TTL de cache. Ahora el estado se reconstruye con los valores guardados.
+- La URL de "Servidor activo" en el login lleva color de tema explicito.
+- Verificacion: `:app:assembleDebug` y tests correctos; login real revisado en el movil en modo oscuro. El flujo de cerrar sesion desde la app no se ha repetido tras el cambio.
+
 ## 2026-10-29 - Fix/UI - Login oscuro y doble spinner (v0.3.1)
 
 - Login y pantalla de desbloqueo con huella: la tarjeta, los titulos, el icono del servidor y el estado de conexion siguen el tema; antes la tarjeta era blanca fija y los campos mostraban texto claro sobre blanco en modo oscuro.

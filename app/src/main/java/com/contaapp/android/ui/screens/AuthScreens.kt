@@ -263,7 +263,7 @@ fun ServerStatusPill(baseUrl: String) {
     ) {
         Column(Modifier.weight(1f)) {
             Text(stringResource(R.string.auths_servidor_activo), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-            Text(baseUrl, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
+            Text(baseUrl, color = MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
         }
         Box(
             Modifier
