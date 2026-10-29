@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.contaapp.android.ui.screens
 
@@ -106,7 +106,7 @@ fun LoginScreen(
         ) {
             AuthBrandMark()
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.94f)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
                 shape = RoundedCornerShape(26.dp),
                 modifier = Modifier
@@ -114,10 +114,10 @@ fun LoginScreen(
                     .widthIn(max = 460.dp)
             ) {
                 Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Text(stringResource(R.string.auths_acceso_seguro), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Black, color = Color(0xFF081320))
+                    Text(stringResource(R.string.auths_acceso_seguro), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface)
                     Text(
                         "Tu posicion financiera, movimientos y alertas en una vista privada y cacheada.",
-                        color = Color(0xFF64748B),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     AuthTrustStrip()
@@ -158,7 +158,7 @@ fun LoginScreen(
                             if (waitingForTwoFactor) twoFactorCode.length >= 6 else email.isNotBlank() && password.isNotBlank(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(50),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A884)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A884), contentColor = Color(0xFF04130F)),
                         contentPadding = PaddingValues(vertical = 15.dp)
                     ) {
                         Text(
@@ -268,10 +268,10 @@ fun ServerStatusPill(baseUrl: String) {
         Box(
             Modifier
                 .size(34.dp)
-                .background(Color(0xFFE0F2F1), RoundedCornerShape(12.dp)),
+                .background(ContaTeal.copy(alpha = 0.16f), RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(painterResource(R.drawable.ic_wifi), contentDescription = null, tint = Color(0xFF0F766E), modifier = Modifier.size(18.dp))
+            Icon(painterResource(R.drawable.ic_wifi), contentDescription = null, tint = ContaTeal, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -355,7 +355,7 @@ fun ServerDialog(
                 Text(stringResource(R.string.auths_emulador_http_10_0_2_2_4000_api), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 Text(stringResource(R.string.auths_movil_fisico_http_ip_del_pc_4000_api), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 state.serverTestMessage?.let {
-                    Text(it, color = if (it == stringResource(R.string.vm_connection_ok)) Color(0xFF0F766E) else MaterialTheme.colorScheme.error)
+                    Text(it, color = if (it == stringResource(R.string.vm_connection_ok)) ContaIncome else MaterialTheme.colorScheme.error)
                 }
             }
         },
@@ -396,7 +396,7 @@ fun LockedScreen(
         ) {
             AuthBrandMark()
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.94f)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
                 shape = RoundedCornerShape(26.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -408,13 +408,13 @@ fun LockedScreen(
                     ) {
                         Icon(painterResource(R.drawable.ic_fingerprint), contentDescription = null, tint = Color(0xFF00A884), modifier = Modifier.size(44.dp))
                     }
-                    Text(stringResource(R.string.auths_datos_protegidos), color = Color(0xFF081320), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                    Text(stringResource(R.string.auths_confirma_tu_identidad_para_abrir_el), color = Color(0xFF64748B), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.auths_datos_protegidos), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.auths_confirma_tu_identidad_para_abrir_el), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     Button(
                         onClick = onUnlock,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(50),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A884)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A884), contentColor = Color(0xFF04130F)),
                         contentPadding = PaddingValues(vertical = 15.dp)
                     ) {
                         Text(stringResource(R.string.auths_desbloquear_con_huella), fontWeight = FontWeight.Bold)

@@ -10,6 +10,12 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - Fix/UI - Login oscuro y doble spinner (v0.3.1)
+
+- Login y pantalla de desbloqueo con huella: la tarjeta, los titulos, el icono del servidor y el estado de conexion siguen el tema; antes la tarjeta era blanca fija y los campos mostraban texto claro sobre blanco en modo oscuro.
+- Inicio: se elimina el spinner a pantalla completa de `MainScaffold`, que coincidia con el indicador de `PullToRefreshBox`.
+- Verificacion: `:app:assembleDebug` y tests correctos; desbloqueo revisado en el movil en claro y oscuro y refresco de Inicio con un solo indicador. El login propiamente dicho no se ha probado (exige cerrar sesion).
+
 ## 2026-10-29 - UX/Tema - Colores semanticos (v0.3.0)
 
 - `ContaPalette` incorpora `income`, `expense`, `warning` y `debt` con variante clara y oscura; se leen con `ContaIncome`, `ContaExpense`, `ContaWarning` y `ContaDebt`.
