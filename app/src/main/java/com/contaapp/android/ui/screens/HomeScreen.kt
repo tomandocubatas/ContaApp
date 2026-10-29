@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.contaapp.android.ui.screens
 
@@ -297,9 +297,9 @@ fun HomePeriodComparisonCard(state: ContaUiState) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionHeader(stringResource(R.string.home_resumen_del_periodo), periodLabel)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                ComparisonMetric(stringResource(R.string.home_ingresos), dashboard.income, ContaTeal, state.privacyMode, Modifier.weight(1f))
-                ComparisonMetric(stringResource(R.string.home_gastos), dashboard.expense, ContaCoral, state.privacyMode, Modifier.weight(1f))
-                ComparisonMetric(stringResource(R.string.home_balance), dashboard.net, if (dashboard.net >= 0.0) ContaTeal else ContaDanger, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.home_ingresos), dashboard.income, ContaIncome, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.home_gastos), dashboard.expense, ContaExpense, state.privacyMode, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.home_balance), dashboard.net, if (dashboard.net >= 0.0) ContaIncome else ContaDanger, state.privacyMode, Modifier.weight(1f))
             }
         }
     }
@@ -308,7 +308,7 @@ fun HomePeriodComparisonCard(state: ContaUiState) {
 @Composable
 private fun CalendarEvent.toAgendaEntry(): AgendaEntry {
     val accent = when {
-        direction == "income" -> ContaTeal
+        direction == "income" -> ContaIncome
         type == "loan" || type == "financing" -> ExecutiveBlue
         type == "insurance" -> ContaAmber
         else -> ContaCoral
@@ -405,7 +405,7 @@ fun HomePeriodCombo(period: QuickRange, onPeriod: (QuickRange) -> Unit) {
 
 @Composable
 fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
-    val netColor = if (dashboard.net >= 0.0) ContaTeal else ContaDanger
+    val netColor = if (dashboard.net >= 0.0) ContaIncome else ContaDanger
     val dark = MaterialTheme.colorScheme.background.red < 0.1f && MaterialTheme.colorScheme.background.green < 0.1f
     val heroBrush = if (dark) {
         Brush.horizontalGradient(listOf(Color(0xFF0B1120), Color(0xFF10233F), Color(0xFF0F2F2A)))
@@ -434,12 +434,12 @@ fun HomeHeroDashboard(dashboard: DashboardSummary, hidden: Boolean) {
                     Text(money(dashboard.totalBalance, hidden), color = heroText, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(stringResource(R.string.home_resumen_ejecutivo_del_periodo_actual), color = heroMuted, style = MaterialTheme.typography.bodySmall)
                 }
-                StatusChip(if (dashboard.net >= 0.0) "positivo" else "atencion", if (dashboard.net >= 0.0) ContaTeal else ContaAmber)
+                StatusChip(if (dashboard.net >= 0.0) "positivo" else "atencion", if (dashboard.net >= 0.0) ContaIncome else ContaWarning)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                 LightHeroMiniMetric(stringResource(R.string.home_neto), money(dashboard.net, hidden), netColor, Modifier.weight(1f))
                 LightHeroMiniMetric(stringResource(R.string.home_revisado), percent(dashboard.reviewedPct), ExecutiveBlue, Modifier.weight(1f))
-                LightHeroMiniMetric(stringResource(R.string.home_categ), percent(dashboard.categorizedPct), ContaAmber, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.home_categ), percent(dashboard.categorizedPct), ContaWarning, Modifier.weight(1f))
             }
         }
     }
@@ -471,9 +471,9 @@ fun LightHeroMiniMetric(label: String, value: String, color: Color, modifier: Mo
 fun HomeQuickMetrics(dashboard: DashboardSummary?, hidden: Boolean, isTablet: Boolean, activeDebt: Double? = null, pendingReview: Int = 0) {
     val columns = if (isTablet) 4 else 2
     val metrics = listOf(
-        ExecutiveMetricSpec("Ingresos", money(dashboard?.income ?: 0.0, hidden), "+ actividad", R.drawable.ic_bank, ContaTeal, listOf(2.0, 3.0, 3.4, 4.0, 4.8, 5.2)),
-        ExecutiveMetricSpec("Gastos", money(dashboard?.expense ?: 0.0, hidden), "control mensual", R.drawable.ic_receipt, ContaCoral, listOf(3.0, 3.6, 3.1, 4.0, 3.8, 4.2)),
-        ExecutiveMetricSpec("Deuda", money(activeDebt?.takeIf { it > 0.0 } ?: dashboard?.totalDebts ?: 0.0, hidden), "exposicion", R.drawable.ic_credit_card, ContaAmber, listOf(5.0, 4.8, 4.6, 4.4, 4.1, 3.9)),
+        ExecutiveMetricSpec("Ingresos", money(dashboard?.income ?: 0.0, hidden), "+ actividad", R.drawable.ic_bank, ContaIncome, listOf(2.0, 3.0, 3.4, 4.0, 4.8, 5.2)),
+        ExecutiveMetricSpec("Gastos", money(dashboard?.expense ?: 0.0, hidden), "control mensual", R.drawable.ic_receipt, ContaExpense, listOf(3.0, 3.6, 3.1, 4.0, 3.8, 4.2)),
+        ExecutiveMetricSpec("Deuda", money(activeDebt?.takeIf { it > 0.0 } ?: dashboard?.totalDebts ?: 0.0, hidden), "exposicion", R.drawable.ic_credit_card, ContaDebt, listOf(5.0, 4.8, 4.6, 4.4, 4.1, 3.9)),
         ExecutiveMetricSpec(stringResource(R.string.home_pendientes), pendingReview.toString(), stringResource(R.string.home_movimientos_por_revisar), R.drawable.ic_shield, ExecutiveBlue, listOf(1.0, 2.0, 2.8, 3.4, 4.2, 5.0))
     )
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -536,14 +536,14 @@ fun FinancialPulseCard(dashboard: DashboardSummary, hidden: Boolean, modifier: M
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionHeader(stringResource(R.string.home_pulso_financiero), "periodo")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                Box(Modifier.weight(incomeProgress.toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaTeal, RoundedCornerShape(50)))
-                Box(Modifier.weight((1.0 - incomeProgress).toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaCoral, RoundedCornerShape(50)))
+                Box(Modifier.weight(incomeProgress.toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaIncome, RoundedCornerShape(50)))
+                Box(Modifier.weight((1.0 - incomeProgress).toFloat().coerceAtLeast(0.08f)).height(10.dp).background(ContaExpense, RoundedCornerShape(50)))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                PulseLine(stringResource(R.string.home_ingresos), money(dashboard.income, hidden), ContaTeal, Modifier.weight(1f))
-                PulseLine(stringResource(R.string.home_gastos), money(dashboard.expense, hidden), ContaCoral, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.home_ingresos), money(dashboard.income, hidden), ContaIncome, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.home_gastos), money(dashboard.expense, hidden), ContaExpense, Modifier.weight(1f))
             }
-            PulseLine(stringResource(R.string.home_neto_del_periodo), money(dashboard.net, hidden), if (dashboard.net >= 0.0) ContaTeal else ContaDanger)
+            PulseLine(stringResource(R.string.home_neto_del_periodo), money(dashboard.net, hidden), if (dashboard.net >= 0.0) ContaIncome else ContaDanger)
         }
     }
 }
@@ -606,7 +606,7 @@ fun HomeHealthCard(dashboard: DashboardSummary?, state: ContaUiState, modifier: 
     val score = ((dashboard?.reviewedPct ?: 0.0) * 0.45 + (dashboard?.categorizedPct ?: 0.0) * 0.35 + if (urgentDebt == 0) 20.0 else 5.0).coerceIn(0.0, 100.0)
     val color = when {
         score >= 75.0 -> ContaTeal
-        score >= 45.0 -> ContaAmber
+        score >= 45.0 -> ContaWarning
         else -> ContaDanger
     }
     Card(
@@ -642,12 +642,12 @@ fun HomeAttentionSection(state: ContaUiState, isTablet: Boolean, modifier: Modif
         SectionHeader(stringResource(R.string.home_requiere_atencion), "lectura rapida")
         if (isTablet) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaAmber, Modifier.weight(1f))
+                AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaWarning, Modifier.weight(1f))
                 AttentionCard(stringResource(R.string.home_deudas_con_aviso), urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger, Modifier.weight(1f))
                 AttentionCard(stringResource(R.string.home_seguros_proximos), upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal, Modifier.weight(1f))
             }
         } else {
-            AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaAmber)
+            AttentionCard(stringResource(R.string.home_movimientos_pendientes), pendingMovements.toString(), "Revisa clasificacion y estado", ContaWarning)
             AttentionCard(stringResource(R.string.home_deudas_con_aviso), urgentDebt.toString(), "Vencidas o proximas a pago", ContaDanger)
             AttentionCard(stringResource(R.string.home_seguros_proximos), upcomingInsurance.toString(), "Renovaciones a 30 dias", ContaTeal)
         }

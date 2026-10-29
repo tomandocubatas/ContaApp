@@ -171,7 +171,7 @@ fun CacheStatusCard(entries: List<CacheStatusUi>, onRefreshEntry: (String) -> Un
 
 @Composable
 fun CacheStatusRow(entry: CacheStatusUi, onRefresh: () -> Unit) {
-    val accent = if (entry.isFresh) ContaTeal else ContaAmber
+    val accent = if (entry.isFresh) ContaIncome else ContaWarning
     Row(
         Modifier
             .fillMaxWidth()
@@ -228,7 +228,7 @@ fun SettingsRoadmapCard(onShowAttentionNotification: () -> Unit) {
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(stringResource(R.string.settings_avisos_y_widget), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-            StatusChip(stringResource(R.string.settings_notificacion_local_de_atencion), ContaAmber)
+            StatusChip(stringResource(R.string.settings_notificacion_local_de_atencion), ContaWarning)
             StatusChip(stringResource(R.string.settings_widget_android_de_balance_y_alertas), ContaTeal)
             Text(
                 "El widget se puede anadir desde el launcher. En Android 13+ la notificacion requiere conceder permiso del sistema.",

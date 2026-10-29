@@ -95,6 +95,10 @@ val ExecutiveSky: Color @Composable @ReadOnlyComposable get() = LocalContaPalett
 val ExecutiveMint: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.mint
 val ExecutiveOrange: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.orange
 val ExecutiveBg: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.background
+val ContaIncome: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.income
+val ContaExpense: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.expense
+val ContaWarning: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.warning
+val ContaDebt: Color @Composable @ReadOnlyComposable get() = LocalContaPalette.current.debt
 
 @Composable
 fun HeroBalance(title: String, value: String, subtitle: String) {
@@ -330,8 +334,8 @@ fun MetricCard(title: String, value: String, modifier: Modifier = Modifier) {
 @Composable
 fun MovementRow(movement: Movement, hidden: Boolean, onClick: () -> Unit) {
     val accent = when {
-        movement.amount > 0 -> ContaTeal
-        movement.amount < 0 -> ContaCoral
+        movement.amount > 0 -> ContaIncome
+        movement.amount < 0 -> ContaExpense
         else -> ContaMuted
     }
     val icon = movementIcon(movement)
@@ -377,7 +381,7 @@ fun MovementDetailDialog(
     onDismiss: () -> Unit
 ) {
     val category = movementCategory(movement, categories)
-    val accent = categoryColor(category, if (movement.amount >= 0.0) ContaTeal else ContaDanger)
+    val accent = categoryColor(category, if (movement.amount >= 0.0) ContaIncome else ContaDanger)
     val accountName = movementAccountName(movement, accounts)
     val link = movementLinkLabel(movement, debts, insurances)
     AlertDialog(
@@ -410,7 +414,7 @@ fun MovementDetailDialog(
                                 Text(if (movement.amount >= 0.0) "Ingreso" else "Gasto", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                                 Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall)
                             }
-                            StatusChip(if (movement.reviewed) "Revisado" else "Pendiente", if (movement.reviewed) ContaTeal else ContaAmber)
+                            StatusChip(if (movement.reviewed) "Revisado" else "Pendiente", if (movement.reviewed) ContaIncome else ContaWarning)
                         }
                         ProgressBar(
                             progress = if (movement.amount >= 0.0) 1.0 else 0.72,
@@ -770,9 +774,9 @@ fun QualityBadges(
     modifier: Modifier = Modifier
 ) {
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (accountName.isNullOrBlank()) StatusChip(stringResource(R.string.commoncomponents_sin_cuenta), ContaAmber)
-        if (category == null && movement.categoryName.isNullOrBlank()) StatusChip(stringResource(R.string.commoncomponents_sin_categoria), ContaAmber)
-        if (!movement.reviewed) StatusChip(stringResource(R.string.commoncomponents_pendiente), ContaAmber)
+        if (accountName.isNullOrBlank()) StatusChip(stringResource(R.string.commoncomponents_sin_cuenta), ContaWarning)
+        if (category == null && movement.categoryName.isNullOrBlank()) StatusChip(stringResource(R.string.commoncomponents_sin_categoria), ContaWarning)
+        if (!movement.reviewed) StatusChip(stringResource(R.string.commoncomponents_pendiente), ContaWarning)
         if (link != null) StatusChip(stringResource(R.string.commoncomponents_vinculado), ExecutiveBlue)
         if (movement.isDuplicate) StatusChip(stringResource(R.string.commoncomponents_duplicado), ContaDanger)
     }

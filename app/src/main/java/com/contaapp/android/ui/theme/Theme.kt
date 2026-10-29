@@ -79,7 +79,11 @@ data class ContaPalette(
     val sky: Color,
     val mint: Color,
     val orange: Color,
-    val background: Color
+    val background: Color,
+    val income: Color,
+    val expense: Color,
+    val warning: Color,
+    val debt: Color
 )
 
 private val LightPalette = ContaPalette(
@@ -94,7 +98,11 @@ private val LightPalette = ContaPalette(
     sky = Color(0xFF1E88E5),
     mint = Color(0xFF22C55E),
     orange = Color(0xFFF59E0B),
-    background = Color(0xFFF1F5F9)
+    background = Color(0xFFF1F5F9),
+    income = Color(0xFF0F766E),
+    expense = Color(0xFFE0463F),
+    warning = Color(0xFFB45309),
+    debt = Color(0xFFC2410C)
 )
 
 private val DarkPalette = ContaPalette(
@@ -109,7 +117,11 @@ private val DarkPalette = ContaPalette(
     sky = Color(0xFF64B5F6),
     mint = Color(0xFF4ADE80),
     orange = Color(0xFFFBBF24),
-    background = Color(0xFF050B16)
+    background = Color(0xFF050B16),
+    income = Color(0xFF2DD4BF),
+    expense = Color(0xFFFF8A80),
+    warning = Color(0xFFFBBF24),
+    debt = Color(0xFFFB923C)
 )
 
 val LocalContaPalette = staticCompositionLocalOf { LightPalette }

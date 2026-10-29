@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.contaapp.android.ui.screens
 
@@ -261,16 +261,16 @@ fun InsuranceRenewalCalendarCard(renewals: List<com.contaapp.android.domain.Insu
             upcoming.forEach { renewal ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        Modifier.size(44.dp).background(ContaAmber.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                        Modifier.size(44.dp).background(ContaWarning.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(renewal.date.takeLast(2), color = ContaAmber, fontWeight = FontWeight.Black)
+                        Text(renewal.date.takeLast(2), color = ContaWarning, fontWeight = FontWeight.Black)
                     }
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(renewal.date.take(10), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                         Text(renewal.names.take(2).joinToString(", "), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
-                    StatusChip("${renewal.count}", ContaAmber)
+                    StatusChip("${renewal.count}", ContaWarning)
                 }
             }
         }
@@ -341,7 +341,7 @@ fun InsurancePolicyRow(policy: InsurancePolicy, hidden: Boolean, onClick: () -> 
     val urgency = insuranceUrgency(date)
     val accent = when (urgency) {
         InsuranceUrgency.Expired -> ContaDanger
-        InsuranceUrgency.Soon -> ContaAmber
+        InsuranceUrgency.Soon -> ContaWarning
         InsuranceUrgency.Future -> ContaTeal
         InsuranceUrgency.Unknown -> MaterialTheme.colorScheme.primary
     }
@@ -408,7 +408,7 @@ fun InsurancePolicyDetailDialog(policy: InsurancePolicy, hidden: Boolean, onDism
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 val accent = when (urgency) {
                     InsuranceUrgency.Expired -> ContaDanger
-                    InsuranceUrgency.Soon -> ContaAmber
+                    InsuranceUrgency.Soon -> ContaWarning
                     InsuranceUrgency.Future -> ContaTeal
                     InsuranceUrgency.Unknown -> MaterialTheme.colorScheme.primary
                 }

@@ -404,7 +404,7 @@ fun MovementGroupHeader(label: String, movements: List<Movement>, hidden: Boolea
             Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
             Text(stringResource(R.string.movements_movimientos, movements.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
         }
-        StatusChip(money(total, hidden), if (total >= 0.0) ContaTeal else ContaDanger)
+        StatusChip(money(total, hidden), if (total >= 0.0) ContaIncome else ContaDanger)
     }
 }
 
@@ -419,7 +419,7 @@ fun WalletMovementRow(
     onClick: () -> Unit
 ) {
     val category = movementCategory(movement, categories)
-    val accent = categoryColor(category, if (movement.amount >= 0.0) ContaTeal else ContaDanger)
+    val accent = categoryColor(category, if (movement.amount >= 0.0) ContaIncome else ContaDanger)
     val accountName = movementAccountName(movement, accounts)
     val link = movementLinkLabel(movement, debts, insurances)
     Card(
@@ -460,7 +460,7 @@ fun WalletMovementRow(
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(money(movement.amount, hidden), color = accent, fontWeight = FontWeight.Black)
                 if (!movement.reviewed) {
-                    StatusChip(stringResource(R.string.movements_pend), ContaAmber)
+                    StatusChip(stringResource(R.string.movements_pend), ContaWarning)
                 }
             }
         }
@@ -770,7 +770,7 @@ fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
                     Text(stringResource(R.string.movements_resultado_visible), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-                    Text(money(net, hidden), color = if (net >= 0.0) ContaTeal else ContaDanger, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                    Text(money(net, hidden), color = if (net >= 0.0) ContaIncome else ContaDanger, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                 }
                 StatusChip(stringResource(R.string.movements_mov, movements.size), ExecutiveBlue)
             }
@@ -779,18 +779,18 @@ fun MovementsInsightCard(movements: List<Movement>, hidden: Boolean) {
                     Modifier
                         .weight((income / total).toFloat().coerceAtLeast(0.08f))
                         .height(8.dp)
-                        .background(ContaTeal, RoundedCornerShape(50))
+                        .background(ContaIncome, RoundedCornerShape(50))
                 )
                 Box(
                     Modifier
                         .weight((expense / total).toFloat().coerceAtLeast(0.08f))
                         .height(8.dp)
-                        .background(ContaCoral, RoundedCornerShape(50))
+                        .background(ContaExpense, RoundedCornerShape(50))
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PulseLine(stringResource(R.string.movements_ingresos), money(income, hidden), ContaTeal, Modifier.weight(1f))
-                PulseLine(stringResource(R.string.movements_gastos), money(expense, hidden), ContaCoral, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.movements_ingresos), money(income, hidden), ContaIncome, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.movements_gastos), money(expense, hidden), ContaExpense, Modifier.weight(1f))
             }
         }
     }

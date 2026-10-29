@@ -10,6 +10,13 @@ YYYY-MM-DD - Tipo - Resumen
 - Archivos afectados si aplica.
 ```
 
+## 2026-10-29 - UX/Tema - Colores semanticos (v0.3.0)
+
+- `ContaPalette` incorpora `income`, `expense`, `warning` y `debt` con variante clara y oscura; se leen con `ContaIncome`, `ContaExpense`, `ContaWarning` y `ContaDebt`.
+- Importes y avisos de Inicio, Movimientos, Cuentas, Deuda, Seguros, Alquileres, Graficos, Agenda y Ajustes usan estos nombres en lugar de teal/coral/ambar.
+- La deuda se distingue del aviso: naranja frente a ambar. En claro, aviso y gasto se oscurecen para mejorar el contraste del texto.
+- Verificacion: `:app:assembleDebug` y tests correctos; Inicio, Movimientos y Deuda revisados en el movil en ambos temas.
+
 ## 2026-10-29 - UX/Tema - Paleta unica de colores (v0.2.0)
 
 - Las constantes de color sueltas (`ContaCoral`, `ContaTeal`, `ExecutiveBlue`...) pasan a leerse de `ContaPalette`, con variante clara y oscura servida por `ContaTheme`.

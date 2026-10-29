@@ -235,7 +235,7 @@ fun BankAccountsCard(
                         Text(stringResource(R.string.accounts_cuentas_2, accounts.size), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                     }
                 }
-                StatusChip(money(total, hidden), if (total >= 0.0) ContaTeal else ContaDanger)
+                StatusChip(money(total, hidden), if (total >= 0.0) ContaIncome else ContaDanger)
             }
             accounts.forEach { account ->
                 Row(
@@ -262,7 +262,7 @@ fun AccountBankHeader(bank: String, total: Double, hidden: Boolean) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(bank, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-        StatusChip(money(total, hidden), if (total >= 0.0) ContaTeal else ContaDanger)
+        StatusChip(money(total, hidden), if (total >= 0.0) ContaIncome else ContaDanger)
     }
 }
 
@@ -343,25 +343,25 @@ fun AccountDetailDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = if (account.balance >= 0.0) ContaTeal.copy(alpha = 0.12f) else ContaDanger.copy(alpha = 0.12f)),
+                    colors = CardDefaults.cardColors(containerColor = if (account.balance >= 0.0) ContaIncome.copy(alpha = 0.12f) else ContaDanger.copy(alpha = 0.12f)),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
                                 Text(account.bankName.ifBlank { "Banco" }, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-                                Text(money(account.balance, hidden), color = if (account.balance >= 0.0) ContaTeal else ContaDanger, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(money(account.balance, hidden), color = if (account.balance >= 0.0) ContaIncome else ContaDanger, fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             Box(
                                 Modifier.size(48.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = if (account.balance >= 0.0) ContaTeal else ContaDanger)
+                                Icon(painterResource(R.drawable.ic_bank), contentDescription = null, tint = if (account.balance >= 0.0) ContaIncome else ContaDanger)
                             }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                             StatusChip(account.currency, MaterialTheme.colorScheme.primary)
-                            StatusChip(if (account.balance >= 0.0) "Saldo positivo" else "En negativo", if (account.balance >= 0.0) ContaTeal else ContaDanger)
+                            StatusChip(if (account.balance >= 0.0) "Saldo positivo" else "En negativo", if (account.balance >= 0.0) ContaIncome else ContaDanger)
                         }
                     }
                 }
@@ -370,9 +370,9 @@ fun AccountDetailDialog(
                 if (movements.isNotEmpty()) {
                     Text(stringResource(R.string.accounts_resumen_visible), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        AccountDetailMetric(stringResource(R.string.accounts_ingresos), money(income, hidden), ContaTeal, Modifier.weight(1f))
-                        AccountDetailMetric(stringResource(R.string.accounts_gastos), money(expense, hidden), ContaCoral, Modifier.weight(1f))
-                        AccountDetailMetric(stringResource(R.string.accounts_neto), money(net, hidden), if (net >= 0.0) ContaTeal else ContaDanger, Modifier.weight(1f))
+                        AccountDetailMetric(stringResource(R.string.accounts_ingresos), money(income, hidden), ContaIncome, Modifier.weight(1f))
+                        AccountDetailMetric(stringResource(R.string.accounts_gastos), money(expense, hidden), ContaExpense, Modifier.weight(1f))
+                        AccountDetailMetric(stringResource(R.string.accounts_neto), money(net, hidden), if (net >= 0.0) ContaIncome else ContaDanger, Modifier.weight(1f))
                     }
                     Text(stringResource(R.string.accounts_actividad_reciente), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                     movements.sortedByDescending { it.date }.take(4).forEach { movement ->
@@ -389,7 +389,7 @@ fun AccountDetailDialog(
 
 @Composable
 fun AccountMovementMiniRow(movement: com.contaapp.android.domain.Movement, hidden: Boolean) {
-    val accent = if (movement.amount >= 0.0) ContaTeal else ContaDanger
+    val accent = if (movement.amount >= 0.0) ContaIncome else ContaDanger
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(30.dp).background(accent.copy(alpha = 0.12f), RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
             Icon(painterResource(movementIcon(movement)), contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))

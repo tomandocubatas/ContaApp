@@ -188,9 +188,9 @@ fun AgendaSummary(calendar: CalendarMonth, hidden: Boolean) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             SectionHeader(stringResource(R.string.agenda_resumen_mensual), "$events eventos")
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                ComparisonMetric(stringResource(R.string.agenda_ingresos), income, ContaTeal, hidden, Modifier.weight(1f))
-                ComparisonMetric(stringResource(R.string.agenda_gastos), expense, ContaCoral, hidden, Modifier.weight(1f))
-                ComparisonMetric(stringResource(R.string.agenda_previstos), pending.toDouble(), ContaAmber, false, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.agenda_ingresos), income, ContaIncome, hidden, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.agenda_gastos), expense, ContaExpense, hidden, Modifier.weight(1f))
+                ComparisonMetric(stringResource(R.string.agenda_previstos), pending.toDouble(), ContaWarning, false, Modifier.weight(1f))
             }
         }
     }
@@ -241,7 +241,7 @@ fun AgendaDayCell(cell: AgendaCell, selected: Boolean, onClick: () -> Unit, modi
     val hasEvents = day?.events?.isNotEmpty() == true
     val accent = when {
         day == null -> Color.Transparent
-        day.totalIncome > day.totalExpense -> ContaTeal
+        day.totalIncome > day.totalExpense -> ContaIncome
         hasEvents -> ContaCoral
         else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.18f)
     }
@@ -292,7 +292,7 @@ fun AgendaEventRow(event: CalendarEvent, hidden: Boolean, onClick: () -> Unit) {
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(money(event.signedAmount(), hidden), color = accent, fontWeight = FontWeight.Black, maxLines = 1)
-                StatusChip(if (event.confirmed) "Confirmado" else "Previsto", if (event.confirmed) ContaTeal else ContaAmber)
+                StatusChip(if (event.confirmed) "Confirmado" else "Previsto", if (event.confirmed) ContaIncome else ContaWarning)
             }
         }
     }
@@ -368,7 +368,7 @@ private fun CalendarEvent.typeLabel(): String {
 @Composable
 private fun eventAccent(event: CalendarEvent): Color {
     return when {
-        event.direction == "income" -> ContaTeal
+        event.direction == "income" -> ContaIncome
         event.type == "loan" || event.type == "financing" -> ExecutiveBlue
         event.type == "insurance" -> ContaAmber
         else -> ContaCoral

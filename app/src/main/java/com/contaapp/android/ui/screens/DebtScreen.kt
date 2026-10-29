@@ -223,7 +223,7 @@ fun DebtCalendarCard(debts: List<DebtDetail>, hidden: Boolean) {
         title = stringResource(R.string.debt_pagos_proximos_30_dias),
         value = money(total, hidden),
         detail = "${next30.size} cuotas previstas o vencidas",
-        color = if (next30.any { (it.daysUntilPayment ?: 99) < 0 }) ContaDanger else ContaAmber
+        color = if (next30.any { (it.daysUntilPayment ?: 99) < 0 }) ContaDanger else ContaWarning
     )
 }
 
@@ -240,7 +240,7 @@ fun DebtNextPaymentCard(debts: List<DebtDetail>, hidden: Boolean) {
             detail = "${next.entity} - ${nextPaymentText(next)}",
             color = when (next.status.lowercase()) {
                 "overdue" -> ContaDanger
-                "warning" -> ContaAmber
+                "warning" -> ContaWarning
                 else -> ContaTeal
             }
         )
@@ -269,10 +269,10 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
                 }
                 pendingShare?.let { StatusChip("${(it * 100).toInt()}%", ContaDanger) }
             }
-            pendingShare?.let { ProgressBar(progress = it, color = ContaCoral) }
+            pendingShare?.let { ProgressBar(progress = it, color = ContaDebt) }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 LightHeroMiniMetric(stringResource(R.string.debt_pagado), paid?.let { money(it, hidden) } ?: NO_DATA, ContaTeal, Modifier.weight(1f))
-                LightHeroMiniMetric(stringResource(R.string.debt_intereses), interest?.let { money(it, hidden) } ?: NO_DATA, ContaAmber, Modifier.weight(1f))
+                LightHeroMiniMetric(stringResource(R.string.debt_intereses), interest?.let { money(it, hidden) } ?: NO_DATA, ContaDebt, Modifier.weight(1f))
             }
         }
     }
@@ -282,7 +282,7 @@ fun DebtHeroCard(debts: List<DebtSummary>, hidden: Boolean) {
 fun DebtDetailRow(debt: DebtDetail, hidden: Boolean, onClick: () -> Unit) {
     val statusColor = when (debt.status.lowercase()) {
         "overdue" -> ContaDanger
-        "warning" -> ContaAmber
+        "warning" -> ContaWarning
         else -> ContaTeal
     }
 
@@ -329,7 +329,7 @@ fun DebtDetailDialog(
     val monthlyRatio = debt.monthlyPayment / (debt.pendingAmount.takeIf { it > 0.0 } ?: 1.0)
     val statusColor = when {
         debt.status.equals("overdue", true) -> ContaDanger
-        debt.status.equals("warning", true) -> ContaAmber
+        debt.status.equals("warning", true) -> ContaWarning
         else -> ContaTeal
     }
     AlertDialog(

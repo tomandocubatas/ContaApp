@@ -172,7 +172,7 @@ fun RentalHeroCard(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(stringResource(R.string.rentals_rentabilidad_neta), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
-                    Text(money(profit, hidden), color = if (profit >= 0.0) ContaTeal else ContaDanger, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                    Text(money(profit, hidden), color = if (profit >= 0.0) ContaIncome else ContaDanger, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                     Text(stringResource(R.string.rentals_de_margen_propiedades_activas, percent(profitability), activeProperties), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
                 Box(
@@ -183,12 +183,12 @@ fun RentalHeroCard(
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                PulseLine(stringResource(R.string.rentals_ingresos), money(income, hidden), ContaTeal, Modifier.weight(1f))
-                PulseLine(stringResource(R.string.rentals_gastos), money(expense, hidden), ContaCoral, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.rentals_ingresos), money(income, hidden), ContaIncome, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.rentals_gastos), money(expense, hidden), ContaExpense, Modifier.weight(1f))
             }
             ProgressBar(
                 progress = income.takeIf { it > 0.0 }?.let { (profit / it).coerceIn(0.0, 1.0) } ?: 0.0,
-                color = if (profit >= 0.0) ContaTeal else ContaDanger
+                color = if (profit >= 0.0) ContaIncome else ContaDanger
             )
         }
     }
@@ -196,7 +196,7 @@ fun RentalHeroCard(
 
 @Composable
 fun RentalPropertyRow(property: RentalProperty, hidden: Boolean, onClick: () -> Unit) {
-    val accent = if (property.profit >= 0.0) ContaTeal else ContaDanger
+    val accent = if (property.profit >= 0.0) ContaIncome else ContaDanger
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
@@ -239,7 +239,7 @@ fun RentalPropertyDetailDialog(
     hidden: Boolean,
     onDismiss: () -> Unit
 ) {
-    val accent = if (property.profit >= 0.0) ContaTeal else ContaDanger
+    val accent = if (property.profit >= 0.0) ContaIncome else ContaDanger
     val activeMonths = months.filter { it.income > 0.0 || it.expense > 0.0 }
     val bestMonth = activeMonths.maxByOrNull { it.profit }
     val worstMonth = activeMonths.minByOrNull { it.profit }
@@ -270,8 +270,8 @@ fun RentalPropertyDetailDialog(
                             StatusChip(percent(property.profitability), accent)
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                            LightHeroMiniMetric(stringResource(R.string.rentals_ingresos), money(property.income, hidden), ContaTeal, Modifier.weight(1f))
-                            LightHeroMiniMetric(stringResource(R.string.rentals_gastos), money(property.expense, hidden), ContaCoral, Modifier.weight(1f))
+                            LightHeroMiniMetric(stringResource(R.string.rentals_ingresos), money(property.income, hidden), ContaIncome, Modifier.weight(1f))
+                            LightHeroMiniMetric(stringResource(R.string.rentals_gastos), money(property.expense, hidden), ContaExpense, Modifier.weight(1f))
                         }
                         ProgressBar(progress = property.income.takeIf { it > 0.0 }?.let { (property.profit / it).coerceIn(0.0, 1.0) } ?: 0.0, color = accent)
                     }
@@ -299,7 +299,7 @@ fun RentalPropertyDetailDialog(
                             Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text(month.monthName, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-                                    Text(money(month.profit, hidden), color = if (month.profit >= 0.0) ContaTeal else ContaDanger, fontWeight = FontWeight.Black)
+                                    Text(money(month.profit, hidden), color = if (month.profit >= 0.0) ContaIncome else ContaDanger, fontWeight = FontWeight.Black)
                                 }
                                 Text(
                                     "Ingresos ${money(month.income, hidden)} · gastos ${money(month.expense, hidden)}",
@@ -309,7 +309,7 @@ fun RentalPropertyDetailDialog(
                                 month.categories.take(3).forEach { category ->
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                         Text(category.categoryName, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                                        Text(money(category.total, hidden), color = ContaCoral, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                        Text(money(category.total, hidden), color = ContaExpense, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -344,7 +344,7 @@ fun RentalMonthsCard(months: List<com.contaapp.android.domain.RentalMonth>, hidd
 
 @Composable
 fun RentalMonthRow(month: com.contaapp.android.domain.RentalMonth, hidden: Boolean) {
-    val accent = if (month.profit >= 0.0) ContaTeal else ContaDanger
+    val accent = if (month.profit >= 0.0) ContaIncome else ContaDanger
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
@@ -371,7 +371,7 @@ fun RentalMonthRow(month: com.contaapp.android.domain.RentalMonth, hidden: Boole
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
-                Text(money(category.total, hidden), color = ContaCoral, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                Text(money(category.total, hidden), color = ContaExpense, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
             }
         }
     }

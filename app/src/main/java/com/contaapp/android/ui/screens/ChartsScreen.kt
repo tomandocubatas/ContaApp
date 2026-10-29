@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.contaapp.android.ui.screens
 
@@ -142,13 +142,13 @@ fun ChartsScreen(state: ContaUiState, onChartFiltersChanged: (MovementFilters) -
                     item {
                         if (isTablet) {
                             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                                CategoryRankingCard(stringResource(R.string.charts_top_gastos), dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaCoral, Modifier.weight(1f))
-                                CategoryRankingCard(stringResource(R.string.charts_top_ingresos), dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaTeal, Modifier.weight(1f))
+                                CategoryRankingCard(stringResource(R.string.charts_top_gastos), dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaExpense, Modifier.weight(1f))
+                                CategoryRankingCard(stringResource(R.string.charts_top_ingresos), dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaIncome, Modifier.weight(1f))
                             }
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                CategoryRankingCard(stringResource(R.string.charts_top_gastos), dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaCoral)
-                                CategoryRankingCard(stringResource(R.string.charts_top_ingresos), dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaTeal)
+                                CategoryRankingCard(stringResource(R.string.charts_top_gastos), dashboard?.expenseCategories.orEmpty(), state.privacyMode, ContaExpense)
+                                CategoryRankingCard(stringResource(R.string.charts_top_ingresos), dashboard?.incomeCategories.orEmpty(), state.privacyMode, ContaIncome)
                             }
                         }
                     }
@@ -246,7 +246,7 @@ fun DebtSnapshotChartCard(state: ContaUiState) {
                         Text(debt.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text("${debt.source} · ${debt.entity}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
-                    Text(money(debt.pendingAmount, state.privacyMode), color = ContaAmber, fontWeight = FontWeight.Bold)
+                    Text(money(debt.pendingAmount, state.privacyMode), color = ContaDebt, fontWeight = FontWeight.Bold)
                 }
             }
             EmptyHint(visibleDebt.isEmpty(), "No hay detalle de deuda activa disponible.")
@@ -270,7 +270,7 @@ fun RentalsSnapshotChartCard(state: ContaUiState) {
                         Text(property.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(stringResource(R.string.charts_margen, percent(property.profitability)), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
-                    Text(money(property.profit, state.privacyMode), color = if (property.profit >= 0.0) ContaTeal else ContaDanger, fontWeight = FontWeight.Bold)
+                    Text(money(property.profit, state.privacyMode), color = if (property.profit >= 0.0) ContaIncome else ContaDanger, fontWeight = FontWeight.Bold)
                 }
             }
             EmptyHint(state.rentalProperties.isEmpty(), "No hay propiedades con actividad en el periodo.")
@@ -299,8 +299,8 @@ fun FinancialEvolutionDashboardCard(
                 style = MaterialTheme.typography.labelMedium
             )
             InlineChartPanel(stringResource(R.string.charts_neto), "Balance del periodo", financial.net, financial.labels, MaterialTheme.colorScheme.primary, hidden = hidden)
-            InlineChartPanel(stringResource(R.string.charts_ingresos), "Serie ${chartMode.label.lowercase()}", financial.income, financial.labels, ContaTeal, hidden = hidden)
-            InlineChartPanel(stringResource(R.string.charts_gastos), "Serie ${chartMode.label.lowercase()}", financial.expense, financial.labels, ContaCoral, hidden = hidden)
+            InlineChartPanel(stringResource(R.string.charts_ingresos), "Serie ${chartMode.label.lowercase()}", financial.income, financial.labels, ContaIncome, hidden = hidden)
+            InlineChartPanel(stringResource(R.string.charts_gastos), "Serie ${chartMode.label.lowercase()}", financial.expense, financial.labels, ContaExpense, hidden = hidden)
         }
     }
 }
@@ -320,17 +320,17 @@ fun QuickDistributionDashboardCard(dashboard: com.contaapp.android.domain.Dashbo
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             ChartCardHeader(stringResource(R.string.charts_distribucion_rapida), "Resumen de ingresos y gastos")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                Box(Modifier.weight((income / total).toFloat().coerceAtLeast(0.08f)).background(ContaTeal, RoundedCornerShape(50)).size(height = 10.dp, width = 1.dp))
-                Box(Modifier.weight((expense / total).toFloat().coerceAtLeast(0.08f)).background(ContaCoral, RoundedCornerShape(50)).size(height = 10.dp, width = 1.dp))
+                Box(Modifier.weight((income / total).toFloat().coerceAtLeast(0.08f)).background(ContaIncome, RoundedCornerShape(50)).size(height = 10.dp, width = 1.dp))
+                Box(Modifier.weight((expense / total).toFloat().coerceAtLeast(0.08f)).background(ContaExpense, RoundedCornerShape(50)).size(height = 10.dp, width = 1.dp))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                PulseLine(stringResource(R.string.charts_ingresos), money(income, hidden), ContaTeal, Modifier.weight(1f))
-                PulseLine(stringResource(R.string.charts_gastos), money(expense, hidden), ContaCoral, Modifier.weight(1f))
-                PulseLine(stringResource(R.string.charts_balance), money(net, hidden), if (net >= 0.0) ContaTeal else ContaDanger, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.charts_ingresos), money(income, hidden), ContaIncome, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.charts_gastos), money(expense, hidden), ContaExpense, Modifier.weight(1f))
+                PulseLine(stringResource(R.string.charts_balance), money(net, hidden), if (net >= 0.0) ContaIncome else ContaDanger, Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                StatusChip(stringResource(R.string.charts_cat_gasto, dashboard?.expenseCategories?.size ?: 0), ContaCoral, Modifier.weight(1f))
-                StatusChip(stringResource(R.string.charts_cat_ingreso, dashboard?.incomeCategories?.size ?: 0), ContaTeal, Modifier.weight(1f))
+                StatusChip(stringResource(R.string.charts_cat_gasto, dashboard?.expenseCategories?.size ?: 0), ContaExpense, Modifier.weight(1f))
+                StatusChip(stringResource(R.string.charts_cat_ingreso, dashboard?.incomeCategories?.size ?: 0), ContaIncome, Modifier.weight(1f))
             }
         }
     }
@@ -340,7 +340,7 @@ fun QuickDistributionDashboardCard(dashboard: com.contaapp.android.domain.Dashbo
 fun CategoryPeriodDashboardCard(expenses: List<CategoryBreakdown>, income: List<CategoryBreakdown>, hidden: Boolean) {
     var type by remember { mutableStateOf("expense") }
     val categories = if (type == "expense") expenses else income
-    val accent = if (type == "expense") ContaCoral else ContaTeal
+    val accent = if (type == "expense") ContaExpense else ContaIncome
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
@@ -385,7 +385,7 @@ fun HistoricalCategoriesDashboardCard(
 ) {
     var type by remember { mutableStateOf("expense") }
     val points = if (type == "expense") expenseValues else incomeValues
-    val accent = if (type == "expense") ContaCoral else ContaTeal
+    val accent = if (type == "expense") ContaExpense else ContaIncome
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
